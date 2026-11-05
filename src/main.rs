@@ -22,7 +22,7 @@ fn main() -> eframe::Result<()> {
     let initial_size = if initial_config.compact_mode {
         vec2(280.0, 95.0)
     } else {
-        vec2(620.0, 310.0)
+        vec2(630.0, 330.0) // Espacio holgado abajo para que el botón jamás se corte
     };
 
     let mut native_options = NativeOptions::default();

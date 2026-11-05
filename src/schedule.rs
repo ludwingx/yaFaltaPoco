@@ -25,13 +25,13 @@ impl ColorRgb {
 }
 
 pub const DEFAULT_COLORS: [(&str, ColorRgb); 8] = [
-    ("Azul", ColorRgb::new(37, 99, 235)),
+    ("Azul Océano", ColorRgb::new(37, 99, 235)),
+    ("Cian Eléctrico", ColorRgb::new(34, 211, 238)),
+    ("Azul Cobalto", ColorRgb::new(29, 78, 216)),
+    ("Azul Cielo", ColorRgb::new(56, 189, 248)),
     ("Ámbar", ColorRgb::new(245, 158, 11)),
-    ("Violeta", ColorRgb::new(147, 51, 234)),
-    ("Cian", ColorRgb::new(34, 211, 238)),
     ("Verde", ColorRgb::new(16, 185, 129)),
-    ("Rosa", ColorRgb::new(236, 72, 153)),
-    ("Rojo", ColorRgb::new(239, 68, 68)),
+    ("Violeta", ColorRgb::new(147, 51, 234)),
     ("Gris", ColorRgb::new(100, 116, 139)),
 ];
 
@@ -196,7 +196,7 @@ pub fn default_sample_blocks() -> Vec<TimeBlock> {
     vec![
         TimeBlock::new("block-1", "OtherBrain I", 8, 0, 12, 0, ColorRgb::new(37, 99, 235)), // Azul
         TimeBlock::new("block-2", "Almuerzo", 12, 0, 13, 0, ColorRgb::new(245, 158, 11)),   // Ámbar
-        TimeBlock::new("block-3", "OtherBrain II", 13, 0, 20, 0, ColorRgb::new(147, 51, 234)), // Violeta
+        TimeBlock::new("block-3", "OtherBrain II", 13, 0, 20, 0, ColorRgb::new(37, 99, 235)), // Azul (concorde con el degradado azul)
     ]
 }
 

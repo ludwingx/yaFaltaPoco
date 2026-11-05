@@ -11,9 +11,9 @@ pub struct ColorRgb {
 impl Default for ColorRgb {
     fn default() -> Self {
         Self {
-            r: 34,
-            g: 211,
-            b: 238,
+            r: 37,
+            g: 99,
+            b: 235,
         }
     }
 }
@@ -25,14 +25,14 @@ impl ColorRgb {
 }
 
 pub const DEFAULT_COLORS: [(&str, ColorRgb); 8] = [
-    ("Azul Océano", ColorRgb::new(37, 99, 235)),
-    ("Ámbar / Naranja", ColorRgb::new(245, 158, 11)),
-    ("Violeta Intenso", ColorRgb::new(147, 51, 234)),
-    ("Cian Neón", ColorRgb::new(34, 211, 238)),
-    ("Verde Esmeralda", ColorRgb::new(16, 185, 129)),
-    ("Rosa Fucsia", ColorRgb::new(236, 72, 153)),
-    ("Rojo Coral", ColorRgb::new(239, 68, 68)),
-    ("Gris Pizarra", ColorRgb::new(100, 116, 139)),
+    ("Azul", ColorRgb::new(37, 99, 235)),
+    ("Ámbar", ColorRgb::new(245, 158, 11)),
+    ("Violeta", ColorRgb::new(147, 51, 234)),
+    ("Cian", ColorRgb::new(34, 211, 238)),
+    ("Verde", ColorRgb::new(16, 185, 129)),
+    ("Rosa", ColorRgb::new(236, 72, 153)),
+    ("Rojo", ColorRgb::new(239, 68, 68)),
+    ("Gris", ColorRgb::new(100, 116, 139)),
 ];
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -188,18 +188,15 @@ pub enum ScheduleStatus<'a> {
         next_block: &'a TimeBlock,
         starts_in_secs: i64,
     },
-    DayFinished {
-        next_block_tomorrow: Option<&'a TimeBlock>,
-        starts_in_secs: Option<i64>,
-    },
+    DayFinished,
     Empty,
 }
 
 pub fn default_sample_blocks() -> Vec<TimeBlock> {
     vec![
-        TimeBlock::new("turn-1", "OtherBrain I", 8, 0, 12, 0, ColorRgb::new(37, 99, 235)), // 08:00 a 12:00
-        TimeBlock::new("turn-2", "Almuerzo", 12, 0, 13, 0, ColorRgb::new(245, 158, 11)),   // 12:00 a 13:00
-        TimeBlock::new("turn-3", "OtherBrain II", 13, 0, 20, 0, ColorRgb::new(147, 51, 234)), // 13:00 a 20:00
+        TimeBlock::new("block-1", "OtherBrain I", 8, 0, 12, 0, ColorRgb::new(37, 99, 235)), // Azul
+        TimeBlock::new("block-2", "Almuerzo", 12, 0, 13, 0, ColorRgb::new(245, 158, 11)),   // Ámbar
+        TimeBlock::new("block-3", "OtherBrain II", 13, 0, 20, 0, ColorRgb::new(147, 51, 234)), // Violeta
     ]
 }
 
@@ -209,9 +206,8 @@ pub fn evaluate_schedule<'a>(blocks: &'a [TimeBlock], now: NaiveDateTime) -> Sch
     }
 
     let today = now.date();
-    let tomorrow = today.succ_opt().unwrap_or(today);
 
-    // 1. Activo ahora
+    // 1. Bloque activo ahora
     for block in blocks {
         if block.is_active_at(now) {
             let yesterday = today.pred_opt().unwrap_or(today);
@@ -234,7 +230,7 @@ pub fn evaluate_schedule<'a>(blocks: &'a [TimeBlock], now: NaiveDateTime) -> Sch
         }
     }
 
-    // 2. Siguiente hoy
+    // 2. Siguiente bloque hoy
     let mut upcoming_today: Vec<(&TimeBlock, i64)> = Vec::new();
     for block in blocks {
         if block.days.matches(today.weekday()) {
@@ -255,31 +251,7 @@ pub fn evaluate_schedule<'a>(blocks: &'a [TimeBlock], now: NaiveDateTime) -> Sch
         };
     }
 
-    // 3. Pasaron los de hoy -> mañana
-    let mut upcoming_tomorrow: Vec<(&TimeBlock, i64)> = Vec::new();
-    for block in blocks {
-        if block.days.matches(tomorrow.weekday()) {
-            let (start, _) = block.interval_for_date(tomorrow);
-            let diff = (start - now).num_seconds();
-            if diff > 0 {
-                upcoming_tomorrow.push((block, diff));
-            }
-        }
-    }
-
-    if !upcoming_tomorrow.is_empty() {
-        upcoming_tomorrow.sort_by_key(|&(_, diff)| diff);
-        let (first_tomorrow, starts_in) = upcoming_tomorrow[0];
-        ScheduleStatus::DayFinished {
-            next_block_tomorrow: Some(first_tomorrow),
-            starts_in_secs: Some(starts_in),
-        }
-    } else {
-        ScheduleStatus::DayFinished {
-            next_block_tomorrow: None,
-            starts_in_secs: None,
-        }
-    }
+    ScheduleStatus::DayFinished
 }
 
 pub fn format_duration_hms(secs: i64) -> String {

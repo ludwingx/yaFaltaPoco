@@ -1,6 +1,7 @@
 use chrono::{Datelike, Local, Timelike};
 use egui::{
-    vec2, Align, Color32, Layout, Rounding, ScrollArea, Stroke, Ui, ViewportCommand,
+    pos2, vec2, Align, Align2, Color32, FontId, Layout, Rounding, ScrollArea, Stroke, Ui,
+    ViewportCommand,
 };
 
 use crate::alarm::AlarmManager;
@@ -10,11 +11,9 @@ use crate::schedule::{
     evaluate_schedule, format_duration_hms, ColorRgb, ScheduleStatus, TimeBlock, WeekdayFilter,
     DEFAULT_COLORS,
 };
-use crate::theme::{
-    BORDER_COLOR, NEON_AMBER, NEON_CYAN, NEON_PURPLE, PURE_BLACK, SURFACE_DARK, TEXT_MUTED,
-};
+use crate::theme::{BG_WIDGET, BORDER_WIDGET, GLOW_BLUE, TEXT_GRAY};
 use crate::tray::{SystemTray, ID_ALWAYS_ON_TOP, ID_PASSTHROUGH, ID_QUIT, ID_TOGGLE_SHOW};
-use crate::widgets::{draw_header_add_button, draw_monochrome_turn_item, draw_oled_timer_card};
+use crate::widgets::{draw_card_with_gradient, draw_event_row, draw_floating_plus};
 
 #[derive(Default)]
 struct BlockEditorState {
@@ -36,7 +35,6 @@ pub struct YaFaltaPocoApp {
     hotkey: Option<HotkeyManager>,
     editor: BlockEditorState,
     window_visible: bool,
-    runtime_ticks: u64, // Contador de ticks para telemetría de automejora recursiva
 }
 
 impl YaFaltaPocoApp {
@@ -46,10 +44,10 @@ impl YaFaltaPocoApp {
         let tray = SystemTray::new().ok();
         let hotkey = HotkeyManager::new().ok();
 
-        // Estética monocromática / OLED
+        // Visuales idénticos a la interfaz de referencia
         let mut visuals = egui::Visuals::dark();
-        visuals.window_rounding = Rounding::ZERO;
-        visuals.panel_fill = PURE_BLACK;
+        visuals.window_rounding = Rounding::same(24.0);
+        visuals.panel_fill = BG_WIDGET;
         cc.egui_ctx.set_visuals(visuals);
 
         let app = Self {
@@ -59,7 +57,6 @@ impl YaFaltaPocoApp {
             hotkey,
             editor: BlockEditorState::default(),
             window_visible: true,
-            runtime_ticks: 0,
         };
 
         app.apply_window_settings(&cc.egui_ctx);
@@ -87,12 +84,10 @@ impl YaFaltaPocoApp {
 
 impl eframe::App for YaFaltaPocoApp {
     fn clear_color(&self, _visuals: &egui::Visuals) -> [f32; 4] {
-        [0.0, 0.0, 0.0, 0.0] // Transparencia total en el lienzo de la ventana
+        [0.0, 0.0, 0.0, 0.0] // Transparencia total en el lienzo de fondo
     }
 
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        self.runtime_ticks += 1;
-
         if let Some(hk) = &self.hotkey {
             if hk.poll_toggle() {
                 self.toggle_visibility(ctx);
@@ -122,26 +117,26 @@ impl eframe::App for YaFaltaPocoApp {
             }
         }
 
-        // Marco Negro Puro OLED con bordes rectos
+        // Marco del widget con esquinas redondeadas (24px) como en la referencia
         let widget_frame = egui::Frame {
-            inner_margin: egui::Margin::same(14.0),
+            inner_margin: egui::Margin::same(16.0),
             outer_margin: egui::Margin::ZERO,
-            rounding: Rounding::ZERO,
+            rounding: Rounding::same(24.0),
             shadow: egui::epaint::Shadow {
-                offset: [0.0, 4.0].into(),
-                blur: 16.0,
+                offset: [0.0, 8.0].into(),
+                blur: 24.0,
                 spread: 0.0,
-                color: Color32::from_black_alpha(200),
+                color: Color32::from_black_alpha(150),
             },
-            fill: PURE_BLACK,
-            stroke: Stroke::new(1.0, BORDER_COLOR),
+            fill: BG_WIDGET,
+            stroke: Stroke::new(1.0, BORDER_WIDGET),
         };
 
         egui::CentralPanel::default()
             .frame(widget_frame)
             .show(ctx, |ui| {
-                // Arrastrar la ventana desde cualquier espacio libre del fondo
-                let bg_drag = ui.interact(ui.max_rect(), ui.id().with("drag_bg"), egui::Sense::drag());
+                // Arrastrar la ventana desde cualquier espacio libre del widget
+                let bg_drag = ui.interact(ui.max_rect(), ui.id().with("drag_window"), egui::Sense::drag());
                 if bg_drag.dragged() {
                     ctx.send_viewport_cmd(ViewportCommand::StartDrag);
                 }
@@ -149,41 +144,32 @@ impl eframe::App for YaFaltaPocoApp {
                 self.render_ui(ui, ctx);
             });
 
+        // Repintar cada segundo para actualizar reloj y temporizador
         ctx.request_repaint_after(std::time::Duration::from_secs(1));
     }
 }
 
 impl YaFaltaPocoApp {
     fn render_ui(&mut self, ui: &mut Ui, ctx: &egui::Context) {
-        // Cabecera minimalista y funcional
+        // Barra superior discreta
         ui.horizontal(|ui| {
             ui.label(
                 egui::RichText::new("YA FALTA POCO")
-                    .color(Color32::from_rgb(140, 140, 140))
+                    .color(Color32::from_rgb(110, 125, 150))
                     .size(11.0)
-                    .monospace(),
+                    .strong(),
             );
 
-            // Botón "+ NUEVO" perfectamente ubicado en la cabecera
-            if draw_header_add_button(ui).clicked() {
-                self.open_editor_new();
-            }
-
             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                // Cerrar
-                if ui
-                    .add(egui::Button::new(egui::RichText::new("✕").color(Color32::from_rgb(160, 160, 160))).frame(false))
-                    .clicked()
-                {
+                if ui.add(egui::Button::new("✕").frame(false)).clicked() {
                     let _ = self.config.save();
                     ctx.send_viewport_cmd(ViewportCommand::Close);
                 }
 
-                // Pin Always on top
-                let pin_text = if self.config.always_on_top { "PIN: ON" } else { "PIN: OFF" };
-                let pin_col = if self.config.always_on_top { NEON_CYAN } else { TEXT_MUTED };
+                let pin_text = if self.config.always_on_top { "📌 Fijado" } else { "📌 Desfijado" };
+                let pin_col = if self.config.always_on_top { Color32::from_rgb(56, 189, 248) } else { TEXT_GRAY };
                 if ui
-                    .add(egui::Button::new(egui::RichText::new(pin_text).color(pin_col).monospace().size(11.0)).frame(false))
+                    .add(egui::Button::new(egui::RichText::new(pin_text).color(pin_col).size(11.0)).frame(false))
                     .clicked()
                 {
                     self.config.always_on_top = !self.config.always_on_top;
@@ -191,13 +177,12 @@ impl YaFaltaPocoApp {
                     let _ = self.config.save();
                 }
 
-                // Modo
                 let mode_lbl = match self.config.mode {
-                    AppMode::Schedule => "MODO: TURNOS",
-                    AppMode::SimpleTimer => "MODO: LIBRE",
+                    AppMode::Schedule => "Horario",
+                    AppMode::SimpleTimer => "Temporizador",
                 };
                 if ui
-                    .add(egui::Button::new(egui::RichText::new(mode_lbl).color(Color32::WHITE).monospace().size(11.0)).frame(false))
+                    .add(egui::Button::new(egui::RichText::new(mode_lbl).color(Color32::WHITE).size(11.0)).frame(false))
                     .clicked()
                 {
                     self.config.mode = match self.config.mode {
@@ -219,89 +204,95 @@ impl YaFaltaPocoApp {
         let now_local = Local::now();
         let now_dt = now_local.naive_local();
 
-        let month_str = match now_local.month() {
-            1 => "ENE", 2 => "FEB", 3 => "MAR", 4 => "ABR",
-            5 => "MAY", 6 => "JUN", 7 => "JUL", 8 => "AGO",
-            9 => "SEP", 10 => "OCT", 11 => "NOV", _ => "DIC",
+        let month_name = match now_local.month() {
+            1 => "Ene", 2 => "Feb", 3 => "Mar", 4 => "Abr",
+            5 => "May", 6 => "Jun", 7 => "Jul", 8 => "Ago",
+            9 => "Sep", 10 => "Oct", 11 => "Nov", _ => "Dic",
         };
         let weekday_str = match now_local.weekday() {
-            chrono::Weekday::Mon => "LUNES",
-            chrono::Weekday::Tue => "MARTES",
-            chrono::Weekday::Wed => "MIÉRCOLES",
-            chrono::Weekday::Thu => "JUEVES",
-            chrono::Weekday::Fri => "VIERNES",
-            chrono::Weekday::Sat => "SÁBADO",
-            chrono::Weekday::Sun => "DOMINGO",
+            chrono::Weekday::Mon => "Lunes",
+            chrono::Weekday::Tue => "Martes",
+            chrono::Weekday::Wed => "Miércoles",
+            chrono::Weekday::Thu => "Jueves",
+            chrono::Weekday::Fri => "Viernes",
+            chrono::Weekday::Sat => "Sábado",
+            chrono::Weekday::Sun => "Domingo",
         };
 
-        let date_text = format!("{}, {:02} {}", weekday_str, now_local.day(), month_str);
-        let time_str = format!(
+        let date_title = format!("{} {:02}", month_name, now_local.day());
+        let current_time_str = format!(
             "{:02}:{:02}:{:02}",
             now_local.hour(),
             now_local.minute(),
             now_local.second()
         );
 
-        // Estado del loop de automejora / optimización recursiva
-        let recursion_info = format!("RECURSION: TICK #{} [OPT: 0 Desfase]", self.runtime_ticks);
+        let today_blocks_count = self
+            .config
+            .blocks
+            .iter()
+            .filter(|b| b.days.matches(now_local.weekday()))
+            .count();
+        let events_count_str = format!("{} bloques", today_blocks_count);
 
         ui.horizontal(|ui| {
             // ===============================================
-            // 1. TARJETA OLED IZQUIERDA: DÍGITOS NEÓN
+            // 1. TARJETA IZQUIERDA (DISEÑO EXACTO A LA FOTO)
             // ===============================================
-            let card_size = vec2(225.0, 220.0);
-            let (card_rect, card_resp) = ui.allocate_exact_size(card_size, egui::Sense::hover());
-            let _ = card_resp;
+            let card_size = vec2(215.0, 215.0);
+            let (card_rect, card_resp) = ui.allocate_exact_size(card_size, egui::Sense::click());
+            if card_resp.clicked() {
+                self.config.mode = match self.config.mode {
+                    AppMode::Schedule => AppMode::SimpleTimer,
+                    AppMode::SimpleTimer => AppMode::Schedule,
+                };
+                let _ = self.config.save();
+            }
 
             match self.config.mode {
                 AppMode::Schedule => {
                     let status = evaluate_schedule(&self.config.blocks, now_dt);
-                    let (countdown_str, label, neon_col, progress) = match status {
-                        ScheduleStatus::Active { block, remaining_secs, progress } => {
-                            let n_col = match block.title.as_str() {
-                                "OtherBrain I" => NEON_CYAN,
-                                "Almuerzo" => NEON_AMBER,
-                                "OtherBrain II" => NEON_PURPLE,
-                                _ => block.color.into(),
-                            };
+                    let (countdown_str, block_name, glow_col) = match status {
+                        ScheduleStatus::Active { block, remaining_secs, .. } => {
                             (
                                 format_duration_hms(remaining_secs),
-                                format!("RESTANTE: {}", block.title.to_uppercase()),
-                                n_col,
-                                progress,
+                                format!("Termina: {}", block.title),
+                                block.color.into(),
                             )
                         }
                         ScheduleStatus::Between { next_block, starts_in_secs } => {
                             (
                                 format_duration_hms(starts_in_secs),
-                                format!("SIGUIENTE: {}", next_block.title.to_uppercase()),
-                                NEON_CYAN,
-                                0.0,
+                                format!("Siguiente: {}", next_block.title),
+                                GLOW_BLUE,
                             )
                         }
-                        ScheduleStatus::DayFinished { .. } => {
+                        ScheduleStatus::DayFinished => {
                             (
                                 "00:00:00".into(),
-                                "JORNADA COMPLETADA".into(),
-                                Color32::from_rgb(80, 80, 80),
-                                1.0,
+                                "Día terminado".into(),
+                                Color32::from_rgb(60, 75, 100),
                             )
                         }
                         ScheduleStatus::Empty => {
-                            ("--:--:--".into(), "SIN TURNOS".into(), NEON_CYAN, 0.0)
+                            (
+                                "--:--:--".into(),
+                                "Sin bloques".into(),
+                                GLOW_BLUE,
+                            )
                         }
                     };
 
-                    draw_oled_timer_card(
+                    draw_card_with_gradient(
                         ui,
                         card_rect,
-                        &date_text,
-                        &time_str,
+                        &date_title,
+                        &current_time_str,
                         &countdown_str,
-                        &label,
-                        neon_col,
-                        progress,
-                        &recursion_info,
+                        &block_name,
+                        weekday_str,
+                        &events_count_str,
+                        glow_col,
                     );
                 }
                 AppMode::SimpleTimer => {
@@ -309,50 +300,48 @@ impl YaFaltaPocoApp {
                     if triggered {
                         self.alarm_manager.trigger(
                             "¡Ya Falta Poco!",
-                            "¡Objetivo alcanzado!",
+                            "¡Ha llegado la hora objetivo!",
                             self.config.sound_enabled,
                         );
                         ctx.send_viewport_cmd(ViewportCommand::Focus);
                     }
 
                     let target_str = format!(
-                        "META  {:02}:{:02}",
+                        "Meta: {:02}:{:02}",
                         self.config.timer.target_hour, self.config.timer.target_min
                     );
-                    draw_oled_timer_card(
+
+                    draw_card_with_gradient(
                         ui,
                         card_rect,
-                        &date_text,
-                        &time_str,
+                        &date_title,
+                        &current_time_str,
                         &format_duration_hms(remaining_secs),
                         &target_str,
-                        NEON_CYAN,
-                        0.5,
-                        &recursion_info,
+                        weekday_str,
+                        "Temporizador",
+                        Color32::from_rgb(34, 211, 238),
                     );
                 }
             }
 
-            ui.add_space(14.0);
+            ui.add_space(20.0);
 
             // ===============================================
-            // 2. LISTA DERECHA: TURNOS MONOCROMÁTICOS
+            // 2. LISTA DERECHA ("HOY")
             // ===============================================
             ui.vertical(|ui| {
-                ui.horizontal(|ui| {
-                    ui.label(
-                        egui::RichText::new("HORARIO DEL DÍA")
-                            .color(Color32::from_rgb(150, 150, 150))
-                            .monospace()
-                            .size(11.5)
-                            .strong(),
-                    );
-                });
-                ui.add_space(6.0);
+                ui.label(
+                    egui::RichText::new("HOY")
+                        .color(Color32::from_rgb(148, 163, 184))
+                        .size(13.0)
+                        .strong(),
+                );
+                ui.add_space(8.0);
 
                 let mut clicked_index = None;
                 ScrollArea::vertical()
-                    .max_height(180.0)
+                    .max_height(170.0)
                     .show(ui, |ui| {
                         let current_weekday = now_local.weekday();
                         for (idx, block) in self.config.blocks.iter().enumerate() {
@@ -371,27 +360,11 @@ impl YaFaltaPocoApp {
                                 block.end_min
                             );
 
-                            let status_text = if is_completed {
-                                "COMPLETADO ✓"
-                            } else if is_active {
-                                "ACTIVO NOW"
-                            } else {
-                                "EN ESPERA"
-                            };
-
-                            let neon_color = match block.title.as_str() {
-                                "OtherBrain I" => NEON_CYAN,
-                                "Almuerzo" => NEON_AMBER,
-                                "OtherBrain II" => NEON_PURPLE,
-                                _ => block.color.into(),
-                            };
-
-                            let resp = draw_monochrome_turn_item(
+                            let resp = draw_event_row(
                                 ui,
                                 &block.title,
                                 &time_range,
-                                status_text,
-                                neon_color,
+                                block.color.into(),
                                 is_active,
                                 is_completed,
                             );
@@ -399,6 +372,7 @@ impl YaFaltaPocoApp {
                             if resp.clicked() {
                                 clicked_index = Some(idx);
                             }
+                            ui.add_space(4.0);
                         }
                     });
 
@@ -408,16 +382,24 @@ impl YaFaltaPocoApp {
             });
         });
 
+        // ===============================================
+        // 3. BOTÓN CIRCULAR FLOTANTE "+" CON RESPLANDOR
+        // ===============================================
+        let base_rect = ui.min_rect();
+        let add_center = pos2(base_rect.max.x - 32.0, base_rect.max.y - 32.0);
+        if draw_floating_plus(ui, add_center, 18.0).clicked() {
+            self.open_editor_new();
+        }
+
         if self.alarm_manager.is_active() {
             ui.add_space(4.0);
             ui.horizontal(|ui| {
                 ui.label(
-                    egui::RichText::new("🔔 ¡TIEMPO COMPLETADO!")
-                        .color(NEON_CYAN)
-                        .monospace()
+                    egui::RichText::new("🔔 ¡Ya es la hora!")
+                        .color(Color32::from_rgb(52, 211, 153))
                         .strong(),
                 );
-                if ui.button("Silenciar").clicked() {
+                if ui.button("Detener").clicked() {
                     self.alarm_manager.stop();
                 }
             });
@@ -458,12 +440,11 @@ impl YaFaltaPocoApp {
         ui.vertical(|ui| {
             ui.heading(
                 egui::RichText::new(if self.editor.editing_index.is_some() {
-                    "CONFIGURACIÓN DE TURNO"
+                    "Editar Bloque"
                 } else {
-                    "NUEVO TURNO"
+                    "Nuevo Bloque"
                 })
-                .monospace()
-                .color(NEON_CYAN),
+                .color(Color32::WHITE),
             );
             ui.add_space(10.0);
 
@@ -498,16 +479,16 @@ impl YaFaltaPocoApp {
 
             ui.add_space(6.0);
             ui.horizontal(|ui| {
-                ui.label("Acento:");
+                ui.label("Color:");
                 for (_, c) in &DEFAULT_COLORS {
                     let c32: Color32 = (*c).into();
                     let (rect, resp) = ui.allocate_exact_size(vec2(18.0, 18.0), egui::Sense::click());
                     let is_sel = self.editor.color == *c;
-                    ui.painter().rect_filled(rect, Rounding::ZERO, c32);
+                    ui.painter().rect_filled(rect, Rounding::same(4.0), c32);
                     if is_sel {
                         ui.painter().rect_stroke(
                             rect,
-                            Rounding::ZERO,
+                            Rounding::same(4.0),
                             Stroke::new(2.0, Color32::WHITE),
                         );
                     }
@@ -520,7 +501,7 @@ impl YaFaltaPocoApp {
             ui.add_space(14.0);
             ui.horizontal(|ui| {
                 if ui
-                    .add(egui::Button::new(egui::RichText::new("GUARDAR").color(Color32::BLACK)).fill(NEON_CYAN))
+                    .add(egui::Button::new("Guardar").fill(Color32::from_rgb(37, 99, 235)))
                     .clicked()
                 {
                     let b = TimeBlock {
@@ -548,7 +529,7 @@ impl YaFaltaPocoApp {
 
                 if let Some(idx) = self.editor.editing_index {
                     if ui
-                        .add(egui::Button::new("ELIMINAR").fill(Color32::from_rgb(180, 30, 30)))
+                        .add(egui::Button::new("Eliminar").fill(Color32::from_rgb(220, 38, 38)))
                         .clicked()
                     {
                         self.config.blocks.remove(idx);
@@ -557,7 +538,7 @@ impl YaFaltaPocoApp {
                     }
                 }
 
-                if ui.button("CANCELAR").clicked() {
+                if ui.button("Cancelar").clicked() {
                     self.editor.is_open = false;
                 }
             });

@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Ya Falta Poco</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* Contenedor flotante con esquinas redondeadas 24px y sombra suave */
+    .widget-container {
+      width: 600px;
+      height: 310px;
+      background: rgba(18, 22, 33, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Barra superior para arrastrar ventana */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      cursor: grab;
+    }
+
+    .top-bar:active {
+      cursor: grabbing;
+    }
+
+    .top-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #64748b;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .top-btn {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 12px;
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+
+    .top-btn:hover {
+      color: #ffffff;
+    }
+
+    .top-btn.pinned {
+      color: #38bdf8;
+    }
+
+    /* Contenido principal dividido en 2 columnas */
+    .main-content {
+      display: flex;
+      gap: 20px;
+      flex: 1;
+    }
+
+    /* Tarjeta izquierda con degradado azul exacto */
+    .card-left {
+      width: 215px;
+      height: 220px;
+      background: linear-gradient(180deg, #090c15 50%, #1e52d8 100%);
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .card-header .date-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.1;
+    }
+
+    .card-header .current-time {
+      font-size: 12.5px;
+      font-family: monospace;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    .card-center {
+      text-align: center;
+      margin-top: -6px;
+    }
+
+    .countdown-timer {
+      font-size: 27px;
+      font-family: monospace;
+      font-weight: 700;
+      color: #22d3ee;
+      text-shadow: 0 0 12px rgba(34, 211, 238, 0.35);
+      letter-spacing: 0.5px;
+    }
+
+    .block-name {
+      font-size: 11.5px;
+      color: #e2e8f0;
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-footer .weekday-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .card-footer .events-count {
+      font-size: 13.5px;
+      color: #93c5fd;
+    }
+
+    /* Columna derecha: Lista de Bloques */
+    .column-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .column-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #94a3b8;
+      letter-spacing: 1.5px;
+      margin-bottom: 10px;
+    }
+
+    .blocks-list {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-right: 6px;
+      max-height: 175px;
+    }
+
+    .blocks-list::-webkit-scrollbar {
+      width: 4px;
+    }
+    .blocks-list::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+    }
+
+    .block-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .block-row:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .block-row.active {
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+    }
+
+    .color-bar {
+      width: 3.5px;
+      height: 30px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .block-details {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .block-title {
+      font-size: 14.5px;
+      font-weight: 500;
+      color: #f8fafc;
+    }
+
+    .block-row.completed .block-title {
+      text-decoration: line-through;
+      color: #64748b;
+    }
+
+    .block-time {
+      font-size: 12px;
+      font-family: monospace;
+      color: #94a3b8;
+    }
+
+    .block-row.active .block-time {
+      color: #38bdf8;
+    }
+
+    /* Botón flotante "+" circular */
+    .btn-floating-add {
+      position: absolute;
+      right: 4px;
+      bottom: 2px;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #0b0f19;
+      border: 2px solid #34d399;
+      box-shadow: 0 0 12px rgba(52, 211, 153, 0.45);
+      color: #ffffff;
+      font-size: 22px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .btn-floating-add:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 16px rgba(52, 211, 153, 0.7);
+    }
+
+    /* Modal / Formulario de edición */
+    .editor-modal {
+      display: none;
+      position: absolute;
+      inset: 16px 20px;
+      background: #111624;
+      border-radius: 18px;
+      padding: 16px;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 10;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .editor-modal.open {
+      display: flex;
+    }
+
+    .editor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .editor-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      color: #94a3b8;
+      font-size: 13px;
+    }
+
+    .editor-input {
+      background: #1e2638;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      padding: 4px 8px;
+      color: #ffffff;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .editor-input:focus {
+      border-color: #38bdf8;
+    }
+
+    .color-picker-palette {
+      display: flex;
+      gap: 6px;
+    }
+
+    .color-swatch {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
+
+    .color-swatch.selected {
+      border-color: #ffffff;
+    }
+
+    .editor-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .btn-action {
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .btn-save { background: #2563eb; color: #ffffff; }
+    .btn-delete { background: #dc2626; color: #ffffff; }
+    .btn-cancel { background: #475569; color: #ffffff; }
+  </style>
+</head>
+<body>
+  <div class="widget-container">
+    <!-- Barra superior para arrastrar ventana con data-tauri-drag-region -->
+    <div class="top-bar" data-tauri-drag-region>
+      <div class="top-title" data-tauri-drag-region>YA FALTA POCO</div>
+      <div class="top-actions">
+        <button class="top-btn" id="btn-mode">Horario</button>
+        <button class="top-btn pinned" id="btn-pin">📌 Fijado</button>
+        <button class="top-btn" id="btn-close">✕</button>
+      </div>
+    </div>
+
+    <!-- Contenido en 2 tarjetas -->
+    <div class="main-content">
+      <!-- Tarjeta izquierda: Reloj, degradado azul y cuenta regresiva -->
+      <div class="card-left">
+        <div class="card-header">
+          <div class="date-title" id="lbl-date">-- --</div>
+          <div class="current-time" id="lbl-time">00:00:00</div>
+        </div>
+        <div class="card-center">
+          <div class="countdown-timer" id="lbl-countdown">--:--:--</div>
+          <div class="block-name" id="lbl-block-name">Cargando...</div>
+        </div>
+        <div class="card-footer">
+          <div class="weekday-title" id="lbl-weekday">---</div>
+          <div class="events-count" id="lbl-events-count">0 bloques</div>
+        </div>
+      </div>
+
+      <!-- Columna derecha: HOY y bloques -->
+      <div class="column-right">
+        <div class="column-title">HOY</div>
+        <div class="blocks-list" id="blocks-container">
+          <!-- Bloques inyectados dinámicamente -->
+        </div>
+        <!-- Botón flotante "+" -->
+        <div class="btn-floating-add" id="btn-add-block">+</div>
+      </div>
+    </div>
+
+    <!-- Editor integrado de bloques -->
+    <div class="editor-modal" id="editor-modal">
+      <div class="editor-header">
+        <span id="editor-title-heading">Nuevo Bloque</span>
+        <button class="top-btn" id="editor-close-x">✕</button>
+      </div>
+
+      <div class="editor-row">
+        <span>Nombre:</span>
+        <input type="text" id="inp-title" class="editor-input" style="flex:1" placeholder="Ej. Trabajo">
+      </div>
+
+      <div class="editor-row">
+        <span>Horario:</span>
+        <input type="number" id="inp-start-h" class="editor-input" min="0" max="23" style="width:48px">:
+        <input type="number" id="inp-start-m" class="editor-input" min="0" max="59" style="width:48px">
+        <span>a</span>
+        <input type="number" id="inp-end-h" class="editor-input" min="0" max="23" style="width:48px">:
+        <input type="number" id="inp-end-m" class="editor-input" min="0" max="59" style="width:48px">
+      </div>
+
+      <div class="editor-row">
+        <span>Color:</span>
+        <div class="color-picker-palette" id="palette"></div>
+      </div>
+
+      <div class="editor-actions">
+        <button class="btn-action btn-save" id="btn-editor-save">Guardar</button>
+        <button class="btn-action btn-delete" id="btn-editor-delete" style="display:none">Eliminar</button>
+        <button class="btn-action btn-cancel" id="btn-editor-cancel">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { invoke } = window.__TAURI__.core;
+
+    let editingIndex = null;
+    let selectedColor = { r: 59, g: 130, b: 246 };
+
+    const PALETTE_COLORS = [
+      { r: 59, g: 130, b: 246 }, // Azul
+      { r: 168, g: 85, b: 247 }, // Violeta
+      { r: 245, g: 158, b: 11 }, // Ámbar
+      { r: 34, g: 197, b: 94 },  // Verde
+      { r: 239, g: 68, b: 68 },  // Rojo
+      { r: 236, g: 72, b: 153 }  // Rosa
+    ];
+
+    function initPalette() {
+      const container = document.getElementById('palette');
+      container.innerHTML = '';
+      PALETTE_COLORS.forEach(c => {
+        const swatch = document.createElement('div');
+        swatch.className = 'color-swatch' + (c.r === selectedColor.r && c.g === selectedColor.g && c.b === selectedColor.b ? ' selected' : '');
+        swatch.style.background = `rgb(${c.r}, ${c.g}, ${c.b})`;
+        swatch.onclick = () => {
+          selectedColor = c;
+          initPalette();
+        };
+        container.appendChild(swatch);
+      });
+    }
+
+    async function refresh() {
+      try {
+        const snap = await invoke('get_snapshot');
+        document.getElementById('lbl-date').textContent = snap.date_title;
+        document.getElementById('lbl-time').textContent = snap.current_time_str;
+        document.getElementById('lbl-countdown').textContent = snap.countdown_str;
+        document.getElementById('lbl-block-name').textContent = snap.block_name;
+        document.getElementById('lbl-weekday').textContent = snap.weekday_str;
+        document.getElementById('lbl-events-count').textContent = snap.events_count_str;
+        document.getElementById('btn-mode').textContent = snap.mode;
+
+        const pinBtn = document.getElementById('btn-pin');
+        if (snap.always_on_top) {
+          pinBtn.classList.add('pinned');
+          pinBtn.textContent = '📌 Fijado';
+        } else {
+          pinBtn.classList.remove('pinned');
+          pinBtn.textContent = '📌 Libre';
+        }
+
+        renderBlocks(snap.blocks, snap.current_time_str);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function renderBlocks(blocks, currentTime) {
+      const container = document.getElementById('blocks-container');
+      container.innerHTML = '';
+
+      const [curH, curM] = currentTime.split(':').map(Number);
+      const curMins = curH * 60 + curM;
+
+      blocks.forEach((b, idx) => {
+        const startMins = b.start_hour * 60 + b.start_min;
+        const endMins = b.end_hour * 60 + b.end_min;
+
+        const isActive = curMins >= startMins && curMins < endMins;
+        const isCompleted = curMins >= endMins;
+
+        const row = document.createElement('div');
+        row.className = 'block-row' + (isActive ? ' active' : '') + (isCompleted ? ' completed' : '');
+        row.onclick = () => openEditor(idx, b);
+
+        const pad = (n) => String(n).padStart(2, '0');
+        const timeRange = `${pad(b.start_hour)}:${pad(b.start_min)} - ${pad(b.end_hour)}:${pad(b.end_min)}`;
+
+        row.innerHTML = `
+          <div class="color-bar" style="background: rgb(${b.color.r}, ${b.color.g}, ${b.color.b})"></div>
+          <div class="block-details">
+            <span class="block-title">${b.title}</span>
+            <span class="block-time">${timeRange}</span>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function openEditor(idx, block) {
+      editingIndex = idx;
+      const modal = document.getElementById('editor-modal');
+      const delBtn = document.getElementById('btn-editor-delete');
+
+      if (block) {
+        document.getElementById('editor-title-heading').textContent = 'Editar Bloque';
+        document.getElementById('inp-title').value = block.title;
+        document.getElementById('inp-start-h').value = block.start_hour;
+        document.getElementById('inp-start-m').value = block.start_min;
+        document.getElementById('inp-end-h').value = block.end_hour;
+        document.getElementById('inp-end-m').value = block.end_min;
+        selectedColor = block.color;
+        delBtn.style.display = 'block';
+      } else {
+        document.getElementById('editor-title-heading').textContent = 'Nuevo Bloque';
+        document.getElementById('inp-title').value = 'Nuevo Bloque';
+        document.getElementById('inp-start-h').value = 8;
+        document.getElementById('inp-start-m').value = 0;
+        document.getElementById('inp-end-h').value = 12;
+        document.getElementById('inp-end-m').value = 0;
+        selectedColor = PALETTE_COLORS[0];
+        delBtn.style.display = 'none';
+      }
+
+      initPalette();
+      modal.classList.add('open');
+    }
+
+    function closeEditor() {
+      document.getElementById('editor-modal').classList.remove('open');
+      editingIndex = null;
+    }
+
+    // Event Listeners
+    document.getElementById('btn-mode').onclick = async () => {
+      await invoke('toggle_mode');
+      refresh();
+    };
+
+    document.getElementById('btn-pin').onclick = async () => {
+      await invoke('toggle_pin');
+      refresh();
+    };
+
+    document.getElementById('btn-close').onclick = () => {
+      invoke('close_app');
+    };
+
+    document.getElementById('btn-add-block').onclick = () => {
+      openEditor(null, null);
+    };
+
+    document.getElementById('editor-close-x').onclick = closeEditor;
+    document.getElementById('btn-editor-cancel').onclick = closeEditor;
+
+    document.getElementById('btn-editor-save').onclick = async () => {
+      const title = document.getElementById('inp-title').value.trim() || 'Sin título';
+      const startH = parseInt(document.getElementById('inp-start-h').value) || 0;
+      const startM = parseInt(document.getElementById('inp-start-m').value) || 0;
+      const endH = parseInt(document.getElementById('inp-end-h').value) || 0;
+      const endM = parseInt(document.getElementById('inp-end-m').value) || 0;
+
+      await invoke('save_block', {
+        index: editingIndex,
+        title,
+        startHour: startH,
+        startMin: startM,
+        endHour: endH,
+        endMin: endM,
+        colorR: selectedColor.r,
+        colorG: selectedColor.g,
+        colorB: selectedColor.b,
+        monday: true, tuesday: true, wednesday: true, thursday: true, friday: true, saturday: true, sunday: true
+      });
+
+      closeEditor();
+      refresh();
+    };
+
+    document.getElementById('btn-editor-delete').onclick = async () => {
+      if (editingIndex !== null) {
+        await invoke('delete_block', { index: editingIndex });
+        closeEditor();
+        refresh();
+      }
+    };
+
+    // Iniciar polling a 1 segundo
+    initPalette();
+    refresh();
+    setInterval(refresh, 1000);
+  </script>
+</body>
+</html>

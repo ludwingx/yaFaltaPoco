@@ -22,7 +22,7 @@ fn main() -> eframe::Result<()> {
     let initial_size = if initial_config.compact_mode {
         vec2(280.0, 95.0)
     } else {
-        vec2(630.0, 330.0) // Espacio holgado abajo para que el botón jamás se corte
+        vec2(640.0, 360.0) // Altura suficiente para que el widget redondeado flote con margen transparente
     };
 
     let mut native_options = NativeOptions::default();

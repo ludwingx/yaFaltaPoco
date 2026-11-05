@@ -205,7 +205,7 @@ pub fn draw_event_row(
 
 /// Botón circular flotante "+" con aro degradado sutil
 pub fn draw_floating_plus(ui: &mut Ui, center: Pos2, radius: f32) -> Response {
-    let size = Vec2::splat(radius * 2.0);
+    let size = Vec2::splat(radius * 2.4); // Área de hit de 43x43 px para que el puntero lo tome con total facilidad
     let rect = Rect::from_center_size(center, size);
     let response = ui.allocate_rect(rect, Sense::click());
     let painter = ui.painter();

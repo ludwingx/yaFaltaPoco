@@ -140,16 +140,18 @@ impl eframe::App for YaFaltaPocoApp {
                     Stroke::new(1.0_f32, BORDER_WIDGET),
                 );
 
-                // Arrastrar la ventana desde cualquier punto del widget
-                let bg_drag = ui.interact(widget_rect, ui.id().with("drag_win"), egui::Sense::drag());
-                if bg_drag.dragged() {
-                    ctx.send_viewport_cmd(ViewportCommand::StartDrag);
-                }
-
-                // Contenido interno con padding
+                // Contenido interactivo primero: los clics se asignan exactamente a sus controles
                 let inner_rect = widget_rect.shrink(18.0);
                 let mut child_ui = ui.new_child(egui::UiBuilder::new().max_rect(inner_rect));
                 self.render_ui(&mut child_ui, ctx, widget_rect);
+
+                // Drag de ventana solo en áreas no clickeadas para no interceptar los clics del usuario
+                if !ctx.wants_pointer_input() {
+                    let bg_drag = ui.interact(widget_rect, ui.id().with("drag_win"), egui::Sense::drag());
+                    if bg_drag.dragged() {
+                        ctx.send_viewport_cmd(ViewportCommand::StartDrag);
+                    }
+                }
             });
 
         ctx.request_repaint_after(std::time::Duration::from_secs(1));
@@ -247,14 +249,7 @@ impl YaFaltaPocoApp {
             // 1. TARJETA IZQUIERDA (AZUL INTENSO EN LA BASE)
             // ===============================================
             let card_size = vec2(215.0, 215.0);
-            let (card_rect, card_resp) = ui.allocate_exact_size(card_size, egui::Sense::click());
-            if card_resp.clicked() {
-                self.config.mode = match self.config.mode {
-                    AppMode::Schedule => AppMode::SimpleTimer,
-                    AppMode::SimpleTimer => AppMode::Schedule,
-                };
-                let _ = self.config.save();
-            }
+            let (card_rect, card_resp) = ui.allocate_exact_size(card_size, egui::Sense::hover());
 
             match self.config.mode {
                 AppMode::Schedule => {

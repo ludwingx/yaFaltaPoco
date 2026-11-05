@@ -1,6 +1,6 @@
 use chrono::{Datelike, Local, Timelike};
 use egui::{
-    pos2, vec2, Align, Color32, Layout, Rect, Rounding, ScrollArea, Stroke, Ui,
+    pos2, vec2, Align, Color32, Layout, Rounding, ScrollArea, Stroke, Ui,
     ViewportCommand,
 };
 
@@ -116,42 +116,32 @@ impl eframe::App for YaFaltaPocoApp {
             }
         }
 
-        // Renderizar el widget principal
+        // Marco del widget con outer_margin para que las 4 esquinas redondeadas respiren
+        // sin crear sub-UIs manuales que desalinean los clics
+        let widget_frame = egui::Frame {
+            inner_margin: egui::Margin::symmetric(18.0, 16.0),
+            outer_margin: egui::Margin::same(16.0),
+            rounding: Rounding::same(24.0),
+            shadow: egui::epaint::Shadow {
+                offset: [0.0, 6.0].into(),
+                blur: 20.0,
+                spread: 0.0,
+                color: Color32::from_black_alpha(180),
+            },
+            fill: BG_WIDGET,
+            stroke: Stroke::new(1.0_f32, BORDER_WIDGET),
+        };
+
         egui::CentralPanel::default()
-            .frame(egui::Frame::none())
+            .frame(widget_frame)
             .show(ctx, |ui| {
-                // Dimensión fija y centrada del widget para garantizar que flote con margen transparente en los 4 costados
-                let widget_size = vec2(600.0, 310.0);
-                let widget_rect = Rect::from_center_size(ui.max_rect().center(), widget_size);
-                let painter = ui.painter();
-
-                // 1. Sombra exterior difusa en las 4 esquinas
-                painter.rect_filled(
-                    widget_rect.translate(vec2(0.0, 8.0)),
-                    Rounding::same(24.0),
-                    Color32::from_black_alpha(210),
-                );
-
-                // 2. Contenedor redondeado en las 4 esquinas completas (24px)
-                painter.rect_filled(widget_rect, Rounding::same(24.0), BG_WIDGET);
-                painter.rect_stroke(
-                    widget_rect,
-                    Rounding::same(24.0),
-                    Stroke::new(1.0_f32, BORDER_WIDGET),
-                );
-
-                // Contenido interactivo primero: los clics se asignan exactamente a sus controles
-                let inner_rect = widget_rect.shrink(18.0);
-                let mut child_ui = ui.new_child(egui::UiBuilder::new().max_rect(inner_rect));
-                self.render_ui(&mut child_ui, ctx, widget_rect);
-
-                // Drag de ventana solo en áreas no clickeadas para no interceptar los clics del usuario
-                if !ctx.wants_pointer_input() {
-                    let bg_drag = ui.interact(widget_rect, ui.id().with("drag_win"), egui::Sense::drag());
-                    if bg_drag.dragged() {
-                        ctx.send_viewport_cmd(ViewportCommand::StartDrag);
-                    }
+                // Arrastrar la ventana desde cualquier zona vacía del fondo
+                let drag_resp = ui.interact(ui.max_rect(), ui.id().with("drag_bg"), egui::Sense::drag());
+                if drag_resp.drag_started() {
+                    ctx.send_viewport_cmd(ViewportCommand::StartDrag);
                 }
+
+                self.render_ui(ui, ctx);
             });
 
         ctx.request_repaint_after(std::time::Duration::from_secs(1));
@@ -159,7 +149,7 @@ impl eframe::App for YaFaltaPocoApp {
 }
 
 impl YaFaltaPocoApp {
-    fn render_ui(&mut self, ui: &mut Ui, ctx: &egui::Context, widget_rect: Rect) {
+    fn render_ui(&mut self, ui: &mut Ui, ctx: &egui::Context) {
         // Barra superior
         ui.horizontal(|ui| {
             ui.label(
@@ -249,7 +239,7 @@ impl YaFaltaPocoApp {
             // 1. TARJETA IZQUIERDA (AZUL INTENSO EN LA BASE)
             // ===============================================
             let card_size = vec2(215.0, 215.0);
-            let (card_rect, card_resp) = ui.allocate_exact_size(card_size, egui::Sense::hover());
+            let (card_rect, _) = ui.allocate_exact_size(card_size, egui::Sense::hover());
 
             match self.config.mode {
                 AppMode::Schedule => {
@@ -379,10 +369,10 @@ impl YaFaltaPocoApp {
         });
 
         // ===============================================
-        // 3. BOTÓN FLOTANTE "+" HOLGADO (EN LA ESQUINA INFERIOR DERECHA)
+        // 3. BOTÓN FLOTANTE "+" (ESQUINA INFERIOR DERECHA)
         // ===============================================
-        // Ubicado exactamente en la esquina inferior derecha del widget con margen óptimo
-        let add_center = pos2(widget_rect.max.x - 38.0, widget_rect.max.y - 38.0);
+        let max = ui.max_rect();
+        let add_center = pos2(max.max.x - 20.0, max.max.y - 20.0);
         if draw_floating_plus(ui, add_center, 18.0).clicked() {
             self.open_editor_new();
         }

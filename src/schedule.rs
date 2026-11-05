@@ -197,9 +197,9 @@ pub enum ScheduleStatus<'a> {
 
 pub fn default_sample_blocks() -> Vec<TimeBlock> {
     vec![
-        TimeBlock::new("sample-1", "OtherBrain I", 8, 0, 12, 0, ColorRgb::new(30, 144, 255)),
-        TimeBlock::new("sample-2", "Almuerzo", 12, 0, 13, 0, ColorRgb::new(245, 158, 11)),
-        TimeBlock::new("sample-3", "OtherBrain II", 13, 0, 20, 0, ColorRgb::new(168, 85, 247)),
+        TimeBlock::new("sample-1", "Daily Meeting", 10, 0, 10, 30, ColorRgb::new(37, 99, 235)), // Azul intenso
+        TimeBlock::new("sample-2", "Focus Time", 11, 0, 13, 0, ColorRgb::new(168, 85, 247)),    // Violeta vibrante
+        TimeBlock::new("sample-3", "UI Demo", 13, 30, 14, 0, ColorRgb::new(34, 211, 238)),       // Cian neón
     ]
 }
 

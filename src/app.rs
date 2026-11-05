@@ -125,10 +125,10 @@ impl eframe::App for YaFaltaPocoApp {
                 offset: [0.0, 8.0].into(),
                 blur: 24.0,
                 spread: 0.0,
-                color: Color32::from_black_alpha(160),
+                color: Color32::from_black_alpha(200),
             },
             fill: BG_WIDGET,
-            stroke: Stroke::new(1.0, BORDER_WIDGET),
+            stroke: Stroke::new(1.0_f32, BORDER_WIDGET),
         };
 
         egui::CentralPanel::default()
@@ -324,7 +324,7 @@ impl YaFaltaPocoApp {
             ui.vertical(|ui| {
                 ui.label(
                     egui::RichText::new("HOY")
-                        .color(Color32::from_rgb(148, 163, 184))
+                        .color(Color32::from_rgb(180, 195, 220))
                         .size(13.0)
                         .strong(),
                 );
@@ -481,7 +481,7 @@ impl YaFaltaPocoApp {
                         ui.painter().rect_stroke(
                             rect,
                             Rounding::same(4.0),
-                            Stroke::new(2.0, Color32::WHITE),
+                            Stroke::new(2.0_f32, Color32::WHITE),
                         );
                     }
                     if resp.clicked() {

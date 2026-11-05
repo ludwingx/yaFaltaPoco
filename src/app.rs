@@ -85,7 +85,7 @@ impl YaFaltaPocoApp {
 
 impl eframe::App for YaFaltaPocoApp {
     fn clear_color(&self, _visuals: &egui::Visuals) -> [f32; 4] {
-        [0.08, 0.10, 0.16, 1.0] // Fondo de ventana exactamente acoplado al widget
+        [0.0, 0.0, 0.0, 0.0] // Transparente total en el lienzo de la ventana
     }
 
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
@@ -135,6 +135,12 @@ impl eframe::App for YaFaltaPocoApp {
         egui::CentralPanel::default()
             .frame(widget_frame)
             .show(ctx, |ui| {
+                // Arrastrar la ventana al hacer clic y arrastrar en cualquier espacio del fondo
+                let bg_response = ui.interact(ui.max_rect(), ui.id().with("window_drag"), egui::Sense::drag());
+                if bg_response.dragged() {
+                    ctx.send_viewport_cmd(ViewportCommand::StartDrag);
+                }
+
                 self.render_ui(ui, ctx);
             });
 

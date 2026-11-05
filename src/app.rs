@@ -439,28 +439,38 @@ impl YaFaltaPocoApp {
 
     fn render_editor(&mut self, ui: &mut Ui) {
         ui.vertical(|ui| {
-            ui.heading(
-                egui::RichText::new(if self.editor.editing_index.is_some() {
-                    "Editar Bloque"
-                } else {
-                    "Nuevo Bloque"
-                })
-                .color(Color32::WHITE),
-            );
-            ui.add_space(10.0);
+            // Cabecera del editor con botón de cierre (✕)
+            ui.horizontal(|ui| {
+                ui.heading(
+                    egui::RichText::new(if self.editor.editing_index.is_some() {
+                        "Editar Bloque"
+                    } else {
+                        "Nuevo Bloque"
+                    })
+                    .color(Color32::WHITE),
+                );
+
+                ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                    if ui.add(egui::Button::new(egui::RichText::new("✕").size(15.0).color(TEXT_GRAY)).frame(false)).clicked() {
+                        self.editor.is_open = false;
+                    }
+                });
+            });
+
+            ui.add_space(8.0);
 
             ui.horizontal(|ui| {
-                ui.label("Nombre:");
+                ui.label(egui::RichText::new("Nombre:").color(TEXT_GRAY));
                 ui.text_edit_singleline(&mut self.editor.title);
             });
 
             ui.add_space(6.0);
             ui.horizontal(|ui| {
-                ui.label("Horario:");
+                ui.label(egui::RichText::new("Horario:").color(TEXT_GRAY));
                 ui.add(egui::DragValue::new(&mut self.editor.start_hour).range(0..=23));
                 ui.label(":");
                 ui.add(egui::DragValue::new(&mut self.editor.start_min).range(0..=59));
-                ui.label("a");
+                ui.label(" a ");
                 ui.add(egui::DragValue::new(&mut self.editor.end_hour).range(0..=23));
                 ui.label(":");
                 ui.add(egui::DragValue::new(&mut self.editor.end_min).range(0..=59));
@@ -468,7 +478,7 @@ impl YaFaltaPocoApp {
 
             ui.add_space(6.0);
             ui.horizontal(|ui| {
-                ui.label("Días:");
+                ui.label(egui::RichText::new("Días:").color(TEXT_GRAY));
                 ui.checkbox(&mut self.editor.days.monday, "L");
                 ui.checkbox(&mut self.editor.days.tuesday, "M");
                 ui.checkbox(&mut self.editor.days.wednesday, "X");
@@ -480,7 +490,7 @@ impl YaFaltaPocoApp {
 
             ui.add_space(6.0);
             ui.horizontal(|ui| {
-                ui.label("Color:");
+                ui.label(egui::RichText::new("Color:").color(TEXT_GRAY));
                 for (_, c) in &DEFAULT_COLORS {
                     let c32: Color32 = (*c).into();
                     let (rect, resp) = ui.allocate_exact_size(vec2(18.0, 18.0), egui::Sense::click());
@@ -501,10 +511,14 @@ impl YaFaltaPocoApp {
 
             ui.add_space(14.0);
             ui.horizontal(|ui| {
-                if ui
-                    .add(egui::Button::new("Guardar").fill(Color32::from_rgb(37, 99, 235)))
-                    .clicked()
-                {
+                // Botón Guardar
+                let save_btn = egui::Button::new(
+                    egui::RichText::new(" Guardar ").color(Color32::WHITE).strong(),
+                )
+                .fill(Color32::from_rgb(37, 99, 235))
+                .rounding(Rounding::same(8.0));
+
+                if ui.add(save_btn).clicked() {
                     let b = TimeBlock {
                         id: format!("b_{}", Local::now().timestamp_millis()),
                         title: self.editor.title.clone(),
@@ -528,18 +542,29 @@ impl YaFaltaPocoApp {
                     self.editor.is_open = false;
                 }
 
+                // Botón Eliminar si se está editando
                 if let Some(idx) = self.editor.editing_index {
-                    if ui
-                        .add(egui::Button::new("Eliminar").fill(Color32::from_rgb(220, 38, 38)))
-                        .clicked()
-                    {
+                    let del_btn = egui::Button::new(
+                        egui::RichText::new(" Eliminar ").color(Color32::WHITE).strong(),
+                    )
+                    .fill(Color32::from_rgb(220, 38, 38))
+                    .rounding(Rounding::same(8.0));
+
+                    if ui.add(del_btn).clicked() {
                         self.config.blocks.remove(idx);
                         let _ = self.config.save();
                         self.editor.is_open = false;
                     }
                 }
 
-                if ui.button("Cancelar").clicked() {
+                // Botón Cancelar estilizado y visible
+                let cancel_btn = egui::Button::new(
+                    egui::RichText::new(" Cancelar ").color(Color32::WHITE),
+                )
+                .fill(Color32::from_rgb(51, 65, 85))
+                .rounding(Rounding::same(8.0));
+
+                if ui.add(cancel_btn).clicked() {
                     self.editor.is_open = false;
                 }
             });

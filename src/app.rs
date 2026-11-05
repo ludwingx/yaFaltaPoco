@@ -96,7 +96,7 @@ impl YaFaltaPocoApp {
 
 impl eframe::App for YaFaltaPocoApp {
     fn clear_color(&self, _visuals: &egui::Visuals) -> [f32; 4] {
-        [0.0, 0.0, 0.0, 0.0]
+        [0.08, 0.10, 0.15, 1.0]
     }
 
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {

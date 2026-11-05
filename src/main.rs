@@ -1,4 +1,4 @@
-#![windows_subsystem = "windows"]
+// #![windows_subsystem = "windows"]
 
 use eframe::egui::vec2;
 use eframe::NativeOptions;
@@ -28,10 +28,11 @@ fn main() -> eframe::Result<()> {
     let mut native_options = NativeOptions::default();
     let mut viewport = eframe::egui::ViewportBuilder::default()
         .with_decorations(false)
-        .with_transparent(true)
         .with_inner_size(initial_size)
         .with_min_inner_size(vec2(260.0, 85.0))
         .with_always_on_top()
+        .with_visible(true)
+        .with_active(true)
         .with_title("Ya Falta Poco");
 
     if let Some(pos) = initial_config.window_pos {

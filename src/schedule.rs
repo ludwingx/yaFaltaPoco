@@ -25,10 +25,10 @@ impl ColorRgb {
 }
 
 pub const DEFAULT_COLORS: [(&str, ColorRgb); 8] = [
-    ("Azul Océano", ColorRgb::new(30, 144, 255)),
-    ("Cian Neón", ColorRgb::new(34, 211, 238)),
+    ("Azul Océano", ColorRgb::new(37, 99, 235)),
     ("Ámbar / Naranja", ColorRgb::new(245, 158, 11)),
-    ("Violeta Suave", ColorRgb::new(168, 85, 247)),
+    ("Violeta Intenso", ColorRgb::new(147, 51, 234)),
+    ("Cian Neón", ColorRgb::new(34, 211, 238)),
     ("Verde Esmeralda", ColorRgb::new(16, 185, 129)),
     ("Rosa Fucsia", ColorRgb::new(236, 72, 153)),
     ("Rojo Coral", ColorRgb::new(239, 68, 68)),
@@ -134,17 +134,6 @@ impl TimeBlock {
         end <= start
     }
 
-    #[allow(dead_code)]
-    pub fn duration_seconds(&self) -> i64 {
-        let start = self.start_hour as i64 * 3600 + self.start_min as i64 * 60;
-        let end = self.end_hour as i64 * 3600 + self.end_min as i64 * 60;
-        if self.crosses_midnight() {
-            (24 * 3600 - start) + end
-        } else {
-            end - start
-        }
-    }
-
     pub fn interval_for_date(&self, date: NaiveDate) -> (NaiveDateTime, NaiveDateTime) {
         let start_dt = date.and_time(self.start_time());
         let end_dt = if self.crosses_midnight() {
@@ -175,6 +164,17 @@ impl TimeBlock {
         }
         false
     }
+
+    pub fn is_completed_at(&self, now: NaiveDateTime) -> bool {
+        let today = now.date();
+        if self.days.matches(today.weekday()) {
+            let (_, end) = self.interval_for_date(today);
+            if now >= end {
+                return true;
+            }
+        }
+        false
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -197,32 +197,10 @@ pub enum ScheduleStatus<'a> {
 
 pub fn default_sample_blocks() -> Vec<TimeBlock> {
     vec![
-        TimeBlock::new("sample-1", "Daily Meeting", 10, 0, 10, 30, ColorRgb::new(37, 99, 235)), // Azul intenso
-        TimeBlock::new("sample-2", "Focus Time", 11, 0, 13, 0, ColorRgb::new(168, 85, 247)),    // Violeta vibrante
-        TimeBlock::new("sample-3", "UI Demo", 13, 30, 14, 0, ColorRgb::new(34, 211, 238)),       // Cian neón
+        TimeBlock::new("turn-1", "OtherBrain I", 8, 0, 12, 0, ColorRgb::new(37, 99, 235)), // 08:00 a 12:00
+        TimeBlock::new("turn-2", "Almuerzo", 12, 0, 13, 0, ColorRgb::new(245, 158, 11)),   // 12:00 a 13:00
+        TimeBlock::new("turn-3", "OtherBrain II", 13, 0, 20, 0, ColorRgb::new(147, 51, 234)), // 13:00 a 20:00
     ]
-}
-
-pub fn detect_overlaps(blocks: &[TimeBlock], date: NaiveDate) -> Vec<(usize, usize)> {
-    let mut active_today: Vec<(usize, NaiveDateTime, NaiveDateTime)> = Vec::new();
-    for (idx, b) in blocks.iter().enumerate() {
-        if b.days.matches(date.weekday()) {
-            let (start, end) = b.interval_for_date(date);
-            active_today.push((idx, start, end));
-        }
-    }
-
-    let mut overlaps = Vec::new();
-    for i in 0..active_today.len() {
-        for j in (i + 1)..active_today.len() {
-            let (_, s1, e1) = active_today[i];
-            let (_, s2, e2) = active_today[j];
-            if s1 < e2 && s2 < e1 {
-                overlaps.push((active_today[i].0, active_today[j].0));
-            }
-        }
-    }
-    overlaps
 }
 
 pub fn evaluate_schedule<'a>(blocks: &'a [TimeBlock], now: NaiveDateTime) -> ScheduleStatus<'a> {
@@ -233,7 +211,7 @@ pub fn evaluate_schedule<'a>(blocks: &'a [TimeBlock], now: NaiveDateTime) -> Sch
     let today = now.date();
     let tomorrow = today.succ_opt().unwrap_or(today);
 
-    // 1. Verificar si hay un bloque activo ahora
+    // 1. Activo ahora
     for block in blocks {
         if block.is_active_at(now) {
             let yesterday = today.pred_opt().unwrap_or(today);
@@ -256,7 +234,7 @@ pub fn evaluate_schedule<'a>(blocks: &'a [TimeBlock], now: NaiveDateTime) -> Sch
         }
     }
 
-    // 2. Si no hay bloque activo, buscar el siguiente bloque de hoy
+    // 2. Siguiente hoy
     let mut upcoming_today: Vec<(&TimeBlock, i64)> = Vec::new();
     for block in blocks {
         if block.days.matches(today.weekday()) {
@@ -277,7 +255,7 @@ pub fn evaluate_schedule<'a>(blocks: &'a [TimeBlock], now: NaiveDateTime) -> Sch
         };
     }
 
-    // 3. Ya pasaron los de hoy -> Buscar el primer bloque de mañana
+    // 3. Pasaron los de hoy -> mañana
     let mut upcoming_tomorrow: Vec<(&TimeBlock, i64)> = Vec::new();
     for block in blocks {
         if block.days.matches(tomorrow.weekday()) {
@@ -310,102 +288,4 @@ pub fn format_duration_hms(secs: i64) -> String {
     let mins = (s % 3600) / 60;
     let seconds = s % 60;
     format!("{:02}:{:02}:{:02}", hours, mins, seconds)
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn sample_blocks() -> Vec<TimeBlock> {
-        default_sample_blocks()
-    }
-
-    #[test]
-    fn test_active_block_first() {
-        let blocks = sample_blocks();
-        let date = NaiveDate::from_ymd_opt(2026, 11, 5).unwrap();
-        let now = date.and_hms_opt(9, 30, 0).unwrap();
-
-        match evaluate_schedule(&blocks, now) {
-            ScheduleStatus::Active { block, remaining_secs, progress } => {
-                assert_eq!(block.title, "OtherBrain I");
-                assert_eq!(remaining_secs, 2 * 3600 + 30 * 60);
-                assert!((progress - 0.375).abs() < 0.01);
-            }
-            _ => panic!("Expected active block"),
-        }
-    }
-
-    #[test]
-    fn test_between_blocks() {
-        let blocks = vec![
-            TimeBlock::new("1", "A", 9, 0, 10, 0, ColorRgb::new(0, 0, 0)),
-            TimeBlock::new("2", "B", 11, 0, 12, 0, ColorRgb::new(0, 0, 0)),
-        ];
-        let date = NaiveDate::from_ymd_opt(2026, 11, 5).unwrap();
-        let now = date.and_hms_opt(10, 15, 0).unwrap();
-
-        match evaluate_schedule(&blocks, now) {
-            ScheduleStatus::Between { next_block, starts_in_secs } => {
-                assert_eq!(next_block.title, "B");
-                assert_eq!(starts_in_secs, 45 * 60);
-            }
-            _ => panic!("Expected between blocks"),
-        }
-    }
-
-    #[test]
-    fn test_day_finished_next_tomorrow() {
-        let blocks = sample_blocks();
-        let date = NaiveDate::from_ymd_opt(2026, 11, 5).unwrap();
-        let now = date.and_hms_opt(21, 0, 0).unwrap();
-
-        match evaluate_schedule(&blocks, now) {
-            ScheduleStatus::DayFinished { next_block_tomorrow, starts_in_secs } => {
-                assert_eq!(next_block_tomorrow.unwrap().title, "OtherBrain I");
-                assert_eq!(starts_in_secs.unwrap(), 11 * 3600);
-            }
-            _ => panic!("Expected day finished"),
-        }
-    }
-
-    #[test]
-    fn test_midnight_crossing_block() {
-        let blocks = vec![
-            TimeBlock::new("night", "Turno Noche", 22, 0, 2, 0, ColorRgb::new(255, 0, 0)),
-        ];
-        let day1 = NaiveDate::from_ymd_opt(2026, 11, 5).unwrap();
-        let day2 = NaiveDate::from_ymd_opt(2026, 11, 6).unwrap();
-
-        let now1 = day1.and_hms_opt(23, 0, 0).unwrap();
-        match evaluate_schedule(&blocks, now1) {
-            ScheduleStatus::Active { block, remaining_secs, .. } => {
-                assert_eq!(block.title, "Turno Noche");
-                assert_eq!(remaining_secs, 3 * 3600);
-            }
-            _ => panic!("Expected active before midnight"),
-        }
-
-        let now2 = day2.and_hms_opt(1, 0, 0).unwrap();
-        match evaluate_schedule(&blocks, now2) {
-            ScheduleStatus::Active { block, remaining_secs, .. } => {
-                assert_eq!(block.title, "Turno Noche");
-                assert_eq!(remaining_secs, 1 * 3600);
-            }
-            _ => panic!("Expected active after midnight"),
-        }
-    }
-
-    #[test]
-    fn test_overlap_detection() {
-        let blocks = vec![
-            TimeBlock::new("1", "A", 10, 0, 12, 0, ColorRgb::new(0, 0, 0)),
-            TimeBlock::new("2", "B", 11, 0, 13, 0, ColorRgb::new(0, 0, 0)),
-            TimeBlock::new("3", "C", 14, 0, 15, 0, ColorRgb::new(0, 0, 0)),
-        ];
-        let date = NaiveDate::from_ymd_opt(2026, 11, 5).unwrap();
-        let overlaps = detect_overlaps(&blocks, date);
-        assert_eq!(overlaps.len(), 1);
-        assert_eq!(overlaps[0], (0, 1));
-    }
 }

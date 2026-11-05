@@ -116,30 +116,35 @@ impl eframe::App for YaFaltaPocoApp {
             }
         }
 
-        // Marco del widget: esquinas redondeadas (24px) y padding inferior amplio
-        let widget_frame = egui::Frame {
-            inner_margin: egui::Margin::symmetric(20.0, 18.0),
-            outer_margin: egui::Margin::ZERO,
-            rounding: Rounding::same(24.0),
-            shadow: egui::epaint::Shadow {
-                offset: [0.0, 8.0].into(),
-                blur: 24.0,
-                spread: 0.0,
-                color: Color32::from_black_alpha(200),
-            },
-            fill: BG_WIDGET,
-            stroke: Stroke::new(1.0_f32, BORDER_WIDGET),
-        };
-
+        // Renderizar el widget principal
         egui::CentralPanel::default()
-            .frame(widget_frame)
+            .frame(egui::Frame::none())
             .show(ctx, |ui| {
-                let bg_drag = ui.interact(ui.max_rect(), ui.id().with("drag_win"), egui::Sense::drag());
+                let rect = ui.max_rect().shrink(6.0); // Margen exterior para que la sombra y las 4 esquinas redondeadas respiren libremente
+                let painter = ui.painter();
+
+                // Sombra suave en las 4 esquinas
+                painter.rect_filled(
+                    rect.translate(vec2(0.0, 6.0)),
+                    Rounding::same(24.0),
+                    Color32::from_black_alpha(180),
+                );
+
+                // Contenedor principal con las 4 esquinas redondeadas suaves (24px)
+                painter.rect_filled(rect, Rounding::same(24.0), BG_WIDGET);
+                painter.rect_stroke(
+                    rect,
+                    Rounding::same(24.0),
+                    Stroke::new(1.0_f32, BORDER_WIDGET),
+                );
+
+                let bg_drag = ui.interact(rect, ui.id().with("drag_win"), egui::Sense::drag());
                 if bg_drag.dragged() {
                     ctx.send_viewport_cmd(ViewportCommand::StartDrag);
                 }
 
-                self.render_ui(ui, ctx);
+                let mut child_ui = ui.new_child(egui::UiBuilder::new().max_rect(rect.shrink(18.0)));
+                self.render_ui(&mut child_ui, ctx);
             });
 
         ctx.request_repaint_after(std::time::Duration::from_secs(1));

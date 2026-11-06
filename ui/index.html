@@ -71,6 +71,17 @@
       letter-spacing: 1.2px;
       color: var(--text-dim);
       text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .brand-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #06b6d4;
+      box-shadow: 0 0 8px #06b6d4;
     }
 
     .top-actions {
@@ -99,11 +110,6 @@
       color: var(--text-white);
     }
 
-    .btn-pill.pinned {
-      background: rgba(56, 189, 248, 0.12);
-      border-color: rgba(56, 189, 248, 0.3);
-      color: #38bdf8;
-    }
 
     .btn-close {
       width: 22px;
@@ -234,6 +240,7 @@
       flex-direction: column;
       gap: 6px;
       padding-right: 6px;
+      padding-bottom: 40px;
       max-height: 175px;
     }
 
@@ -488,11 +495,12 @@
   <div class="widget-container">
     <!-- Barra Superior -->
     <div class="top-bar" data-tauri-drag-region>
-      <div class="brand-tag" data-tauri-drag-region>YA FALTA POCO</div>
+      <div class="brand-tag" data-tauri-drag-region>
+        <span class="brand-dot"></span>YA FALTA POCO
+      </div>
       <div class="top-actions">
         <button class="btn-pill" id="btn-mode">Horario</button>
-        <button class="btn-pill pinned" id="btn-pin">📌 Fijado</button>
-        <button class="btn-close" id="btn-close">✕</button>
+        <button class="btn-close" id="btn-close" title="Cerrar">✕</button>
       </div>
     </div>
 
@@ -609,15 +617,6 @@
         document.getElementById('lbl-events-count').textContent = snap.events_count_str;
         document.getElementById('btn-mode').textContent = snap.mode;
 
-        const pinBtn = document.getElementById('btn-pin');
-        if (snap.always_on_top) {
-          pinBtn.classList.add('pinned');
-          pinBtn.textContent = '📌 Fijado';
-        } else {
-          pinBtn.classList.remove('pinned');
-          pinBtn.textContent = '📌 Libre';
-        }
-
         renderScheduleStream(snap.blocks, snap.current_time_str);
       } catch (e) {
         console.error(e);
@@ -692,14 +691,18 @@
       currentEditingIndex = null;
     }
 
+    // Native OS Window Dragging
+    document.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      if (e.target.closest('button, input, select, textarea, .block-row, .editor-overlay, .swatch')) {
+        return;
+      }
+      invoke('drag_window');
+    });
+
     // Handlers
     document.getElementById('btn-mode').onclick = async () => {
       await invoke('toggle_mode');
-      pollSnapshot();
-    };
-
-    document.getElementById('btn-pin').onclick = async () => {
-      await invoke('toggle_pin');
       pollSnapshot();
     };
 

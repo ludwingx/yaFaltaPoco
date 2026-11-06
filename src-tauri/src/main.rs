@@ -3,7 +3,7 @@
 use std::sync::Mutex;
 use chrono::{Datelike, Local, Timelike};
 use serde::{Deserialize, Serialize};
-use tauri::{AppHandle, Manager, State};
+use tauri::{AppHandle, Manager, State, WebviewWindow};
 
 mod alarm;
 mod config;
@@ -107,6 +107,11 @@ fn get_snapshot(state: State<'_, AppState>) -> AppSnapshot {
         always_on_top: cfg.always_on_top,
         alarm_active: alarm.is_active(),
     }
+}
+
+#[tauri::command]
+fn drag_window(window: WebviewWindow) {
+    let _ = window.start_dragging();
 }
 
 #[tauri::command]
@@ -220,6 +225,7 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             get_snapshot,
+            drag_window,
             toggle_mode,
             toggle_pin,
             save_block,

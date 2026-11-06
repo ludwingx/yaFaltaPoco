@@ -109,6 +109,14 @@ fn get_snapshot(state: State<'_, AppState>) -> AppSnapshot {
     }
 }
 
+fn get_today_last_block_end(blocks: &[TimeBlock], weekday: chrono::Weekday) -> Option<(u32, u32)> {
+    blocks
+        .iter()
+        .filter(|b| b.days.matches(weekday))
+        .max_by_key(|b| b.end_hour * 60 + b.end_min)
+        .map(|b| (b.end_hour, b.end_min))
+}
+
 #[tauri::command]
 fn drag_window(window: WebviewWindow) {
     let _ = window.start_dragging();
@@ -118,7 +126,14 @@ fn drag_window(window: WebviewWindow) {
 fn toggle_mode(state: State<'_, AppState>) -> String {
     let mut cfg = state.config.lock().unwrap();
     cfg.mode = match cfg.mode {
-        AppMode::Schedule => AppMode::SimpleTimer,
+        AppMode::Schedule => {
+            let now_local = Local::now();
+            if let Some((h, m)) = get_today_last_block_end(&cfg.blocks, now_local.weekday()) {
+                cfg.timer.target_hour = h;
+                cfg.timer.target_min = m;
+            }
+            AppMode::SimpleTimer
+        }
         AppMode::SimpleTimer => AppMode::Schedule,
     };
     let _ = cfg.save();
@@ -126,6 +141,14 @@ fn toggle_mode(state: State<'_, AppState>) -> String {
         AppMode::Schedule => "Horario".into(),
         AppMode::SimpleTimer => "Temporizador".into(),
     }
+}
+
+#[tauri::command]
+fn set_timer_target(state: State<'_, AppState>, hour: u32, min: u32) {
+    let mut cfg = state.config.lock().unwrap();
+    cfg.timer.target_hour = hour.min(23);
+    cfg.timer.target_min = min.min(59);
+    let _ = cfg.save();
 }
 
 #[tauri::command]
@@ -189,6 +212,13 @@ fn save_block(
     } else {
         cfg.blocks.push(block);
     }
+
+    let now_local = Local::now();
+    if let Some((h, m)) = get_today_last_block_end(&cfg.blocks, now_local.weekday()) {
+        cfg.timer.target_hour = h;
+        cfg.timer.target_min = m;
+    }
+
     let _ = cfg.save();
 }
 
@@ -197,6 +227,11 @@ fn delete_block(state: State<'_, AppState>, index: usize) {
     let mut cfg = state.config.lock().unwrap();
     if index < cfg.blocks.len() {
         cfg.blocks.remove(index);
+        let now_local = Local::now();
+        if let Some((h, m)) = get_today_last_block_end(&cfg.blocks, now_local.weekday()) {
+            cfg.timer.target_hour = h;
+            cfg.timer.target_min = m;
+        }
         let _ = cfg.save();
     }
 }
@@ -215,8 +250,17 @@ fn close_app(app: AppHandle, state: State<'_, AppState>) {
 }
 
 fn main() {
-    let (initial_config, _) = AppConfig::load();
+    let (mut initial_config, _) = AppConfig::load();
     let alarm = AlarmManager::new();
+
+    let now_local = Local::now();
+    if let Some((h, m)) = get_today_last_block_end(&initial_config.blocks, now_local.weekday()) {
+        if initial_config.timer.target_hour == 18 && initial_config.timer.target_min == 0 {
+            initial_config.timer.target_hour = h;
+            initial_config.timer.target_min = m;
+            let _ = initial_config.save();
+        }
+    }
 
     tauri::Builder::default()
         .manage(AppState {
@@ -227,6 +271,7 @@ fn main() {
             get_snapshot,
             drag_window,
             toggle_mode,
+            set_timer_target,
             toggle_pin,
             save_block,
             delete_block,

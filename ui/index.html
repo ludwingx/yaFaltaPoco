@@ -612,7 +612,16 @@
         document.getElementById('lbl-date').textContent = snap.date_title;
         document.getElementById('lbl-time').textContent = snap.current_time_str;
         document.getElementById('lbl-countdown').textContent = snap.countdown_str;
-        document.getElementById('lbl-block-name').textContent = snap.block_name;
+        const blockNameEl = document.getElementById('lbl-block-name');
+        blockNameEl.textContent = snap.block_name;
+        if (snap.mode === 'Temporizador') {
+          blockNameEl.title = 'Haz clic para ajustar la hora meta';
+          blockNameEl.style.cursor = 'pointer';
+        } else {
+          blockNameEl.title = '';
+          blockNameEl.style.cursor = 'default';
+        }
+
         document.getElementById('lbl-weekday').textContent = snap.weekday_str;
         document.getElementById('lbl-events-count').textContent = snap.events_count_str;
         document.getElementById('btn-mode').textContent = snap.mode;
@@ -704,6 +713,22 @@
     document.getElementById('btn-mode').onclick = async () => {
       await invoke('toggle_mode');
       pollSnapshot();
+    };
+
+    document.getElementById('lbl-block-name').onclick = async () => {
+      const modeBtn = document.getElementById('btn-mode').textContent;
+      if (modeBtn === 'Temporizador') {
+        const currentText = document.getElementById('lbl-block-name').textContent;
+        const defaultTime = currentText.replace(/[^0-9:]/g, '') || '20:00';
+        const newTime = prompt('Ajustar hora meta (HH:MM):', defaultTime);
+        if (newTime && newTime.includes(':')) {
+          const parts = newTime.split(':').map(Number);
+          if (!isNaN(parts[0]) && !isNaN(parts[1])) {
+            await invoke('set_timer_target', { hour: parts[0], min: parts[1] });
+            pollSnapshot();
+          }
+        }
+      }
     };
 
     document.getElementById('btn-close').onclick = () => {

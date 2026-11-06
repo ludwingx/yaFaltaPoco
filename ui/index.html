@@ -8,16 +8,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-glass: rgba(14, 18, 27, 0.88);
-      --border-glass: rgba(255, 255, 255, 0.08);
-      --border-highlight: rgba(255, 255, 255, 0.16);
-      --text-main: #f8fafc;
+      --bg-surface: #101522;
+      --border-subtle: rgba(255, 255, 255, 0.07);
+      --text-white: #ffffff;
       --text-muted: #94a3b8;
-      --text-sub: #64748b;
-      --accent-blue: #3b82f6;
-      --accent-cyan: #06b6d4;
-      --accent-emerald: #10b981;
-      --card-gradient: linear-gradient(175deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.75) 55%, rgba(30, 64, 175, 0.8) 100%);
+      --text-dim: #64748b;
+      --blue-accent: #3b82f6;
+      --blue-glow: #1d4ed8;
+      --green-ring: #34d399;
     }
 
     * {
@@ -39,32 +37,28 @@
       width: 100vw;
     }
 
-    /* Contenedor Flotante Ultra Moderno */
+    /* Widget Exterior: Proporciones armónicas y sin márgenes apretados */
     .widget-container {
       width: 610px;
       height: 310px;
-      background: var(--bg-glass);
-      backdrop-filter: blur(28px) saturate(190%);
-      -webkit-backdrop-filter: blur(28px) saturate(190%);
-      border: 1px solid var(--border-glass);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
       border-radius: 28px;
-      box-shadow: 
-        0 20px 40px -10px rgba(0, 0, 0, 0.7),
-        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.8);
       padding: 16px 20px 18px 20px;
       display: flex;
       flex-direction: column;
       position: relative;
     }
 
-    /* Barra Superior Sutil y Discreta */
+    /* Barra Superior */
     .top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 12px;
-      padding: 0 4px;
       cursor: grab;
+      padding: 0 4px;
     }
 
     .top-bar:active {
@@ -72,28 +66,14 @@
     }
 
     .brand-tag {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-
-    .brand-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent-cyan);
-      box-shadow: 0 0 8px var(--accent-cyan);
-    }
-
-    .brand-title {
-      font-size: 10.5px;
+      font-size: 11px;
       font-weight: 700;
       letter-spacing: 1.2px;
-      color: var(--text-sub);
+      color: var(--text-dim);
       text-transform: uppercase;
     }
 
-    .window-controls {
+    .top-actions {
       display: flex;
       gap: 6px;
       align-items: center;
@@ -101,28 +81,27 @@
 
     .btn-pill {
       background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
       color: var(--text-muted);
       font-size: 11px;
       font-weight: 600;
       padding: 3px 10px;
-      border-radius: 20px;
+      border-radius: 16px;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 5px;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.15s;
     }
 
     .btn-pill:hover {
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--text-main);
-      border-color: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.09);
+      color: var(--text-white);
     }
 
     .btn-pill.pinned {
-      background: rgba(56, 189, 248, 0.15);
-      border-color: rgba(56, 189, 248, 0.35);
+      background: rgba(56, 189, 248, 0.12);
+      border-color: rgba(56, 189, 248, 0.3);
       color: #38bdf8;
     }
 
@@ -130,57 +109,42 @@
       width: 22px;
       height: 22px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.04);
       border: none;
-      color: var(--text-sub);
+      color: var(--text-dim);
       font-size: 11px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.15s;
     }
 
     .btn-close:hover {
-      background: rgba(239, 68, 68, 0.25);
+      background: rgba(239, 68, 68, 0.2);
       color: #f87171;
     }
 
-    /* Layout Principal */
+    /* Grid de Contenido */
     .content-layout {
       display: grid;
       grid-template-columns: 215px 1fr;
-      gap: 20px;
+      gap: 22px;
       flex: 1;
       height: calc(100% - 34px);
     }
 
-    /* Tarjeta Izquierda (Hero de Tiempo) */
+    /* Tarjeta Izquierda (Hero) */
     .card-hero {
-      background: var(--card-gradient);
+      background: linear-gradient(180deg, #0a0d14 45%, #1844b8 100%);
       border-radius: 22px;
-      border: 1px solid var(--border-glass);
-      box-shadow: 
-        inset 0 1px 0 rgba(255, 255, 255, 0.15),
-        0 8px 24px -6px rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--border-subtle);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
       padding: 18px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       position: relative;
-      overflow: hidden;
-    }
-
-    /* Resplandor orgánico en la base */
-    .card-hero::after {
-      content: '';
-      position: absolute;
-      bottom: -30px;
-      left: 10%;
-      width: 80%;
-      height: 80px;
-      background: radial-gradient(circle, rgba(59, 130, 246, 0.45) 0%, transparent 70%);
-      pointer-events: none;
     }
 
     .date-row {
@@ -189,40 +153,36 @@
     }
 
     .date-main {
-      font-size: 26px;
+      font-size: 27px;
       font-weight: 800;
-      color: var(--text-main);
-      letter-spacing: -0.6px;
+      color: var(--text-white);
+      letter-spacing: -0.5px;
       line-height: 1.1;
     }
 
     .clock-badge {
       font-family: 'JetBrains Mono', monospace;
       font-size: 12px;
-      font-weight: 500;
       color: var(--text-muted);
       margin-top: 4px;
-      letter-spacing: 0.5px;
     }
 
     .countdown-hub {
       text-align: center;
-      z-index: 1;
-      margin-top: -4px;
+      margin-top: -6px;
     }
 
     .timer-display {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 29px;
+      font-size: 28px;
       font-weight: 700;
       color: #ffffff;
       letter-spacing: -0.5px;
-      text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
       line-height: 1.1;
     }
 
     .timer-sublabel {
-      font-size: 11.5px;
+      font-size: 11px;
       font-weight: 600;
       color: #93c5fd;
       margin-top: 4px;
@@ -236,22 +196,20 @@
     .day-info {
       display: flex;
       flex-direction: column;
-      z-index: 1;
     }
 
     .day-text {
-      font-size: 14.5px;
+      font-size: 15px;
       font-weight: 700;
-      color: var(--text-main);
+      color: var(--text-white);
     }
 
     .blocks-stat {
-      font-size: 12px;
-      font-weight: 500;
+      font-size: 12.5px;
       color: #bfdbfe;
     }
 
-    /* Columna Derecha (Agenda de Horarios) */
+    /* Columna Derecha (Agenda) */
     .agenda-section {
       display: flex;
       flex-direction: column;
@@ -259,20 +217,14 @@
       height: 100%;
     }
 
-    .agenda-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      padding: 0 4px;
-    }
-
     .agenda-title {
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 1.5px;
-      color: var(--text-sub);
+      color: var(--text-dim);
       text-transform: uppercase;
+      margin-bottom: 8px;
+      padding-left: 2px;
     }
 
     .schedule-stream {
@@ -280,61 +232,55 @@
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 7px;
-      padding-right: 4px;
-      max-height: 185px;
+      gap: 6px;
+      padding-right: 6px;
+      max-height: 175px;
     }
 
     .schedule-stream::-webkit-scrollbar {
       width: 4px;
     }
     .schedule-stream::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.1);
       border-radius: 4px;
     }
 
-    /* Item de Bloque de Horario */
-    .block-card {
-      background: rgba(255, 255, 255, 0.025);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 14px;
-      padding: 8px 12px;
+    /* Fila de Bloque: Minimalista y elegante, sin cajas gigantes */
+    .block-row {
       display: flex;
       align-items: center;
       gap: 12px;
+      padding: 7px 10px;
+      border-radius: 10px;
       cursor: pointer;
       position: relative;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: background 0.15s;
     }
 
-    .block-card:hover {
-      background: rgba(255, 255, 255, 0.06);
-      border-color: rgba(255, 255, 255, 0.12);
-      transform: translateY(-1px);
+    .block-row:hover {
+      background: rgba(255, 255, 255, 0.05);
     }
 
-    .block-card.active {
+    .block-row.active {
       background: rgba(59, 130, 246, 0.12);
-      border-color: rgba(59, 130, 246, 0.35);
-      box-shadow: 0 4px 16px -4px rgba(59, 130, 246, 0.2);
     }
 
-    .block-card.completed {
-      opacity: 0.55;
+    .block-row.completed {
+      opacity: 0.5;
     }
 
-    .block-card.completed .block-name-text {
+    .block-row.completed .block-name-text {
       text-decoration: line-through;
     }
 
-    .accent-indicator {
+    .accent-bar {
       width: 3.5px;
       height: 28px;
-      border-radius: 3px;
+      border-radius: 2px;
       flex-shrink: 0;
     }
 
-    .block-info-col {
+    .block-info {
       display: flex;
       flex-direction: column;
       flex: 1;
@@ -344,69 +290,64 @@
     .block-name-text {
       font-size: 13.5px;
       font-weight: 600;
-      color: var(--text-main);
-      letter-spacing: -0.2px;
+      color: #f1f5f9;
     }
 
     .block-time-range {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 11.5px;
-      color: var(--text-sub);
+      font-size: 11px;
+      color: var(--text-dim);
     }
 
-    .block-card.active .block-time-range {
+    .block-row.active .block-time-range {
       color: #60a5fa;
       font-weight: 600;
     }
 
     .status-badge {
-      font-size: 10px;
+      font-size: 9.5px;
       font-weight: 700;
       text-transform: uppercase;
       padding: 2px 7px;
-      border-radius: 10px;
+      border-radius: 8px;
       background: rgba(59, 130, 246, 0.2);
       color: #93c5fd;
       letter-spacing: 0.5px;
     }
 
-    /* Botón Flotante "+" Luminoso */
+    /* Botón Flotante "+" Circular con aro luminoso */
     .fab-add {
       position: absolute;
-      right: 6px;
+      right: 4px;
       bottom: 2px;
       width: 38px;
       height: 38px;
       border-radius: 50%;
-      background: #0f172a;
-      border: 1.5px solid var(--accent-emerald);
+      background: #0b0f19;
+      border: 2px solid var(--green-ring);
       color: #ffffff;
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 300;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      box-shadow: 
-        0 4px 14px rgba(16, 185, 129, 0.35),
-        inset 0 0 10px rgba(16, 185, 129, 0.2);
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 0 12px rgba(52, 211, 153, 0.4);
+      transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
       z-index: 5;
     }
 
     .fab-add:hover {
-      transform: scale(1.1);
-      box-shadow: 
-        0 6px 20px rgba(16, 185, 129, 0.55),
-        inset 0 0 14px rgba(16, 185, 129, 0.3);
+      transform: scale(1.08);
+      box-shadow: 0 0 18px rgba(52, 211, 153, 0.65);
     }
 
-    /* Editor Modal Integrado y Pulido */
+    /* Modal Editor Integrado */
     .editor-overlay {
       position: absolute;
       inset: 12px 16px;
-      background: rgba(15, 23, 42, 0.98);
-      border: 1px solid var(--border-highlight);
+      background: rgba(11, 15, 25, 0.98);
+      border: 1px solid var(--border-subtle);
       border-radius: 20px;
       padding: 16px 20px;
       display: none;
@@ -414,17 +355,10 @@
       justify-content: space-between;
       z-index: 20;
       box-shadow: 0 16px 36px rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(20px);
     }
 
     .editor-overlay.visible {
       display: flex;
-      animation: fadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.98); }
-      to { opacity: 1; transform: scale(1); }
     }
 
     .editor-top {
@@ -436,7 +370,7 @@
     .editor-heading {
       font-size: 15px;
       font-weight: 700;
-      color: var(--text-main);
+      color: var(--text-white);
     }
 
     .form-group {
@@ -455,18 +389,16 @@
     .text-field {
       flex: 1;
       background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-glass);
-      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
       padding: 6px 12px;
       color: #ffffff;
       font-size: 13px;
       outline: none;
-      transition: border-color 0.2s;
     }
 
     .text-field:focus {
-      border-color: var(--accent-blue);
-      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--blue-accent);
     }
 
     .time-inputs {
@@ -478,7 +410,7 @@
     .time-field {
       width: 52px;
       background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-glass);
+      border: 1px solid var(--border-subtle);
       border-radius: 8px;
       padding: 5px 6px;
       color: #ffffff;
@@ -489,7 +421,7 @@
     }
 
     .time-field:focus {
-      border-color: var(--accent-blue);
+      border-color: var(--blue-accent);
     }
 
     .palette-row {
@@ -506,11 +438,7 @@
       transition: transform 0.15s;
     }
 
-    .swatch:hover {
-      transform: scale(1.15);
-    }
-
-    .swatch.selected {
+    .swatch:hover, .swatch.selected {
       border-color: #ffffff;
       transform: scale(1.15);
     }
@@ -524,7 +452,7 @@
 
     .action-btn {
       padding: 6px 16px;
-      border-radius: 10px;
+      border-radius: 8px;
       font-size: 12.5px;
       font-weight: 600;
       border: none;
@@ -533,7 +461,7 @@
     }
 
     .btn-save {
-      background: var(--accent-blue);
+      background: var(--blue-accent);
       color: #ffffff;
     }
     .btn-save:hover {
@@ -544,9 +472,6 @@
       background: rgba(239, 68, 68, 0.15);
       color: #f87171;
       border: 1px solid rgba(239, 68, 68, 0.25);
-    }
-    .btn-delete:hover {
-      background: rgba(239, 68, 68, 0.3);
     }
 
     .btn-cancel {
@@ -561,20 +486,17 @@
 </head>
 <body>
   <div class="widget-container">
-    <!-- Barra Superior Arrastrable -->
+    <!-- Barra Superior -->
     <div class="top-bar" data-tauri-drag-region>
-      <div class="brand-tag" data-tauri-drag-region>
-        <span class="brand-dot"></span>
-        <span class="brand-title" data-tauri-drag-region>Ya Falta Poco</span>
-      </div>
-      <div class="window-controls">
+      <div class="brand-tag" data-tauri-drag-region>YA FALTA POCO</div>
+      <div class="top-actions">
         <button class="btn-pill" id="btn-mode">Horario</button>
         <button class="btn-pill pinned" id="btn-pin">📌 Fijado</button>
         <button class="btn-close" id="btn-close">✕</button>
       </div>
     </div>
 
-    <!-- Contenido en 2 Bloques -->
+    <!-- Contenido -->
     <div class="content-layout">
       <!-- Tarjeta Izquierda (Hero) -->
       <div class="card-hero">
@@ -596,15 +518,13 @@
 
       <!-- Sección Derecha (Agenda) -->
       <div class="agenda-section">
-        <div class="agenda-header">
-          <span class="agenda-title">Hoy</span>
-        </div>
+        <div class="agenda-title">HOY</div>
 
         <div class="schedule-stream" id="schedule-container">
           <!-- Bloques inyectados dinámicamente -->
         </div>
 
-        <!-- Botón Añadir Flotante -->
+        <!-- Botón Flotante "+" -->
         <button class="fab-add" id="btn-open-editor" title="Añadir Bloque">+</button>
       </div>
     </div>
@@ -625,11 +545,11 @@
         <span class="form-label">Horario</span>
         <div class="time-inputs">
           <input type="number" id="inp-start-h" class="time-field" min="0" max="23" value="08">
-          <span style="color:var(--text-sub)">:</span>
+          <span style="color:var(--text-dim)">:</span>
           <input type="number" id="inp-start-m" class="time-field" min="0" max="59" value="00">
-          <span style="color:var(--text-sub); margin: 0 4px">hasta</span>
+          <span style="color:var(--text-dim); margin: 0 4px">hasta</span>
           <input type="number" id="inp-end-h" class="time-field" min="0" max="23" value="12">
-          <span style="color:var(--text-sub)">:</span>
+          <span style="color:var(--text-dim)">:</span>
           <input type="number" id="inp-end-m" class="time-field" min="0" max="59" value="00">
         </div>
       </div>
@@ -654,7 +574,7 @@
     let activeColor = { r: 59, g: 130, b: 246 };
 
     const COLOR_PRESETS = [
-      { r: 59, g: 130, b: 246 },  // Azul Zafiro
+      { r: 59, g: 130, b: 246 },  // Azul
       { r: 168, g: 85, b: 247 },  // Violeta
       { r: 245, g: 158, b: 11 },  // Ámbar
       { r: 16, g: 185, b: 129 },  // Esmeralda
@@ -718,23 +638,23 @@
         const isActive = nowTotal >= start && nowTotal < end;
         const isCompleted = nowTotal >= end;
 
-        const card = document.createElement('div');
-        card.className = 'block-card' + (isActive ? ' active' : '') + (isCompleted ? ' completed' : '');
-        card.onclick = () => openModal(idx, block);
+        const row = document.createElement('div');
+        row.className = 'block-row' + (isActive ? ' active' : '') + (isCompleted ? ' completed' : '');
+        row.onclick = () => openModal(idx, block);
 
         const pad = (num) => String(num).padStart(2, '0');
         const rangeText = `${pad(block.start_hour)}:${pad(block.start_min)} - ${pad(block.end_hour)}:${pad(block.end_min)}`;
 
-        card.innerHTML = `
-          <div class="accent-indicator" style="background: rgb(${block.color.r}, ${block.color.g}, ${block.color.b})"></div>
-          <div class="block-info-col">
+        row.innerHTML = `
+          <div class="accent-bar" style="background: rgb(${block.color.r}, ${block.color.g}, ${block.color.b})"></div>
+          <div class="block-info">
             <span class="block-name-text">${block.title}</span>
             <span class="block-time-range">${rangeText}</span>
           </div>
           ${isActive ? '<span class="status-badge">En curso</span>' : ''}
         `;
 
-        container.appendChild(card);
+        container.appendChild(row);
       });
     }
 

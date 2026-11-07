@@ -20,6 +20,8 @@ pub struct AppConfig {
     pub blocks: Vec<TimeBlock>,
     pub timer: SimpleTimer,
     pub window_pos: Option<[f32; 2]>,
+    #[serde(default)]
+    pub window_size: Option<[f64; 2]>,
     pub always_on_top: bool,
     pub opacity: f32,
     pub compact_mode: bool,
@@ -37,6 +39,7 @@ impl Default for AppConfig {
             blocks: default_sample_blocks(),
             timer: SimpleTimer::default(),
             window_pos: None,
+            window_size: None,
             always_on_top: true,
             opacity: 0.95,
             compact_mode: false,

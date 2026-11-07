@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <style>
     :root {
+      --s: 1;
       --bg-surface: #101522;
       --border-subtle: rgba(255, 255, 255, 0.07);
       --text-white: #ffffff;
@@ -30,25 +31,27 @@
     body {
       background: transparent;
       overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      margin: 0;
+      padding: 0;
       height: 100vh;
       width: 100vw;
+      display: block;
     }
 
-    /* Widget Exterior: Proporciones armónicas y sin márgenes apretados */
+    /* Widget Exterior: Llena la ventana y escala proporcionalmente */
     .widget-container {
-      width: 610px;
-      height: 310px;
+      width: 100%;
+      height: 100%;
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
-      border-radius: 28px;
-      box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.8);
-      padding: 16px 20px 18px 20px;
+      border-radius: calc(var(--s) * 24px);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7);
+      padding: calc(var(--s) * 12px) calc(var(--s) * 16px) calc(var(--s) * 12px) calc(var(--s) * 16px);
       display: flex;
       flex-direction: column;
       position: relative;
+      overflow: hidden;
+      box-sizing: border-box;
     }
 
     /* Barra Superior */
@@ -56,9 +59,10 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: calc(var(--s) * 10px);
       cursor: grab;
-      padding: 0 4px;
+      padding: 0 calc(var(--s) * 2px);
+      flex-shrink: 0;
     }
 
     .top-bar:active {
@@ -66,27 +70,27 @@
     }
 
     .brand-tag {
-      font-size: 11px;
+      font-size: calc(var(--s) * 11px);
       font-weight: 700;
-      letter-spacing: 1.2px;
+      letter-spacing: calc(var(--s) * 1.2px);
       color: var(--text-dim);
       text-transform: uppercase;
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: calc(var(--s) * 7px);
     }
 
     .brand-dot {
-      width: 7px;
-      height: 7px;
+      width: calc(var(--s) * 7px);
+      height: calc(var(--s) * 7px);
       border-radius: 50%;
       background: #06b6d4;
-      box-shadow: 0 0 8px #06b6d4;
+      box-shadow: 0 0 calc(var(--s) * 8px) #06b6d4;
     }
 
     .top-actions {
       display: flex;
-      gap: 6px;
+      gap: calc(var(--s) * 6px);
       align-items: center;
     }
 
@@ -94,14 +98,14 @@
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid var(--border-subtle);
       color: var(--text-muted);
-      font-size: 11px;
+      font-size: calc(var(--s) * 11px);
       font-weight: 600;
-      padding: 3px 10px;
-      border-radius: 16px;
+      padding: calc(var(--s) * 3px) calc(var(--s) * 9px);
+      border-radius: calc(var(--s) * 16px);
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: calc(var(--s) * 5px);
       transition: all 0.15s;
     }
 
@@ -110,15 +114,14 @@
       color: var(--text-white);
     }
 
-
     .btn-close {
-      width: 22px;
-      height: 22px;
+      width: calc(var(--s) * 22px);
+      height: calc(var(--s) * 22px);
       border-radius: 50%;
       background: rgba(255, 255, 255, 0.04);
       border: none;
       color: var(--text-dim);
-      font-size: 11px;
+      font-size: calc(var(--s) * 11px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -132,13 +135,13 @@
     }
 
     .btn-icon {
-      width: 22px;
-      height: 22px;
+      width: calc(var(--s) * 22px);
+      height: calc(var(--s) * 22px);
       border-radius: 50%;
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid var(--border-subtle);
       color: var(--text-muted);
-      font-size: 11px;
+      font-size: calc(var(--s) * 11px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -160,23 +163,25 @@
     /* Grid de Contenido */
     .content-layout {
       display: grid;
-      grid-template-columns: 215px 1fr;
-      gap: 22px;
+      grid-template-columns: minmax(calc(var(--s) * 150px), calc(var(--s) * 215px)) 1fr;
+      gap: calc(var(--s) * 16px);
       flex: 1;
-      height: calc(100% - 34px);
+      min-height: 0;
+      height: calc(100% - calc(var(--s) * 32px));
     }
 
     /* Tarjeta Izquierda (Hero) */
     .card-hero {
       background: linear-gradient(180deg, #0a0d14 45%, #1844b8 100%);
-      border-radius: 22px;
+      border-radius: calc(var(--s) * 18px);
       border: 1px solid var(--border-subtle);
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
-      padding: 18px;
+      padding: calc(var(--s) * 14px);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       position: relative;
+      height: 100%;
     }
 
     .date-row {
@@ -185,7 +190,7 @@
     }
 
     .date-main {
-      font-size: 27px;
+      font-size: calc(var(--s) * 26px);
       font-weight: 800;
       color: var(--text-white);
       letter-spacing: -0.5px;
@@ -194,9 +199,9 @@
 
     .clock-badge {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
+      font-size: calc(var(--s) * 12px);
       color: var(--text-muted);
-      margin-top: 4px;
+      margin-top: calc(var(--s) * 4px);
     }
 
     .countdown-hub {
@@ -207,25 +212,25 @@
       justify-content: center;
       margin-top: auto;
       margin-bottom: auto;
-      padding-top: 6px;
+      padding-top: calc(var(--s) * 6px);
     }
 
     .timer-display {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 32px;
+      font-size: calc(var(--s) * 32px);
       font-weight: 700;
       color: #ffffff;
       letter-spacing: -0.5px;
       line-height: 1.1;
-      text-shadow: 0 0 16px rgba(59, 130, 246, 0.45);
+      text-shadow: 0 0 calc(var(--s) * 16px) rgba(59, 130, 246, 0.45);
     }
 
     .timer-sublabel {
-      font-size: 11.5px;
+      font-size: calc(var(--s) * 11px);
       font-weight: 600;
       color: #93c5fd;
-      margin-top: 6px;
-      max-width: 185px;
+      margin-top: calc(var(--s) * 5px);
+      max-width: calc(var(--s) * 185px);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -238,44 +243,45 @@
       flex-direction: column;
       position: relative;
       height: 100%;
+      min-height: 0;
     }
 
     .agenda-title {
-      font-size: 11px;
+      font-size: calc(var(--s) * 11px);
       font-weight: 700;
-      letter-spacing: 1.5px;
+      letter-spacing: calc(var(--s) * 1.5px);
       color: var(--text-dim);
       text-transform: uppercase;
-      margin-bottom: 8px;
+      margin-bottom: calc(var(--s) * 6px);
       padding-left: 2px;
     }
 
     .schedule-stream {
       flex: 1;
+      min-height: 0;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      padding-right: 6px;
-      padding-bottom: 40px;
-      max-height: 175px;
+      gap: calc(var(--s) * 5px);
+      padding-right: calc(var(--s) * 4px);
+      padding-bottom: calc(var(--s) * 36px);
     }
 
     .schedule-stream::-webkit-scrollbar {
-      width: 4px;
+      width: calc(var(--s) * 4px);
     }
     .schedule-stream::-webkit-scrollbar-thumb {
       background: rgba(255, 255, 255, 0.1);
       border-radius: 4px;
     }
 
-    /* Fila de Bloque: Minimalista y elegante, sin cajas gigantes */
+    /* Fila de Bloque: Minimalista y elegante */
     .block-row {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 7px 10px;
-      border-radius: 10px;
+      gap: calc(var(--s) * 10px);
+      padding: calc(var(--s) * 6px) calc(var(--s) * 10px);
+      border-radius: calc(var(--s) * 9px);
       cursor: pointer;
       position: relative;
       transition: background 0.15s;
@@ -298,8 +304,8 @@
     }
 
     .accent-bar {
-      width: 3.5px;
-      height: 28px;
+      width: calc(var(--s) * 3.5px);
+      height: calc(var(--s) * 24px);
       border-radius: 2px;
       flex-shrink: 0;
     }
@@ -309,17 +315,21 @@
       flex-direction: column;
       flex: 1;
       gap: 2px;
+      min-width: 0;
     }
 
     .block-name-text {
-      font-size: 13.5px;
+      font-size: calc(var(--s) * 13px);
       font-weight: 600;
       color: #f1f5f9;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .block-time-range {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
+      font-size: calc(var(--s) * 10.5px);
       color: var(--text-dim);
     }
 
@@ -329,28 +339,29 @@
     }
 
     .status-badge {
-      font-size: 9.5px;
+      font-size: calc(var(--s) * 9px);
       font-weight: 700;
       text-transform: uppercase;
-      padding: 2px 7px;
-      border-radius: 8px;
+      padding: calc(var(--s) * 2px) calc(var(--s) * 6px);
+      border-radius: calc(var(--s) * 8px);
       background: rgba(59, 130, 246, 0.2);
       color: #93c5fd;
       letter-spacing: 0.5px;
+      flex-shrink: 0;
     }
 
     /* Botón Flotante "+" Circular con aro luminoso */
     .fab-add {
       position: absolute;
-      right: 4px;
-      bottom: 2px;
-      width: 38px;
-      height: 38px;
+      right: calc(var(--s) * 4px);
+      bottom: calc(var(--s) * 2px);
+      width: calc(var(--s) * 34px);
+      height: calc(var(--s) * 34px);
       border-radius: 50%;
       background: #0b0f19;
       border: 2px solid var(--green-ring);
       color: #ffffff;
-      font-size: 22px;
+      font-size: calc(var(--s) * 20px);
       font-weight: 300;
       display: flex;
       align-items: center;
@@ -366,14 +377,63 @@
       box-shadow: 0 0 18px rgba(52, 211, 153, 0.65);
     }
 
+    /* Manijas de Redimensionamiento */
+    .resize-handle.corner-se {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 22px;
+      height: 22px;
+      cursor: se-resize;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+      padding: 4px;
+      z-index: 60;
+    }
+
+    .resize-grip {
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid rgba(255, 255, 255, 0.4);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+      border-bottom-right-radius: 2px;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+
+    .resize-handle.corner-se:hover .resize-grip {
+      border-color: #38bdf8;
+      transform: scale(1.2);
+    }
+
+    .resize-handle.edge-r {
+      position: absolute;
+      right: 0;
+      top: 15px;
+      bottom: 22px;
+      width: 6px;
+      cursor: e-resize;
+      z-index: 40;
+    }
+
+    .resize-handle.edge-b {
+      position: absolute;
+      left: 15px;
+      right: 22px;
+      bottom: 0;
+      height: 6px;
+      cursor: s-resize;
+      z-index: 40;
+    }
+
     /* Modal Editor Integrado */
     .editor-overlay {
       position: absolute;
-      inset: 12px 16px;
+      inset: calc(var(--s) * 10px) calc(var(--s) * 14px);
       background: rgba(11, 15, 25, 0.98);
       border: 1px solid var(--border-subtle);
-      border-radius: 20px;
-      padding: 16px 20px;
+      border-radius: calc(var(--s) * 18px);
+      padding: calc(var(--s) * 14px) calc(var(--s) * 18px);
       display: none;
       flex-direction: column;
       justify-content: space-between;
@@ -392,7 +452,7 @@
     }
 
     .editor-heading {
-      font-size: 15px;
+      font-size: calc(var(--s) * 14px);
       font-weight: 700;
       color: var(--text-white);
     }
@@ -400,24 +460,24 @@
     .form-group {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: calc(var(--s) * 10px);
     }
 
     .form-label {
-      font-size: 12.5px;
+      font-size: calc(var(--s) * 12px);
       font-weight: 600;
       color: var(--text-muted);
-      width: 60px;
+      width: calc(var(--s) * 55px);
     }
 
     .text-field {
       flex: 1;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border-subtle);
-      border-radius: 8px;
-      padding: 6px 12px;
+      border-radius: calc(var(--s) * 8px);
+      padding: calc(var(--s) * 5px) calc(var(--s) * 10px);
       color: #ffffff;
-      font-size: 13px;
+      font-size: calc(var(--s) * 12.5px);
       outline: none;
     }
 
@@ -428,18 +488,18 @@
     .time-inputs {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: calc(var(--s) * 5px);
     }
 
     .time-field {
-      width: 52px;
+      width: calc(var(--s) * 48px);
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border-subtle);
-      border-radius: 8px;
-      padding: 5px 6px;
+      border-radius: calc(var(--s) * 7px);
+      padding: calc(var(--s) * 4px) calc(var(--s) * 5px);
       color: #ffffff;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
+      font-size: calc(var(--s) * 12px);
       text-align: center;
       outline: none;
     }
@@ -450,13 +510,13 @@
 
     .palette-row {
       display: flex;
-      gap: 8px;
+      gap: calc(var(--s) * 7px);
     }
 
     .swatch {
-      width: 22px;
-      height: 22px;
-      border-radius: 6px;
+      width: calc(var(--s) * 20px);
+      height: calc(var(--s) * 20px);
+      border-radius: calc(var(--s) * 5px);
       cursor: pointer;
       border: 2px solid transparent;
       transition: transform 0.15s;
@@ -470,14 +530,14 @@
     .footer-actions {
       display: flex;
       justify-content: flex-end;
-      gap: 8px;
-      margin-top: 6px;
+      gap: calc(var(--s) * 8px);
+      margin-top: calc(var(--s) * 4px);
     }
 
     .action-btn {
-      padding: 6px 16px;
-      border-radius: 8px;
-      font-size: 12.5px;
+      padding: calc(var(--s) * 5px) calc(var(--s) * 14px);
+      border-radius: calc(var(--s) * 7px);
+      font-size: calc(var(--s) * 12px);
       font-weight: 600;
       border: none;
       cursor: pointer;
@@ -587,6 +647,13 @@
       </div>
     </div>
     <audio id="snd-alarm" src="alarm.mp3" preload="auto"></audio>
+
+    <!-- Manijas de Redimensionamiento -->
+    <div class="resize-handle corner-se" id="resize-corner" title="Arrastrar esquina para cambiar tamaño">
+      <div class="resize-grip"></div>
+    </div>
+    <div class="resize-handle edge-r" id="resize-edge-r" title="Arrastrar borde para cambiar ancho"></div>
+    <div class="resize-handle edge-b" id="resize-edge-b" title="Arrastrar borde para cambiar alto"></div>
   </div>
 
   <script>
@@ -752,10 +819,76 @@
       currentEditingIndex = null;
     }
 
+    // Responsive Scaling Function
+    function updateResponsiveScale() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const scaleW = w / 640;
+      const scaleH = h / 340;
+      const scale = Math.max(0.55, Math.min(2.0, Math.min(scaleW, scaleH)));
+      document.documentElement.style.setProperty('--s', scale.toFixed(4));
+    }
+    window.addEventListener('resize', updateResponsiveScale);
+    updateResponsiveScale();
+
+    // Corner and Edge Resizing via Pointer Events
+    function initWindowResizing() {
+      const corner = document.getElementById('resize-corner');
+      const edgeR = document.getElementById('resize-edge-r');
+      const edgeB = document.getElementById('resize-edge-b');
+
+      function setupHandle(element, resizeX, resizeY) {
+        if (!element) return;
+        element.addEventListener('pointerdown', (e) => {
+          if (e.button !== 0) return;
+          e.preventDefault();
+          e.stopPropagation();
+
+          try { element.setPointerCapture(e.pointerId); } catch (_) {}
+
+          const startScreenX = e.screenX;
+          const startScreenY = e.screenY;
+          const startW = window.innerWidth;
+          const startH = window.innerHeight;
+
+          let animFrameId = null;
+
+          const onPointerMove = (ev) => {
+            const deltaX = resizeX ? (ev.screenX - startScreenX) : 0;
+            const deltaY = resizeY ? (ev.screenY - startScreenY) : 0;
+            const newW = Math.max(320, Math.round(startW + deltaX));
+            const newH = Math.max(180, Math.round(startH + deltaY));
+
+            if (animFrameId) cancelAnimationFrame(animFrameId);
+            animFrameId = requestAnimationFrame(() => {
+              invoke('resize_window', { width: newW, height: newH });
+            });
+          };
+
+          const onPointerUp = (ev) => {
+            try { element.releasePointerCapture(ev.pointerId); } catch (_) {}
+            element.removeEventListener('pointermove', onPointerMove);
+            element.removeEventListener('pointerup', onPointerUp);
+            element.removeEventListener('pointercancel', onPointerUp);
+            if (animFrameId) cancelAnimationFrame(animFrameId);
+          };
+
+          element.addEventListener('pointermove', onPointerMove);
+          element.addEventListener('pointerup', onPointerUp);
+          element.addEventListener('pointercancel', onPointerUp);
+        });
+      }
+
+      setupHandle(corner, true, true);
+      setupHandle(edgeR, true, false);
+      setupHandle(edgeB, false, true);
+    }
+    initWindowResizing();
+
     // Native OS Window Dragging
     document.addEventListener('mousedown', (e) => {
       if (e.button !== 0) return;
-      if (e.target.closest('button, input, select, textarea, .block-row, .editor-overlay, .swatch')) {
+      if (e.target.closest('button, input, select, textarea, .block-row, .editor-overlay, .swatch, .resize-handle')) {
         return;
       }
       invoke('drag_window');

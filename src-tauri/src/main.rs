@@ -3,7 +3,7 @@
 use std::sync::Mutex;
 use chrono::{Datelike, Local, Timelike};
 use serde::{Deserialize, Serialize};
-use tauri::{AppHandle, Manager, State, WebviewWindow};
+use tauri::{AppHandle, LogicalSize, Manager, Size, State, WebviewWindow};
 
 mod alarm;
 mod config;
@@ -180,6 +180,19 @@ fn drag_window(window: WebviewWindow) {
 }
 
 #[tauri::command]
+fn resize_window(state: State<'_, AppState>, window: WebviewWindow, width: f64, height: f64) {
+    let w = width.max(320.0);
+    let h = height.max(180.0);
+    let _ = window.set_size(Size::Logical(LogicalSize {
+        width: w,
+        height: h,
+    }));
+    let mut cfg = state.config.lock().unwrap();
+    cfg.window_size = Some([w, h]);
+    let _ = cfg.save();
+}
+
+#[tauri::command]
 fn toggle_mode(state: State<'_, AppState>) -> String {
     let mut cfg = state.config.lock().unwrap();
     cfg.mode = match cfg.mode {
@@ -328,6 +341,16 @@ fn main() {
     }
 
     tauri::Builder::default()
+        .setup(|app| {
+            if let Some(win) = app.get_webview_window("main") {
+                let state = app.state::<AppState>();
+                let cfg = state.config.lock().unwrap();
+                if let Some([w, h]) = cfg.window_size {
+                    let _ = win.set_size(Size::Logical(LogicalSize { width: w, height: h }));
+                }
+            }
+            Ok(())
+        })
         .manage(AppState {
             config: Mutex::new(initial_config),
             alarm: Mutex::new(alarm),
@@ -336,6 +359,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             get_snapshot,
             drag_window,
+            resize_window,
             toggle_mode,
             toggle_sound,
             set_timer_target,

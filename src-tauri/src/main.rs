@@ -14,9 +14,18 @@ use alarm::AlarmManager;
 use config::{AppConfig, AppMode};
 use schedule::{evaluate_schedule, format_duration_hms, ColorRgb, ScheduleStatus, TimeBlock, WeekdayFilter};
 
+#[derive(Default)]
+pub struct TurnTracker {
+    pub last_active_block_id: Option<String>,
+    pub last_remaining_secs: Option<i64>,
+    pub last_alarm_played_for: Option<String>,
+    pub should_play_sound: bool,
+}
+
 pub struct AppState {
     pub config: Mutex<AppConfig>,
     pub alarm: Mutex<AlarmManager>,
+    pub tracker: Mutex<TurnTracker>,
 }
 
 #[derive(Serialize)]
@@ -31,14 +40,18 @@ pub struct AppSnapshot {
     pub blocks: Vec<TimeBlock>,
     pub always_on_top: bool,
     pub alarm_active: bool,
+    pub should_play_sound: bool,
+    pub sound_enabled: bool,
 }
 
 #[tauri::command]
 fn get_snapshot(state: State<'_, AppState>) -> AppSnapshot {
-    let mut cfg = state.config.lock().unwrap();
+    let cfg = state.config.lock().unwrap();
     let alarm = state.alarm.lock().unwrap();
+    let mut tracker = state.tracker.lock().unwrap();
     let now_local = Local::now();
     let now_dt = now_local.naive_local();
+    let today_date_str = now_local.format("%Y%m%d").to_string();
 
     let month_name = match now_local.month() {
         1 => "Ene", 2 => "Feb", 3 => "Mar", 4 => "Abr",
@@ -68,17 +81,56 @@ fn get_snapshot(state: State<'_, AppState>) -> AppSnapshot {
             let status = evaluate_schedule(&cfg.blocks, now_dt);
             match status {
                 ScheduleStatus::Active { block, remaining_secs, .. } => {
+                    let block_key = format!("end_{}_{}", block.id, today_date_str);
+                    if remaining_secs <= 0 && tracker.last_alarm_played_for.as_deref() != Some(&block_key) {
+                        if tracker.last_active_block_id.as_deref() == Some(&block.id) {
+                            tracker.should_play_sound = true;
+                            tracker.last_alarm_played_for = Some(block_key);
+                        }
+                    }
+                    tracker.last_active_block_id = Some(block.id.clone());
+                    tracker.last_remaining_secs = Some(remaining_secs);
                     (format_duration_hms(remaining_secs), format!("Termina: {}", block.title))
                 }
                 ScheduleStatus::Between { next_block, starts_in_secs } => {
+                    if let Some(prev_id) = tracker.last_active_block_id.take() {
+                        let prev_key = format!("end_{}_{}", prev_id, today_date_str);
+                        if tracker.last_alarm_played_for.as_deref() != Some(&prev_key) {
+                            tracker.should_play_sound = true;
+                            tracker.last_alarm_played_for = Some(prev_key);
+                        }
+                    }
+                    tracker.last_remaining_secs = Some(starts_in_secs);
                     (format_duration_hms(starts_in_secs), format!("Siguiente: {}", next_block.title))
                 }
-                ScheduleStatus::DayFinished => ("00:00:00".into(), "Día terminado".into()),
-                ScheduleStatus::Empty => ("--:--:--".into(), "Sin bloques".into()),
+                ScheduleStatus::DayFinished => {
+                    if let Some(prev_id) = tracker.last_active_block_id.take() {
+                        let prev_key = format!("end_{}_{}", prev_id, today_date_str);
+                        if tracker.last_alarm_played_for.as_deref() != Some(&prev_key) {
+                            tracker.should_play_sound = true;
+                            tracker.last_alarm_played_for = Some(prev_key);
+                        }
+                    }
+                    tracker.last_remaining_secs = Some(0);
+                    ("00:00:00".into(), "Día terminado".into())
+                }
+                ScheduleStatus::Empty => {
+                    tracker.last_active_block_id = None;
+                    tracker.last_remaining_secs = None;
+                    ("--:--:--".into(), "Sin bloques".into())
+                }
             }
         }
         AppMode::SimpleTimer => {
-            let (remaining_secs, _) = cfg.timer.evaluate(now_dt);
+            let (remaining_secs, reached) = cfg.timer.evaluate(now_dt);
+            let timer_key = format!("timer_{}_{:02}:{:02}", today_date_str, cfg.timer.target_hour, cfg.timer.target_min);
+            if (remaining_secs <= 0 || reached) && tracker.last_alarm_played_for.as_deref() != Some(&timer_key) {
+                if tracker.last_remaining_secs.map_or(false, |s| s > 0) {
+                    tracker.should_play_sound = true;
+                    tracker.last_alarm_played_for = Some(timer_key);
+                }
+            }
+            tracker.last_remaining_secs = Some(remaining_secs);
             let target_str = format!("Meta: {:02}:{:02}", cfg.timer.target_hour, cfg.timer.target_min);
             (format_duration_hms(remaining_secs), target_str)
         }
@@ -95,6 +147,9 @@ fn get_snapshot(state: State<'_, AppState>) -> AppSnapshot {
         AppMode::SimpleTimer => "Temporizador",
     };
 
+    let should_play = tracker.should_play_sound && cfg.sound_enabled;
+    tracker.should_play_sound = false;
+
     AppSnapshot {
         date_title,
         current_time_str,
@@ -106,6 +161,8 @@ fn get_snapshot(state: State<'_, AppState>) -> AppSnapshot {
         blocks: cfg.blocks.clone(),
         always_on_top: cfg.always_on_top,
         alarm_active: alarm.is_active(),
+        should_play_sound: should_play,
+        sound_enabled: cfg.sound_enabled,
     }
 }
 
@@ -237,6 +294,14 @@ fn delete_block(state: State<'_, AppState>, index: usize) {
 }
 
 #[tauri::command]
+fn toggle_sound(state: State<'_, AppState>) -> bool {
+    let mut cfg = state.config.lock().unwrap();
+    cfg.sound_enabled = !cfg.sound_enabled;
+    let _ = cfg.save();
+    cfg.sound_enabled
+}
+
+#[tauri::command]
 fn stop_alarm(state: State<'_, AppState>) {
     let mut alarm = state.alarm.lock().unwrap();
     alarm.stop();
@@ -266,11 +331,13 @@ fn main() {
         .manage(AppState {
             config: Mutex::new(initial_config),
             alarm: Mutex::new(alarm),
+            tracker: Mutex::new(TurnTracker::default()),
         })
         .invoke_handler(tauri::generate_handler![
             get_snapshot,
             drag_window,
             toggle_mode,
+            toggle_sound,
             set_timer_target,
             toggle_pin,
             save_block,

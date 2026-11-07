@@ -131,6 +131,32 @@
       color: #f87171;
     }
 
+    .btn-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-icon:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--text-white);
+      transform: scale(1.08);
+    }
+
+    @keyframes alarm-pulse {
+      0%, 100% { transform: scale(1); text-shadow: 0 0 16px rgba(59, 130, 246, 0.45); }
+      50% { transform: scale(1.06); text-shadow: 0 0 24px #38bdf8, 0 0 40px #38bdf8; color: #38bdf8; }
+    }
+
     /* Grid de Contenido */
     .content-layout {
       display: grid;
@@ -490,6 +516,7 @@
         <span class="brand-dot"></span>YA FALTA POCO
       </div>
       <div class="top-actions">
+        <button class="btn-icon" id="btn-sound" title="Sonido activado (clic para probar, clic derecho para silenciar)">🔔</button>
         <button class="btn-pill" id="btn-mode">Horario</button>
         <button class="btn-close" id="btn-close" title="Cerrar">✕</button>
       </div>
@@ -559,6 +586,7 @@
         <button class="action-btn btn-save" id="btn-save">Guardar</button>
       </div>
     </div>
+    <audio id="snd-alarm" src="alarm.mp3" preload="auto"></audio>
   </div>
 
   <script>
@@ -592,6 +620,34 @@
       });
     }
 
+    const audioAlarm = document.getElementById('snd-alarm');
+
+    function playAlarm() {
+      if (!audioAlarm) return;
+      audioAlarm.currentTime = 0;
+      audioAlarm.play().catch(e => {
+        console.warn('Audio play error:', e);
+      });
+
+      const cd = document.getElementById('lbl-countdown');
+      if (cd) {
+        cd.style.animation = 'alarm-pulse 0.7s ease-in-out 3';
+        setTimeout(() => { cd.style.animation = ''; }, 2200);
+      }
+    }
+
+    let audioUnlocked = false;
+    function unlockAudio() {
+      if (audioUnlocked || !audioAlarm) return;
+      audioAlarm.play().then(() => {
+        audioAlarm.pause();
+        audioAlarm.currentTime = 0;
+        audioUnlocked = true;
+      }).catch(() => {});
+    }
+    window.addEventListener('click', unlockAudio, { once: true });
+    window.addEventListener('mousedown', unlockAudio, { once: true });
+
     async function pollSnapshot() {
       try {
         const snap = await invoke('get_snapshot');
@@ -609,6 +665,18 @@
         }
 
         document.getElementById('btn-mode').textContent = snap.mode;
+
+        if (snap.should_play_sound) {
+          playAlarm();
+        }
+
+        const soundBtn = document.getElementById('btn-sound');
+        if (soundBtn) {
+          soundBtn.textContent = snap.sound_enabled ? '🔔' : '🔇';
+          soundBtn.title = snap.sound_enabled 
+            ? 'Sonido activado (clic para probar, clic derecho para silenciar)' 
+            : 'Sonido silenciado (clic para activar)';
+        }
 
         renderScheduleStream(snap.blocks, snap.current_time_str);
       } catch (e) {
@@ -694,6 +762,22 @@
     });
 
     // Handlers
+    document.getElementById('btn-sound').onclick = async () => {
+      const soundBtn = document.getElementById('btn-sound');
+      if (soundBtn.textContent === '🔇') {
+        await invoke('toggle_sound');
+        pollSnapshot();
+      } else {
+        playAlarm();
+      }
+    };
+
+    document.getElementById('btn-sound').oncontextmenu = async (e) => {
+      e.preventDefault();
+      await invoke('toggle_sound');
+      pollSnapshot();
+    };
+
     document.getElementById('btn-mode').onclick = async () => {
       await invoke('toggle_mode');
       pollSnapshot();

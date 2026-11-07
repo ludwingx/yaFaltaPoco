@@ -2,7 +2,7 @@
 
 use std::sync::Mutex;
 use chrono::{Datelike, Local, Timelike};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use tauri::{AppHandle, LogicalSize, Manager, Size, State, WebviewWindow};
 
 mod alarm;
@@ -58,6 +58,15 @@ fn get_snapshot(state: State<'_, AppState>) -> AppSnapshot {
         5 => "May", 6 => "Jun", 7 => "Jul", 8 => "Ago",
         9 => "Sep", 10 => "Oct", 11 => "Nov", _ => "Dic",
     };
+    let day_abbrev = match now_local.weekday() {
+        chrono::Weekday::Mon => "Lun",
+        chrono::Weekday::Tue => "Mar",
+        chrono::Weekday::Wed => "Mié",
+        chrono::Weekday::Thu => "Jue",
+        chrono::Weekday::Fri => "Vie",
+        chrono::Weekday::Sat => "Sáb",
+        chrono::Weekday::Sun => "Dom",
+    };
     let weekday_str = match now_local.weekday() {
         chrono::Weekday::Mon => "Lunes",
         chrono::Weekday::Tue => "Martes",
@@ -68,7 +77,7 @@ fn get_snapshot(state: State<'_, AppState>) -> AppSnapshot {
         chrono::Weekday::Sun => "Domingo",
     };
 
-    let date_title = format!("{} {:02}", month_name, now_local.day());
+    let date_title = format!("{} {:02} {} {}", day_abbrev, now_local.day(), month_name, now_local.year());
     let current_time_str = format!(
         "{:02}:{:02}:{:02}",
         now_local.hour(),
@@ -316,7 +325,7 @@ fn toggle_sound(state: State<'_, AppState>) -> bool {
 
 #[tauri::command]
 fn stop_alarm(state: State<'_, AppState>) {
-    let mut alarm = state.alarm.lock().unwrap();
+    let alarm = state.alarm.lock().unwrap();
     alarm.stop();
 }
 

@@ -48,11 +48,23 @@ pub struct WeekdayFilter {
 
 impl Default for WeekdayFilter {
     fn default() -> Self {
-        Self::all()
+        Self::monday_to_saturday()
     }
 }
 
 impl WeekdayFilter {
+    pub const fn monday_to_saturday() -> Self {
+        Self {
+            monday: true,
+            tuesday: true,
+            wednesday: true,
+            thursday: true,
+            friday: true,
+            saturday: true,
+            sunday: false,
+        }
+    }
+
     pub const fn all() -> Self {
         Self {
             monday: true,
@@ -111,7 +123,7 @@ impl TimeBlock {
             end_hour,
             end_min,
             color,
-            days: WeekdayFilter::all(),
+            days: WeekdayFilter::monday_to_saturday(),
             notify_on_start: true,
             notify_on_end: true,
             notify_before_min: Some(5),
@@ -189,6 +201,7 @@ pub enum ScheduleStatus<'a> {
         starts_in_secs: i64,
     },
     DayFinished,
+    FreeDay,
     Empty,
 }
 
@@ -206,6 +219,10 @@ pub fn evaluate_schedule<'a>(blocks: &'a [TimeBlock], now: NaiveDateTime) -> Sch
     }
 
     let today = now.date();
+    let has_blocks_today = blocks.iter().any(|b| b.days.matches(today.weekday()));
+    if !has_blocks_today {
+        return ScheduleStatus::FreeDay;
+    }
 
     // 1. Bloque activo ahora
     for block in blocks {

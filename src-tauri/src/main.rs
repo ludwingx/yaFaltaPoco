@@ -38,6 +38,7 @@ pub struct AppSnapshot {
     pub events_count_str: String,
     pub mode: String,
     pub blocks: Vec<TimeBlock>,
+    pub is_free_day: bool,
     pub always_on_top: bool,
     pub alarm_active: bool,
     pub should_play_sound: bool,
@@ -58,6 +59,7 @@ fn get_snapshot(state: State<'_, AppState>) -> AppSnapshot {
         5 => "May", 6 => "Jun", 7 => "Jul", 8 => "Ago",
         9 => "Sep", 10 => "Oct", 11 => "Nov", _ => "Dic",
     };
+    let is_sunday = now_local.weekday() == chrono::Weekday::Sun;
     let day_abbrev = match now_local.weekday() {
         chrono::Weekday::Mon => "Lun",
         chrono::Weekday::Tue => "Mar",
@@ -65,7 +67,7 @@ fn get_snapshot(state: State<'_, AppState>) -> AppSnapshot {
         chrono::Weekday::Thu => "Jue",
         chrono::Weekday::Fri => "Vie",
         chrono::Weekday::Sat => "Sáb",
-        chrono::Weekday::Sun => "Dom",
+        chrono::Weekday::Sun => "",
     };
     let weekday_str = match now_local.weekday() {
         chrono::Weekday::Mon => "Lunes",
@@ -77,7 +79,11 @@ fn get_snapshot(state: State<'_, AppState>) -> AppSnapshot {
         chrono::Weekday::Sun => "Domingo",
     };
 
-    let date_title = format!("{} {:02} {} {}", day_abbrev, now_local.day(), month_name, now_local.year());
+    let date_title = if is_sunday {
+        format!("{:02} {} {}", now_local.day(), month_name, now_local.year())
+    } else {
+        format!("{} {:02} {} {}", day_abbrev, now_local.day(), month_name, now_local.year())
+    };
     let current_time_str = format!(
         "{:02}:{:02}:{:02}",
         now_local.hour(),
@@ -123,6 +129,16 @@ fn get_snapshot(state: State<'_, AppState>) -> AppSnapshot {
                     tracker.last_remaining_secs = Some(0);
                     ("00:00:00".into(), "Día terminado".into())
                 }
+                ScheduleStatus::FreeDay => {
+                    tracker.last_active_block_id = None;
+                    tracker.last_remaining_secs = None;
+                    let free_label = if is_sunday {
+                        "¡Domingo Free! 🎉".to_string()
+                    } else {
+                        "Día libre 🎉".to_string()
+                    };
+                    ("LIBRE".into(), free_label)
+                }
                 ScheduleStatus::Empty => {
                     tracker.last_active_block_id = None;
                     tracker.last_remaining_secs = None;
@@ -131,17 +147,21 @@ fn get_snapshot(state: State<'_, AppState>) -> AppSnapshot {
             }
         }
         AppMode::SimpleTimer => {
-            let (remaining_secs, reached) = cfg.timer.evaluate(now_dt);
-            let timer_key = format!("timer_{}_{:02}:{:02}", today_date_str, cfg.timer.target_hour, cfg.timer.target_min);
-            if (remaining_secs <= 0 || reached) && tracker.last_alarm_played_for.as_deref() != Some(&timer_key) {
-                if tracker.last_remaining_secs.map_or(false, |s| s > 0) {
-                    tracker.should_play_sound = true;
-                    tracker.last_alarm_played_for = Some(timer_key);
+            if is_sunday {
+                ("LIBRE".into(), "Domingo Free".into())
+            } else {
+                let (remaining_secs, reached) = cfg.timer.evaluate(now_dt);
+                let timer_key = format!("timer_{}_{:02}:{:02}", today_date_str, cfg.timer.target_hour, cfg.timer.target_min);
+                if (remaining_secs <= 0 || reached) && tracker.last_alarm_played_for.as_deref() != Some(&timer_key) {
+                    if tracker.last_remaining_secs.map_or(false, |s| s > 0) {
+                        tracker.should_play_sound = true;
+                        tracker.last_alarm_played_for = Some(timer_key);
+                    }
                 }
+                tracker.last_remaining_secs = Some(remaining_secs);
+                let target_str = format!("Meta: {:02}:{:02}", cfg.timer.target_hour, cfg.timer.target_min);
+                (format_duration_hms(remaining_secs), target_str)
             }
-            tracker.last_remaining_secs = Some(remaining_secs);
-            let target_str = format!("Meta: {:02}:{:02}", cfg.timer.target_hour, cfg.timer.target_min);
-            (format_duration_hms(remaining_secs), target_str)
         }
     };
 
@@ -150,6 +170,7 @@ fn get_snapshot(state: State<'_, AppState>) -> AppSnapshot {
         .filter(|b| b.days.matches(now_local.weekday()))
         .count();
     let events_count_str = format!("{} bloques", today_blocks_count);
+    let is_free_day = is_sunday || today_blocks_count == 0;
 
     let mode_str = match cfg.mode {
         AppMode::Schedule => "Horario",
@@ -168,6 +189,7 @@ fn get_snapshot(state: State<'_, AppState>) -> AppSnapshot {
         events_count_str,
         mode: mode_str.into(),
         blocks: cfg.blocks.clone(),
+        is_free_day,
         always_on_top: cfg.always_on_top,
         alarm_active: alarm.is_active(),
         should_play_sound: should_play,

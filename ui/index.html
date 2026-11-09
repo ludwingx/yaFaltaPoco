@@ -212,23 +212,30 @@
       color: var(--text-muted);
     }
 
-    /* GIF de marca prominente y visible arriba del temporizador */
+    /* GIF de marca prominente y visible arriba del temporizador (sin máscara circular ni glow circular) */
     .logo-hub {
       display: flex;
       align-items: center;
       justify-content: center;
       margin: auto 0;
       position: relative;
+      background: transparent;
+      padding: 0;
     }
 
     .logo-gif-img {
-      width: calc(var(--s) * 94px);
-      height: calc(var(--s) * 94px);
+      max-width: calc(var(--s) * 125px);
+      max-height: calc(var(--s) * 90px);
+      width: auto;
+      height: auto;
       object-fit: contain;
-      border-radius: 50%;
-      filter: drop-shadow(0 0 calc(var(--s) * 20px) rgba(59, 130, 246, 0.55));
-      transition: transform 0.2s ease;
+      border-radius: 0 !important;
+      border: none !important;
+      box-shadow: none !important;
+      filter: none !important;
+      background: transparent;
       pointer-events: none;
+      display: block;
     }
 
     .countdown-hub {
@@ -261,7 +268,7 @@
       text-overflow: ellipsis;
     }
 
-    /* Columna Derecha (Agenda estilo Timeline de referencia) */
+    /* Columna Derecha: Agenda con Timeline idéntica a la imagen de referencia */
     .agenda-section {
       display: flex;
       flex-direction: column;
@@ -275,7 +282,7 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: calc(var(--s) * 6px);
-      padding: 0 2px;
+      padding: 0 calc(var(--s) * 4px);
       flex-shrink: 0;
     }
 
@@ -288,13 +295,12 @@
     }
 
     .agenda-count-badge {
-      font-size: calc(var(--s) * 9.5px);
+      font-size: calc(var(--s) * 10px);
       font-weight: 600;
-      color: var(--text-muted);
-      background: rgba(255, 255, 255, 0.05);
-      padding: calc(var(--s) * 1px) calc(var(--s) * 7px);
-      border-radius: calc(var(--s) * 8px);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: #8e8e93;
+      background: #222225;
+      padding: calc(var(--s) * 1px) calc(var(--s) * 8px);
+      border-radius: calc(var(--s) * 10px);
     }
 
     .timeline-stream {
@@ -312,239 +318,293 @@
       width: calc(var(--s) * 4px);
     }
     .timeline-stream::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.12);
       border-radius: 4px;
     }
 
-    /* Extremos de la Vía (Sun / Moon) */
-    .timeline-pole {
+    /* Top Sun Node Row */
+    .timeline-pole-row {
       display: flex;
       align-items: center;
-      height: calc(var(--s) * 14px);
-      padding-left: calc(var(--s) * 12px);
-      flex-shrink: 0;
-    }
-    .pole-icon {
-      font-size: calc(var(--s) * 10px);
-      line-height: 1;
-      opacity: 0.6;
-      filter: grayscale(0.2);
-    }
-
-    /* Fila de Timeline */
-    .timeline-row {
-      display: flex;
-      align-items: stretch;
-      gap: calc(var(--s) * 10px);
-      position: relative;
       margin-bottom: calc(var(--s) * 6px);
-    }
-
-    /* Columna del Riel */
-    .timeline-rail {
-      width: calc(var(--s) * 34px);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
       flex-shrink: 0;
     }
-
-    .rail-track-line {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: calc(var(--s) * 2px);
-      background: rgba(255, 255, 255, 0.1);
-      z-index: 1;
+    .timeline-pole-gutter {
+      width: calc(var(--s) * 36px);
+      flex-shrink: 0;
     }
-
-    .timeline-capsule {
+    .timeline-pole-rail {
       width: calc(var(--s) * 32px);
-      height: calc(var(--s) * 42px);
-      border-radius: calc(var(--s) * 12px);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: calc(var(--s) * 15px);
+      flex-shrink: 0;
+    }
+    .pole-node {
+      width: calc(var(--s) * 18px);
+      height: calc(var(--s) * 18px);
+      border-radius: 50%;
+      background: #242426;
+      border: 1px solid #38383c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: calc(var(--s) * 10px);
+      color: #8e8e93;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Fila de Timeline (Gutter + Rail + Card) */
+    .timeline-row {
+      display: flex;
+      align-items: stretch;
+      gap: calc(var(--s) * 8px);
       position: relative;
-      z-index: 2;
-      margin: auto 0;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
-      transition: transform 0.15s, box-shadow 0.15s;
+      margin-bottom: calc(var(--s) * 8px);
+      min-height: calc(var(--s) * 58px);
+    }
+
+    /* Gutter Izquierdo (Horas 08, 09 y Laser Tag 08:18) */
+    .time-gutter {
+      width: calc(var(--s) * 36px);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: flex-start;
+      padding-top: calc(var(--s) * 6px);
+      position: relative;
       flex-shrink: 0;
     }
 
-    .timeline-row.active .timeline-capsule {
-      transform: scale(1.08);
+    .gutter-hour {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: calc(var(--s) * 19px);
+      font-weight: 800;
+      color: #3e3e44;
+      line-height: 1;
+      letter-spacing: -0.5px;
     }
 
-    .timeline-row.completed .timeline-capsule {
-      opacity: 0.5;
-      filter: grayscale(0.5);
+    .laser-time-tag {
+      position: absolute;
+      top: calc(var(--s) * 18px);
+      right: 0;
+      transform: translateY(-50%);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: calc(var(--s) * 10px);
+      font-weight: 700;
+      color: #ff453a;
+      line-height: 1;
+      z-index: 15;
+      text-shadow: 0 0 6px rgba(255, 69, 58, 0.6);
     }
 
-    /* Tarjeta de Contenido */
-    .timeline-card {
+    /* Columna del Riel */
+    .rail-container {
+      width: calc(var(--s) * 32px);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .rail-line-back {
+      position: absolute;
+      top: calc(var(--s) * -8px);
+      bottom: calc(var(--s) * -8px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(var(--s) * 2px);
+      background: #343438;
+      z-index: 1;
+    }
+
+    .rail-capsule {
+      width: calc(var(--s) * 32px);
+      height: 100%;
+      min-height: calc(var(--s) * 56px);
+      border-radius: calc(var(--s) * 13px);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: calc(var(--s) * 8px);
+      position: relative;
+      z-index: 2;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .capsule-icon {
+      font-size: calc(var(--s) * 14px);
+      line-height: 1;
+    }
+
+    /* Tarjeta Derecha (Estilo Apple Graphite como en la imagen) */
+    .card-box {
       flex: 1;
       min-width: 0;
-      background: #141720;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: calc(var(--s) * 12px);
-      padding: calc(var(--s) * 8px) calc(var(--s) * 12px);
+      background: #2c2c2e;
+      border: 1px solid rgba(255, 255, 255, 0.02);
+      border-radius: calc(var(--s) * 14px);
+      padding: calc(var(--s) * 10px) calc(var(--s) * 14px);
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: calc(var(--s) * 8px);
       cursor: pointer;
-      transition: background 0.15s, border-color 0.15s, transform 0.12s;
+      position: relative;
+      z-index: 2;
+      transition: background 0.15s, transform 0.12s;
     }
 
-    .timeline-card:hover {
-      background: #1a1e2b;
-      border-color: rgba(255, 255, 255, 0.1);
-      transform: translateX(calc(var(--s) * 2px));
+    .card-box:hover {
+      background: #343438;
+      transform: translateX(calc(var(--s) * 1px));
     }
 
-    .timeline-row.active .timeline-card {
-      background: rgba(30, 41, 59, 0.7);
-      border-color: rgba(59, 130, 246, 0.4);
-      box-shadow: 0 0 calc(var(--s) * 14px) rgba(59, 130, 246, 0.15);
-    }
-
-    .timeline-row.completed .timeline-card {
-      opacity: 0.55;
-    }
-
-    .card-body {
+    .card-info {
       display: flex;
       flex-direction: column;
-      gap: calc(var(--s) * 2px);
+      gap: calc(var(--s) * 3px);
       min-width: 0;
       flex: 1;
     }
 
-    .card-title {
-      font-size: calc(var(--s) * 13px);
+    .card-title-text {
+      font-size: calc(var(--s) * 14px);
       font-weight: 700;
-      color: #f8fafc;
+      color: #ffffff;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      line-height: 1.2;
     }
 
-    .timeline-row.completed .card-title {
+    .timeline-row.completed .card-title-text {
       text-decoration: line-through;
-      color: #64748b;
+      color: #636366;
     }
 
-    .card-time {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: calc(var(--s) * 10.5px);
-      color: var(--text-dim);
+    .card-sub-text {
+      font-size: calc(var(--s) * 12px);
+      color: #8e8e93;
       display: flex;
       align-items: center;
       gap: calc(var(--s) * 4px);
+      font-weight: 500;
     }
 
-    .timeline-row.active .card-time {
-      color: #60a5fa;
-      font-weight: 600;
+    .card-duration-text {
+      color: #8e8e93;
+      font-size: calc(var(--s) * 11px);
     }
 
-    .card-duration {
-      color: var(--text-dim);
-      font-size: calc(var(--s) * 10px);
-      opacity: 0.85;
-    }
-
-    /* Checkbox / Indicador en la tarjeta */
-    .card-checkbox {
-      width: calc(var(--s) * 18px);
-      height: calc(var(--s) * 18px);
+    /* Checkbox estilo iOS */
+    .card-check {
+      width: calc(var(--s) * 20px);
+      height: calc(var(--s) * 20px);
       border-radius: calc(var(--s) * 5px);
+      flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: calc(var(--s) * 11px);
+      font-size: calc(var(--s) * 12px);
       font-weight: 800;
-      flex-shrink: 0;
       transition: all 0.15s ease;
     }
 
-    /* Línea Indicadora de Hora Actual (como en la imagen con 08:18 roja) */
-    .timeline-now-divider {
-      display: flex;
-      align-items: center;
-      gap: calc(var(--s) * 6px);
-      margin: calc(var(--s) * -2px) 0 calc(var(--s) * 4px) calc(var(--s) * 2px);
-      position: relative;
-      z-index: 10;
-    }
-
-    .now-time-tag {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: calc(var(--s) * 9px);
-      font-weight: 700;
-      color: #f87171;
-      background: rgba(239, 68, 68, 0.18);
-      border: 1px solid rgba(239, 68, 68, 0.4);
-      padding: calc(var(--s) * 1px) calc(var(--s) * 5px);
-      border-radius: calc(var(--s) * 4px);
-      line-height: 1.2;
-      flex-shrink: 0;
-    }
-
-    .now-red-line {
-      flex: 1;
+    /* Rayo Láser Rojo Horizontal */
+    .laser-line-beam {
+      position: absolute;
+      left: calc(var(--s) * 36px);
+      right: 0;
+      top: calc(var(--s) * 18px);
       height: 1.5px;
-      background: linear-gradient(90deg, #ef4444 0%, rgba(239, 68, 68, 0.4) 75%, transparent 100%);
-      box-shadow: 0 0 6px rgba(239, 68, 68, 0.65);
+      background: #ff453a;
+      box-shadow: 0 0 6px #ff453a, 0 0 12px rgba(255, 69, 58, 0.5);
+      z-index: 10;
+      pointer-events: none;
     }
 
-    /* Footer de la Agenda (Fin de jornada + Botón Crear) */
-    .timeline-footer {
+    /* Bloque Inferior: Fin de jornada y Botón Crear + Luna */
+    .timeline-bottom-area {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: calc(var(--s) * 6px);
-      padding-top: calc(var(--s) * 4px);
+      align-items: flex-start;
+      gap: calc(var(--s) * 8px);
+      margin-top: calc(var(--s) * 4px);
       flex-shrink: 0;
-      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      position: relative;
     }
 
-    .end-of-day-label {
+    .timeline-rail-continuation {
+      width: calc(var(--s) * 32px);
+      margin-left: calc(var(--s) * 36px);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      height: 100%;
+      min-height: calc(var(--s) * 54px);
+    }
+
+    .timeline-rail-continuation .rail-line-back {
+      top: calc(var(--s) * -8px);
+      bottom: calc(var(--s) * 10px);
+    }
+
+    .timeline-rail-continuation .pole-node.bottom {
+      margin-top: auto;
+      margin-bottom: calc(var(--s) * 2px);
+      z-index: 2;
+    }
+
+    .timeline-footer-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--s) * 6px);
+      padding: calc(var(--s) * 4px) 0;
+    }
+
+    .end-of-day-line {
       font-family: 'JetBrains Mono', monospace;
-      font-size: calc(var(--s) * 10px);
-      color: var(--text-dim);
+      font-size: calc(var(--s) * 11px);
+      color: #8e8e93;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: calc(var(--s) * 230px);
     }
 
     .btn-create-event {
-      background: rgba(255, 255, 255, 0.07);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #f1f5f9;
+      background: #2c2c2e;
+      border: 1px solid #3a3a3c;
+      color: #d1d1d6;
       font-size: calc(var(--s) * 11px);
       font-weight: 600;
-      padding: calc(var(--s) * 3px) calc(var(--s) * 10px);
-      border-radius: calc(var(--s) * 7px);
+      padding: calc(var(--s) * 5px) calc(var(--s) * 12px);
+      border-radius: calc(var(--s) * 8px);
       cursor: pointer;
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: calc(var(--s) * 5px);
+      gap: calc(var(--s) * 6px);
+      width: fit-content;
       transition: all 0.15s ease;
     }
 
     .btn-create-event:hover {
-      background: rgba(255, 255, 255, 0.13);
+      background: #3a3a3c;
       color: #ffffff;
-      border-color: rgba(255, 255, 255, 0.18);
+      border-color: #48484a;
       transform: translateY(-1px);
+    }
+
+    .btn-plus-icon {
+      font-size: calc(var(--s) * 12px);
+      font-weight: 700;
+      line-height: 1;
     }
 
     .free-day-banner {
@@ -820,13 +880,6 @@
         <div class="timeline-stream" id="schedule-container">
           <!-- Bloques y timeline inyectados dinámicamente -->
         </div>
-
-        <div class="timeline-footer">
-          <div class="end-of-day-label" id="lbl-end-of-day">Fin de jornada: --</div>
-          <button class="btn-create-event" id="btn-open-editor">
-            <span style="font-weight:700">+</span> Crear turno
-          </button>
-        </div>
       </div>
     </div>
 
@@ -891,7 +944,7 @@
           start_min: 0,
           end_hour: 12,
           end_min: 0,
-          color: { r: 37, g: 99, b: 235 },
+          color: { r: 10, g: 132, b: 255 },
           days: { monday: true, tuesday: true, wednesday: true, thursday: true, friday: true, saturday: true, sunday: false }
         },
         {
@@ -901,7 +954,7 @@
           start_min: 0,
           end_hour: 13,
           end_min: 0,
-          color: { r: 245, g: 158, b: 11 },
+          color: { r: 255, g: 159, b: 10 },
           days: { monday: true, tuesday: true, wednesday: true, thursday: true, friday: true, saturday: true, sunday: false }
         },
         {
@@ -911,7 +964,7 @@
           start_min: 0,
           end_hour: 20,
           end_min: 0,
-          color: { r: 37, g: 99, b: 235 },
+          color: { r: 191, g: 90, b: 242 },
           days: { monday: true, tuesday: true, wednesday: true, thursday: true, friday: true, saturday: true, sunday: false }
         }
       ]
@@ -980,13 +1033,13 @@
     let activeColor = { r: 59, g: 130, b: 246 };
 
     const COLOR_PRESETS = [
-      { r: 59, g: 130, b: 246 },  // Azul
-      { r: 168, g: 85, b: 247 },  // Violeta
-      { r: 245, g: 158, b: 11 },  // Ámbar
-      { r: 16, g: 185, b: 129 },  // Esmeralda
-      { r: 239, g: 68, b: 68 },   // Coral
-      { r: 236, g: 72, b: 153 },  // Fucsia
-      { r: 6, g: 182, b: 212 }    // Cian
+      { r: 10, g: 132, b: 255 },  // Azul vibrante (Shower)
+      { r: 255, g: 159, b: 10 },  // Ámbar / Naranja (Breakfast)
+      { r: 191, g: 90, b: 242 },  // Púrpura (Check Email)
+      { r: 255, g: 55, b: 95 },   // Rosa / Coral (Workout)
+      { r: 48, g: 209, b: 88 },   // Verde
+      { r: 100, g: 210, b: 255 }, // Cian
+      { r: 255, g: 214, b: 10 }   // Amarillo
     ];
 
     function renderPalette() {
@@ -1117,7 +1170,7 @@
       const diffSecs = maxEndSecs - nowTotalSecs;
 
       if (diffSecs <= 0) {
-        el.textContent = 'Fin de jornada: Concluida ✨';
+        el.textContent = 'Fin del día: Concluido ✨';
         return;
       }
 
@@ -1126,9 +1179,9 @@
       const s = diffSecs % 60;
 
       if (h > 0) {
-        el.textContent = `Fin de jornada: ${h} hrs, ${m} min, ${s} s`;
+        el.textContent = `End of day: ${h} hrs, ${m} min, ${s} secs`;
       } else {
-        el.textContent = `Fin de jornada: ${m} min, ${s} s`;
+        el.textContent = `End of day: ${m} min, ${s} secs`;
       }
     }
 
@@ -1140,8 +1193,6 @@
       if (countBadge) {
         countBadge.textContent = isFreeDay ? 'Día Libre' : `${blocks.length} turnos`;
       }
-
-      updateEndOfDay(blocks, timeStr, isFreeDay);
 
       if (isFreeDay) {
         const freeCard = document.createElement('div');
@@ -1165,9 +1216,16 @@
 
       // Marcador inicial sol ☀️
       const topPole = document.createElement('div');
-      topPole.className = 'timeline-pole';
-      topPole.innerHTML = '<span class="pole-icon">☀️</span>';
+      topPole.className = 'timeline-pole-row';
+      topPole.innerHTML = `
+        <div class="timeline-pole-gutter"></div>
+        <div class="timeline-pole-rail">
+          <div class="pole-node">☀️</div>
+        </div>
+      `;
       container.appendChild(topPole);
+
+      let shownHours = new Set();
 
       blocks.forEach((block, idx) => {
         const start = block.start_hour * 60 + block.start_min;
@@ -1176,54 +1234,75 @@
         const isActive = !isFreeDay && (nowTotal >= start && nowTotal < end);
         const isCompleted = !isFreeDay && (nowTotal >= end);
 
-        // Si este bloque está activo ahora, insertamos la línea roja de hora actual antes de él
-        if (isActive) {
-          const nowDivider = document.createElement('div');
-          nowDivider.className = 'timeline-now-divider';
-          nowDivider.innerHTML = `
-            <span class="now-time-tag">${nowStrFormatted}</span>
-            <div class="now-red-line"></div>
-          `;
-          container.appendChild(nowDivider);
-        }
-
-        const row = document.createElement('div');
-        row.className = 'timeline-row' + (isActive ? ' active' : '') + (isCompleted ? ' completed' : '');
-
         const icon = getBlockIcon(block.title);
         const rangeText = `${pad(block.start_hour)}:${pad(block.start_min)}–${pad(block.end_hour)}:${pad(block.end_min)}`;
         const durText = formatBlockDuration(block.start_hour, block.start_min, block.end_hour, block.end_min);
         const colRgb = `${block.color.r}, ${block.color.g}, ${block.color.b}`;
 
+        const hourKey = pad(block.start_hour);
+        const showHour = !isActive && !shownHours.has(hourKey);
+        if (showHour) shownHours.add(hourKey);
+
+        const row = document.createElement('div');
+        row.className = 'timeline-row' + (isActive ? ' active' : '') + (isCompleted ? ' completed' : '');
+
+        // Checkbox: completado = fondo sólido rosa-rojo con ✓; pendiente = borde hollow con color del bloque
         const checkboxHtml = isCompleted
-          ? `<div class="card-checkbox" style="background: rgb(${colRgb}); border: 2px solid rgb(${colRgb}); color: #fff;">✓</div>`
-          : `<div class="card-checkbox" style="border: 2px solid rgb(${colRgb}); background: transparent;"></div>`;
+          ? `<div class="card-check" style="background: #ff375f; color: #fff;">✓</div>`
+          : `<div class="card-check" style="border: calc(var(--s) * 2.2px) solid rgb(${colRgb}); background: transparent;"></div>`;
+
+        // Cápsula: completado = gris oscuro discreto #323235; activo/pendiente = color sólido vibrante
+        const capsuleBg = isCompleted ? '#323235' : `rgb(${colRgb})`;
 
         row.innerHTML = `
-          <div class="timeline-rail">
-            <div class="rail-track-line"></div>
-            <div class="timeline-capsule" style="background: rgb(${colRgb}); box-shadow: 0 4px 14px rgba(${colRgb}, 0.4);">
-              <span>${icon}</span>
+          <div class="time-gutter">
+            ${isActive ? `<div class="laser-time-tag">${nowStrFormatted}</div>` : (showHour ? `<div class="gutter-hour">${hourKey}</div>` : '')}
+          </div>
+          <div class="rail-container">
+            <div class="rail-line-back"></div>
+            <div class="rail-capsule" style="background: ${capsuleBg};">
+              <span class="capsule-icon" style="${isCompleted ? 'color: #ff375f; opacity: 0.9;' : ''}">${icon}</span>
             </div>
           </div>
-          <div class="timeline-card">
-            <div class="card-body">
-              <span class="card-title">${block.title}</span>
-              <span class="card-time">${rangeText} <span class="card-duration">(${durText})</span></span>
+          <div class="card-box">
+            <div class="card-info">
+              <span class="card-title-text">${block.title}</span>
+              <span class="card-sub-text">
+                ${rangeText} <span class="card-duration-text">(${durText})</span>
+              </span>
             </div>
             ${checkboxHtml}
           </div>
+          ${isActive ? '<div class="laser-line-beam"></div>' : ''}
         `;
 
-        row.querySelector('.timeline-card').onclick = () => openModal(idx, block);
+        row.querySelector('.card-box').onclick = () => openModal(idx, block);
         container.appendChild(row);
       });
 
-      // Marcador final luna 🌙
-      const bottomPole = document.createElement('div');
-      bottomPole.className = 'timeline-pole';
-      bottomPole.innerHTML = '<span class="pole-icon">🌙</span>';
-      container.appendChild(bottomPole);
+      // Marcador final y footer con Luna 🌙
+      const bottomArea = document.createElement('div');
+      bottomArea.className = 'timeline-bottom-area';
+      bottomArea.innerHTML = `
+        <div class="timeline-rail-continuation">
+          <div class="rail-line-back"></div>
+          <div class="pole-node bottom">🌙</div>
+        </div>
+        <div class="timeline-footer-content">
+          <div class="end-of-day-line" id="lbl-end-of-day">End of day: --</div>
+          <button class="btn-create-event" id="btn-create-in-stream">
+            <span class="btn-plus-icon">+</span> Crear turno
+          </button>
+        </div>
+      `;
+      container.appendChild(bottomArea);
+
+      const btnCreate = bottomArea.querySelector('#btn-create-in-stream');
+      if (btnCreate) {
+        btnCreate.onclick = () => openModal(null, null);
+      }
+
+      updateEndOfDay(blocks, timeStr, isFreeDay);
     }
 
     function openModal(idx, block) {
@@ -1377,7 +1456,8 @@
       invoke('close_app');
     };
 
-    document.getElementById('btn-open-editor').onclick = () => openModal(null, null);
+    const openEditorBtn = document.getElementById('btn-open-editor');
+    if (openEditorBtn) openEditorBtn.onclick = () => openModal(null, null);
     document.getElementById('btn-close-modal').onclick = closeModal;
     document.getElementById('btn-cancel').onclick = closeModal;
 

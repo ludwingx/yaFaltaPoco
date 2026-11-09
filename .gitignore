@@ -12,6 +12,7 @@ src-tauri/gen/
 yafaltapoco.json
 *.log
 **/*.tmp
+tools/installer/obj/
 
 # IDE and agent metadata
 .agents/

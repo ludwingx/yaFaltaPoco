@@ -53,18 +53,18 @@
 
 ---
 
-## 🚀 Descarga y Ejecución
+## 🚀 Descarga e Instalación
 
-Puedes ejecutar **Ya Falta Poco** de tres maneras:
+Puedes usar **Ya Falta Poco** de dos maneras:
 
-1. **Portable (Recomendado para uso inmediato):**
-   - Ejecuta directamente [`yafaltapoco.exe`](./yafaltapoco.exe) ubicado en la raíz del proyecto. No requiere instalación.
+1. **Instalador Oficial (`setup.exe` - Recomendado):**
+   - Ejecuta directamente [`setup.exe`](./setup.exe) en la raíz del proyecto.
+   - Presenta un diseño moderno en **modo oscuro** (`#0e0e11`) con el logotipo animado a la izquierda, paso a paso interactivo y barra de progreso.
+   - Instala la aplicación en `%LOCALAPPDATA%\Programs\YaFaltaPoco`, copia todas las librerías necesarias (`WebView2Loader.dll`) y crea automáticamente el **acceso directo en el Escritorio** y en el **Menú Inicio**.
+   - Incluye desinstalador integrado accesible desde el menú de inicio y desde la configuración de aplicaciones de Windows.
 
-2. **Instalador Setup Windows (NSIS):**
-   - Ubicado en: `src-tauri/target/release/bundle/nsis/yafaltapoco_1.0.0_x64-setup.exe`
-
-3. **Paquete MSI:**
-   - Ubicado en: `src-tauri/target/release/bundle/msi/yafaltapoco_1.0.0_x64_en-US.msi`
+2. **Portable (Uso directo sin instalar):**
+   - Ejecuta [`yafaltapoco.exe`](./yafaltapoco.exe) manteniendo `WebView2Loader.dll` en la misma carpeta.
 
 ---
 
@@ -86,10 +86,19 @@ Puedes ejecutar **Ya Falta Poco** de tres maneras:
 
 ## 📁 Estructura del Proyecto
 
-El proyecto sigue una arquitectura limpia (*Clean Architecture*) separando claramente el backend nativo en Rust, la interfaz visual web y los archivos históricos:
+El proyecto sigue una arquitectura limpia (*Clean Architecture*) separando claramente el backend nativo en Rust, la interfaz visual web, el instalador nativo y los archivos históricos:
 
 ```text
 yaFaltaPoco/
+├── setup.exe                   # 📦 Instalador oficial moderno (Modo oscuro + GIF + Acceso directo)
+├── yafaltapoco.exe             # 🚀 Ejecutable release portable
+├── WebView2Loader.dll          # ⚙️ Loader necesario para ejecución portable en Windows (GNU toolchain)
+│
+├── tools/                      # 🛠️ Herramientas y utilidades del proyecto
+│   └── installer/              # Código fuente y script de compilación de setup.exe (C# WinForms)
+│       ├── Program.cs          # UI oscura, reproductor de GIF, pasos de instalación y accesos directos
+│       └── build-installer.ps1 # Automatización de empaquetado y compresión
+│
 ├── src-tauri/                  # 🦀 Backend nativo (Rust + Tauri v2)
 │   ├── src/
 │   │   ├── main.rs             # Punto de entrada, ventana flotante y comandos IPC
@@ -109,7 +118,6 @@ yaFaltaPoco/
 ├── legacy/                     # 📦 Archivo histórico
 │   └── egui-prototype/         # Prototipo inicial en egui/eframe (archivado)
 │
-├── yafaltapoco.exe             # 🚀 Ejecutable release listo para usar
 ├── .gitignore                  # Exclusiones de Git (builds, temporales y configs)
 └── README.md                   # Esta documentación
 ```
@@ -121,12 +129,17 @@ yaFaltaPoco/
 ### Requisitos previos:
 - [Rust](https://rustup.rs/) (versión 1.75 o superior).
 - Windows 10/11 con soporte para WebView2 (incluido de forma nativa en el sistema).
-- Node.js (opcional, solo para ejecutar la CLI de Tauri).
+- .NET Framework (incluido de forma nativa en Windows 10/11 para compilar el instalador con `csc.exe`).
+
+### Compilar el instalador `setup.exe`:
+```powershell
+powershell -ExecutionPolicy Bypass -File tools\installer\build-installer.ps1
+```
 
 ### Previsualización instantánea en navegador (sin compilar):
 Puedes abrir directamente [`ui/index.html`](./ui/index.html) en Chrome, Edge o Firefox. La aplicación incluye un sistema de *mock* automático que simula los comandos de Tauri, permitiendo ajustar estilos y diseño de forma inmediata.
 
-### Compilar el binario Release:
+### Compilar el binario Release de Rust:
 ```powershell
 # Desde el directorio src-tauri:
 cd src-tauri

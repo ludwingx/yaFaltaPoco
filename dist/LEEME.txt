@@ -1,0 +1,19 @@
+﻿============================================================
+           â³ YaFaltaPoco - Archivos de DistribuciÃ³n
+============================================================
+
+Â¿CÃ³mo utilizar la aplicaciÃ³n?
+
+1. Instalador Oficial (Recomendado):
+   Ejecuta "setup.exe". 
+   - DiseÃ±ado con asistente visual en modo oscuro y logo animado.
+   - Crea automÃ¡ticamente el acceso directo en el Escritorio y en el MenÃº Inicio.
+   - Integra desinstalador limpio en el Panel de ConfiguraciÃ³n de Windows.
+
+2. VersiÃ³n Portable (Sin instalaciÃ³n):
+   Ingresa a la carpeta "portable" y ejecuta directamente "yafaltapoco.exe".
+   - Puedes llevarla en una memoria USB o usarla sin permisos de administrador.
+   - Requiere mantener "WebView2Loader.dll" en la misma carpeta.
+
+Â¡Que disfrutes tu jornada! ðŸš€
+============================================================

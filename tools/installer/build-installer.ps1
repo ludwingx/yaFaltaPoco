@@ -8,23 +8,55 @@ Write-Host "==========================================" -ForegroundColor Cyan
 Write-Host "  Compilando setup.exe para YaFaltaPoco   " -ForegroundColor Cyan
 Write-Host "==========================================" -ForegroundColor Cyan
 
-$exeSource = "$workspaceRoot\yafaltapoco.exe"
-$dllSource = "$workspaceRoot\WebView2Loader.dll"
-$gifSource = "$workspaceRoot\ui\bg-logo.gif"
-$icoSource = "$workspaceRoot\src-tauri\icons\icon.ico"
-$outputSetup = "$workspaceRoot\setup.exe"
+# Directorios de destino para distribución limpia
+$distDir = "$workspaceRoot\dist"
+$portableDir = "$distDir\portable"
+if (-not (Test-Path $distDir)) { New-Item -ItemType Directory -Path $distDir | Out-Null }
+if (-not (Test-Path $portableDir)) { New-Item -ItemType Directory -Path $portableDir | Out-Null }
 
-# Validar existencia de archivos fuente
-if (-not (Test-Path $exeSource)) {
-    throw "No se encontró $exeSource. Asegúrate de haber compilado la aplicación primero."
-}
-if (-not (Test-Path $dllSource)) {
-    if (Test-Path "$workspaceRoot\src-tauri\target\release\WebView2Loader.dll") {
-        Copy-Item "$workspaceRoot\src-tauri\target\release\WebView2Loader.dll" -Destination $dllSource -Force
-    } else {
-        throw "No se encontró $dllSource."
+# Búsqueda inteligente de binarios compilados
+$exeCandidates = @(
+    "$workspaceRoot\src-tauri\target\release\yafaltapoco.exe",
+    "$portableDir\yafaltapoco.exe",
+    "$workspaceRoot\yafaltapoco.exe"
+)
+$exeSource = $null
+foreach ($cand in $exeCandidates) {
+    if (Test-Path $cand) {
+        $exeSource = $cand
+        break
     }
 }
+if (-not $exeSource) {
+    throw "No se encontró yafaltapoco.exe. Compila primero con: cargo build --release --manifest-path src-tauri/Cargo.toml"
+}
+
+$dllCandidates = @(
+    "$workspaceRoot\src-tauri\target\release\WebView2Loader.dll",
+    "$workspaceRoot\src-tauri\target\release\build\*\out\x64\WebView2Loader.dll",
+    "$portableDir\WebView2Loader.dll",
+    "$workspaceRoot\WebView2Loader.dll"
+)
+$dllSource = $null
+foreach ($cand in $dllCandidates) {
+    $matched = Get-Item -Path $cand -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($matched -and (Test-Path $matched.FullName)) {
+        $dllSource = $matched.FullName
+        break
+    }
+}
+if (-not $dllSource) {
+    throw "No se encontró WebView2Loader.dll en las carpetas de compilación ni en dist."
+}
+
+# Sincronizar versión portable en dist/portable/
+Copy-Item $exeSource -Destination "$portableDir\yafaltapoco.exe" -Force
+Copy-Item $dllSource -Destination "$portableDir\WebView2Loader.dll" -Force
+
+$gifSource = "$workspaceRoot\ui\bg-logo.gif"
+$icoSource = "$workspaceRoot\src-tauri\icons\icon.ico"
+$outputSetup = "$distDir\setup.exe"
+
 if (-not (Test-Path $gifSource)) {
     throw "No se encontró $gifSource."
 }
@@ -52,8 +84,8 @@ function Compress-FileGzip($sourcePath, $destPath) {
     $fs.Close()
 }
 
-Compress-FileGzip $exeSource $appGz
-Compress-FileGzip $dllSource $loaderGz
+Compress-FileGzip "$portableDir\yafaltapoco.exe" $appGz
+Compress-FileGzip "$portableDir\WebView2Loader.dll" $loaderGz
 
 $appGzSize = [math]::Round((Get-Item $appGz).Length / 1MB, 2)
 Write-Host "  -> yafaltapoco.exe comprimido: $appGzSize MB" -ForegroundColor DarkGray
@@ -91,8 +123,33 @@ if ($LASTEXITCODE -ne 0) {
 # Limpiar carpeta temporal obj
 Remove-Item $tempBuild -Recurse -Force
 
+# Generar LEEME.txt informativo en dist/
+$leemeContent = @"
+============================================================
+           ⏳ YaFaltaPoco - Archivos de Distribución
+============================================================
+
+¿Cómo utilizar la aplicación?
+
+1. Instalador Oficial (Recomendado):
+   Ejecuta "setup.exe". 
+   - Diseñado con asistente visual en modo oscuro y logo animado.
+   - Crea automáticamente el acceso directo en el Escritorio y en el Menú Inicio.
+   - Integra desinstalador limpio en el Panel de Configuración de Windows.
+
+2. Versión Portable (Sin instalación):
+   Ingresa a la carpeta "portable" y ejecuta directamente "yafaltapoco.exe".
+   - Puedes llevarla en una memoria USB o usarla sin permisos de administrador.
+   - Requiere mantener "WebView2Loader.dll" en la misma carpeta.
+
+¡Que disfrutes tu jornada! 🚀
+============================================================
+"@
+Set-Content -Path "$distDir\LEEME.txt" -Value $leemeContent -Encoding UTF8
+
 $setupSize = [math]::Round((Get-Item $outputSetup).Length / 1MB, 2)
 Write-Host "[3/3] ¡Instalador generado con éxito!" -ForegroundColor Green
-Write-Host "  -> Ubicación: $outputSetup" -ForegroundColor White
-Write-Host "  -> Tamaño final: $setupSize MB" -ForegroundColor White
+Write-Host "  -> Instalador: $outputSetup ($setupSize MB)" -ForegroundColor White
+Write-Host "  -> Versión Portable: $portableDir\" -ForegroundColor White
+Write-Host "  -> Guía de usuario: $distDir\LEEME.txt" -ForegroundColor White
 Write-Host "==========================================" -ForegroundColor Cyan

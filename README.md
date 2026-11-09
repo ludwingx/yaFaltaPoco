@@ -91,14 +91,16 @@ Arrastra la esquina inferior derecha o los bordes. Todas las fuentes, cápsulas 
 
 ### 📦 ¿Cómo empezar en 1 minuto?
 
-#### Opción A: Instalador de un Clic (`setup.exe` — ¡Recomendado!)
-1. Descarga o abre [`setup.exe`](./setup.exe) (pesa solo **4.9 MB**).
+Todos los archivos listos para el usuario final se encuentran organizados dentro de la carpeta [`dist/`](./dist/):
+
+#### Opción A: Instalador de un Clic (`dist/setup.exe` — ¡Recomendado!)
+1. Descarga o abre [`dist/setup.exe`](./dist/setup.exe) (pesa solo **4.9 MB**).
 2. Verás una ventana moderna en modo oscuro con el logo animado y el paso a paso interactivo.
 3. Haz clic en **Instalar**. En 2 segundos creará tu acceso directo en el **Escritorio** y en el **Menú Inicio**.
 4. ¡Listo! Ábrelo desde tu escritorio como cualquier programa normal.
 
 #### Opción B: Modo Portable (Sin instalar)
-Simplemente ejecuta [`yafaltapoco.exe`](./yafaltapoco.exe) manteniendo `WebView2Loader.dll` en la misma carpeta.
+Ingresa a la carpeta [`dist/portable/`](./dist/portable/) y ejecuta directamente `yafaltapoco.exe` (mantiene `WebView2Loader.dll` a su lado para máxima portabilidad en memorias USB o equipos sin privilegios).
 
 ---
 
@@ -122,29 +124,34 @@ Simplemente ejecuta [`yafaltapoco.exe`](./yafaltapoco.exe) manteniendo `WebView2
 
 ### 🗂️ Estructura del Proyecto
 
-Organizado bajo principios de **Clean Code** y separación de responsabilidades:
+Organizado bajo principios de **Clean Code** y estricta separación entre código fuente y distribución:
 
 ```text
 yaFaltaPoco/
-├── 📦 setup.exe                # Instalador nativo oficial (Modo oscuro + GIF + Accesos)
-├── 🚀 yafaltapoco.exe          # Ejecutable release portable
-├── ⚙️ WebView2Loader.dll       # Runtime loader para Windows (GNU toolchain)
-│
-├── 🛠️ tools/installer/         # Código fuente del instalador nativo en C# WinForms
-│   ├── Program.cs             # Lógica de instalación, pasos animados y accesos directos
-│   └── build-installer.ps1    # Script automatizado de empaquetado y compresión GZip
+├── 📦 dist/                     # Carpeta de Distribución Pública (Releases)
+│   ├── setup.exe               # Instalador nativo oficial todo-en-uno (4.9 MB)
+│   ├── LEEME.txt               # Guía rápida para el usuario final
+│   └── portable/               # Versión portable lista para usar sin instalación
+│       ├── yafaltapoco.exe
+│       └── WebView2Loader.dll
 │
 ├── 🦀 src-tauri/               # Backend en Rust (Tauri v2)
 │   ├── src/main.rs            # Ventana flotante sin bordes, drag IPC y comandos nativos
 │   ├── src/schedule.rs        # Lógica de bloques horarios, colores y duración
 │   ├── src/timer.rs           # Temporizador regresivo y hora meta
-│   ├── src/config.rs          # Guardado automático en yafaltapoco.json
+│   ├── src/config.rs          # Persistencia en yafaltapoco.json
 │   └── Cargo.toml             # Dependencias de Rust
 │
 ├── 🎨 ui/                      # Frontend Web ultra ligero (HTML5 + CSS3 + Vanilla JS)
-│   ├── index.html             # Interfaz, maquetación del riel, láser e iconos Lucide
+│   ├── index.html             # Interfaz, riel de tiempo, 6 temas, clima Open-Meteo
 │   ├── bg-logo.gif            # Logotipo animado por defecto
 │   └── alarm.mp3              # Campana de fin de turno
+│
+├── 🛠️ tools/                   # Herramientas de build y automatización
+│   ├── build.ps1              # Script maestro de compilación integral (Rust + Dist)
+│   └── installer/             # Código fuente del instalador nativo en C# WinForms
+│       ├── Program.cs         # Lógica visual del instalador y descompresión GZip
+│       └── build-installer.ps1 # Empaquetador a dist/setup.exe
 │
 ├── 📦 legacy/                  # Prototipo inicial en egui/eframe (archivado históricamente)
 └── 📖 README.md                # Esta guía
@@ -154,19 +161,14 @@ yaFaltaPoco/
 
 ### 💻 Para Desarrolladores y Curiosos
 
-#### 1. Previsualización instantánea en el navegador (sin compilar nada):
-Abre directamente [`ui/index.html`](./ui/index.html) con tu navegador favorito (Chrome, Edge, Firefox). El archivo incluye un simulador (*mock*) automático de Tauri para que puedas ajustar estilos y probar animaciones al instante.
-
-#### 2. Compilar el binario release de Rust:
+#### 1. Compilación Completa en Un Solo Comando:
 ```powershell
-cd src-tauri
-cargo build --release
+powershell -ExecutionPolicy Bypass -File tools/build.ps1
 ```
+Este script compila el binario release de Rust con optimizaciones máximas, extrae las librerías a `dist/portable/` y genera el instalador oficial `dist/setup.exe`.
 
-#### 3. Recompilar el instalador `setup.exe`:
-```powershell
-powershell -ExecutionPolicy Bypass -File tools\installer\build-installer.ps1
-```
+#### 2. Previsualización instantánea en el navegador (sin compilar nada):
+Abre directamente [`ui/index.html`](./ui/index.html) con cualquier navegador (Chrome, Edge, Firefox). Incluye un simulador (*mock*) automático de Tauri para ajustar estilos y animaciones al instante.
 
 ---
 

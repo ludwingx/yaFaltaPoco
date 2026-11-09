@@ -1,5 +1,21 @@
+# Rust build artifacts
 /target
-/target/
+/src-tauri/target
+target/
 src-tauri/target/
-**/*.tmp
+**/*.rs.bk
+
+# Tauri generated files
+src-tauri/gen/
+
+# Local configuration and logs
 yafaltapoco.json
+*.log
+**/*.tmp
+
+# IDE and agent metadata
+.agents/
+.gemini/
+skills-lock.json
+.vscode/
+.idea/

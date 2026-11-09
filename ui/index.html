@@ -29,7 +29,7 @@
     }
 
     body {
-      background: transparent;
+      background: #000000;
       overflow: hidden;
       margin: 0;
       padding: 0;
@@ -877,7 +877,104 @@
   </div>
 
   <script>
-    const { invoke } = window.__TAURI__.core;
+    const hasTauri = typeof window !== 'undefined' && window.__TAURI__ && window.__TAURI__.core;
+
+    // Entorno de desarrollo para previsualización instantánea en navegador sin compilar
+    let devMockState = {
+      mode: 'Horario',
+      sound_enabled: true,
+      blocks: [
+        {
+          id: 'block-1',
+          title: 'OtherBrain I',
+          start_hour: 8,
+          start_min: 0,
+          end_hour: 12,
+          end_min: 0,
+          color: { r: 37, g: 99, b: 235 },
+          days: { monday: true, tuesday: true, wednesday: true, thursday: true, friday: true, saturday: true, sunday: false }
+        },
+        {
+          id: 'block-2',
+          title: 'Almuerzo',
+          start_hour: 12,
+          start_min: 0,
+          end_hour: 13,
+          end_min: 0,
+          color: { r: 245, g: 158, b: 11 },
+          days: { monday: true, tuesday: true, wednesday: true, thursday: true, friday: true, saturday: true, sunday: false }
+        },
+        {
+          id: 'block-3',
+          title: 'OtherBrain II',
+          start_hour: 13,
+          start_min: 0,
+          end_hour: 20,
+          end_min: 0,
+          color: { r: 37, g: 99, b: 235 },
+          days: { monday: true, tuesday: true, wednesday: true, thursday: true, friday: true, saturday: true, sunday: false }
+        }
+      ]
+    };
+
+    async function mockInvoke(cmd, args = {}) {
+      if (cmd === 'get_snapshot') {
+        const now = new Date();
+        const pad = (n) => String(n).padStart(2, '0');
+        const timeStr = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+        const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+        const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+        const isSunday = now.getDay() === 0;
+        const dateTitle = isSunday
+          ? `${pad(now.getDate())} ${monthNames[now.getMonth()]} ${now.getFullYear()}`
+          : `${dayNames[now.getDay()]} ${pad(now.getDate())} ${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+
+        return {
+          date_title: dateTitle,
+          current_time_str: timeStr,
+          weekday_str: isSunday ? 'Domingo' : dayNames[now.getDay()],
+          countdown_str: isSunday ? 'LIBRE' : '02:44:15',
+          block_name: isSunday ? '¡Domingo Free! 🎉' : 'Termina: OtherBrain I',
+          events_count_str: `${devMockState.blocks.length} turnos`,
+          mode: devMockState.mode,
+          blocks: devMockState.blocks,
+          is_free_day: isSunday,
+          always_on_top: true,
+          alarm_active: false,
+          should_play_sound: false,
+          sound_enabled: devMockState.sound_enabled
+        };
+      } else if (cmd === 'toggle_mode') {
+        devMockState.mode = devMockState.mode === 'Horario' ? 'Temporizador' : 'Horario';
+      } else if (cmd === 'toggle_sound') {
+        devMockState.sound_enabled = !devMockState.sound_enabled;
+      } else if (cmd === 'save_block') {
+        const newBlock = {
+          id: `block-${Date.now()}`,
+          title: args.title || 'Nuevo Turno',
+          start_hour: args.startHour,
+          start_min: args.startMin,
+          end_hour: args.endHour,
+          end_min: args.endMin,
+          color: { r: args.colorR, g: args.colorG, b: args.colorB },
+          days: { monday: true, tuesday: true, wednesday: true, thursday: true, friday: true, saturday: true, sunday: false }
+        };
+        if (args.index !== null && args.index !== undefined && devMockState.blocks[args.index]) {
+          devMockState.blocks[args.index] = newBlock;
+        } else {
+          devMockState.blocks.push(newBlock);
+        }
+      } else if (cmd === 'delete_block') {
+        if (args.index !== null && args.index !== undefined) {
+          devMockState.blocks.splice(args.index, 1);
+        }
+      } else if (cmd === 'close_app') {
+        window.close();
+      }
+      return null;
+    }
+
+    const invoke = hasTauri ? window.__TAURI__.core.invoke : mockInvoke;
 
     let currentEditingIndex = null;
     let activeColor = { r: 59, g: 130, b: 246 };

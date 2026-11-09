@@ -11,6 +11,10 @@
       --s: 1;
       --bg-surface: #000000;
       --border-subtle: rgba(255, 255, 255, 0.08);
+      --card-bg: #2c2c2e;
+      --card-border: rgba(255, 255, 255, 0.02);
+      --laser-color: #ff453a;
+      --laser-glow: rgba(255, 69, 58, 0.6);
       --text-white: #ffffff;
       --text-muted: #94a3b8;
       --text-dim: #64748b;
@@ -213,10 +217,52 @@
       white-space: nowrap;
     }
 
+    .date-sub-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: calc(var(--s) * 6px);
+      margin-top: calc(var(--s) * 1px);
+    }
+
     .clock-badge {
       font-family: 'JetBrains Mono', monospace;
       font-size: calc(var(--s) * 12px);
       color: var(--text-muted);
+    }
+
+    .weather-pill {
+      display: none;
+      align-items: center;
+      gap: calc(var(--s) * 3px);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: calc(var(--s) * 10px);
+      padding: calc(var(--s) * 1px) calc(var(--s) * 6px);
+      font-size: calc(var(--s) * 10px);
+      font-weight: 600;
+      color: #94a3b8;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .weather-pill:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.22);
+      transform: translateY(-0.5px);
+    }
+
+    .weather-icon {
+      font-size: calc(var(--s) * 11px);
+      line-height: 1;
+    }
+
+    .weather-temp {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: calc(var(--s) * 10.5px);
+      color: #cbd5e1;
     }
 
     /* GIF de marca con zoom prominente arriba de la hora y difuminado */
@@ -516,14 +562,14 @@
       font-family: 'JetBrains Mono', monospace;
       font-size: calc(var(--s) * 10px);
       font-weight: 700;
-      color: #ff453a;
+      color: var(--laser-color);
       line-height: 1;
       z-index: 15;
-      text-shadow: 0 0 6px rgba(255, 69, 58, 0.7);
+      text-shadow: 0 0 6px var(--laser-glow);
       background: rgba(14, 14, 16, 0.92);
       padding: 1px 3px;
       border-radius: 3px;
-      border: 1px solid rgba(255, 69, 58, 0.35);
+      border: 1px solid var(--laser-color);
       white-space: nowrap;
       user-select: none;
       pointer-events: none;
@@ -585,8 +631,8 @@
     .card-box {
       flex: 1;
       min-width: 0;
-      background: #2c2c2e;
-      border: 1px solid rgba(255, 255, 255, 0.02);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
       border-radius: calc(var(--s) * 14px);
       padding: calc(var(--s) * 10px) calc(var(--s) * 14px);
       display: flex;
@@ -661,14 +707,14 @@
       display: block;
     }
 
-    /* Rayo Láser Rojo Horizontal */
+    /* Rayo Láser Horizontal */
     .laser-line-beam {
       position: absolute;
       left: calc(var(--s) * 38px);
       right: 0;
       height: 1.5px;
-      background: #ff453a;
-      box-shadow: 0 0 6px #ff453a, 0 0 12px rgba(255, 69, 58, 0.5);
+      background: var(--laser-color);
+      box-shadow: 0 0 6px var(--laser-color), 0 0 12px var(--laser-glow);
       z-index: 10;
       pointer-events: none;
     }
@@ -999,43 +1045,173 @@
       color: #ffffff;
     }
 
-    /* Modal de Personalización de Tema y Logo */
-    .theme-modal-overlay {
+    /* Modal Integral de Configuración, Temas y Clima */
+    .settings-modal-overlay {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: calc(100% - calc(var(--s) * 28px));
-      max-width: calc(var(--s) * 400px);
-      max-height: calc(100% - calc(var(--s) * 20px));
+      width: calc(100% - calc(var(--s) * 20px));
+      max-width: calc(var(--s) * 440px);
+      max-height: calc(100% - calc(var(--s) * 16px));
       overflow-y: auto;
-      background: #18181b;
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: #141417;
+      border: 1px solid rgba(255, 255, 255, 0.14);
       border-radius: calc(var(--s) * 16px);
       padding: calc(var(--s) * 14px);
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95);
       z-index: 100;
       display: none;
       flex-direction: column;
-      gap: calc(var(--s) * 10px);
+      gap: calc(var(--s) * 8px);
     }
 
-    .theme-modal-overlay.active {
+    .settings-modal-overlay.active {
       display: flex;
+    }
+
+    .settings-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: calc(var(--s) * 6px);
+    }
+
+    .settings-modal-title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .settings-modal-title {
+      font-size: calc(var(--s) * 14px);
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .settings-modal-sub {
+      font-size: calc(var(--s) * 9.5px);
+      color: #94a3b8;
+    }
+
+    /* Tabs */
+    .settings-tabs {
+      display: flex;
+      gap: calc(var(--s) * 4px);
+      background: rgba(255, 255, 255, 0.04);
+      padding: calc(var(--s) * 3px);
+      border-radius: calc(var(--s) * 8px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .settings-tab-btn {
+      flex: 1;
+      padding: calc(var(--s) * 5px) calc(var(--s) * 6px);
+      background: transparent;
+      border: none;
+      border-radius: calc(var(--s) * 6px);
+      color: #94a3b8;
+      font-size: calc(var(--s) * 10px);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .settings-tab-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .settings-tab-btn.active {
+      background: #27272a;
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+
+    .settings-tab-pane {
+      display: none;
+      flex-direction: column;
+      gap: calc(var(--s) * 8px);
+    }
+
+    .settings-tab-pane.active {
+      display: flex;
+    }
+
+    /* Grid de tarjetas de temas */
+    .theme-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: calc(var(--s) * 6px);
+    }
+
+    .theme-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: calc(var(--s) * 9px);
+      padding: calc(var(--s) * 6px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: calc(var(--s) * 4px);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .theme-card:hover {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .theme-card.active {
+      border-color: #3b82f6;
+      background: rgba(59, 130, 246, 0.12);
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+    }
+
+    .theme-card-preview {
+      width: 100%;
+      height: calc(var(--s) * 22px);
+      border-radius: calc(var(--s) * 5px);
+      border: 1px solid transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: calc(var(--s) * 4px);
+    }
+
+    .preview-dot {
+      width: calc(var(--s) * 6px);
+      height: calc(var(--s) * 6px);
+      border-radius: 50%;
+    }
+
+    .theme-card-name {
+      font-size: calc(var(--s) * 9px);
+      font-weight: 600;
+      color: #cbd5e1;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
     }
 
     .theme-section {
       display: flex;
       flex-direction: column;
-      gap: calc(var(--s) * 6px);
+      gap: calc(var(--s) * 5px);
       background: rgba(255, 255, 255, 0.03);
       padding: calc(var(--s) * 8px) calc(var(--s) * 10px);
-      border-radius: calc(var(--s) * 10px);
+      border-radius: calc(var(--s) * 9px);
       border: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .theme-section-title {
-      font-size: calc(var(--s) * 10.5px);
+      font-size: calc(var(--s) * 10px);
       font-weight: 700;
       color: #94a3b8;
       text-transform: uppercase;
@@ -1053,9 +1229,9 @@
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.12);
       color: #ffffff;
-      padding: calc(var(--s) * 5px) calc(var(--s) * 10px);
+      padding: calc(var(--s) * 4px) calc(var(--s) * 10px);
       border-radius: calc(var(--s) * 7px);
-      font-size: calc(var(--s) * 11px);
+      font-size: calc(var(--s) * 10.5px);
       font-weight: 600;
       cursor: pointer;
       display: inline-flex;
@@ -1154,6 +1330,58 @@
       accent-color: #3b82f6;
       cursor: pointer;
     }
+
+    .settings-select {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #ffffff;
+      padding: calc(var(--s) * 4px) calc(var(--s) * 8px);
+      border-radius: calc(var(--s) * 7px);
+      font-size: calc(var(--s) * 11px);
+      font-family: inherit;
+      outline: none;
+      cursor: pointer;
+      width: 100%;
+    }
+    .settings-select option {
+      background: #18181b;
+      color: #ffffff;
+    }
+
+    .weather-preview-box {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: calc(var(--s) * 9px);
+      padding: calc(var(--s) * 8px) calc(var(--s) * 10px);
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--s) * 4px);
+    }
+    .weather-preview-main {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .weather-preview-temp {
+      font-size: calc(var(--s) * 16px);
+      font-weight: 800;
+      color: #ffffff;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .weather-preview-desc {
+      font-size: calc(var(--s) * 10.5px);
+      color: #94a3b8;
+    }
+    .weather-preview-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: calc(var(--s) * 4px);
+      margin-top: calc(var(--s) * 2px);
+      padding-top: calc(var(--s) * 4px);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: calc(var(--s) * 10px);
+      color: #cbd5e1;
+    }
   </style>
 </head>
 <body>
@@ -1166,6 +1394,9 @@
       <div class="top-actions">
         <button class="btn-icon" id="btn-sound" title="Sonido activado (clic para probar, clic derecho para silenciar)">
           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+        </button>
+        <button class="btn-icon" id="btn-settings" title="Configuración, Temas y Clima">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
         <button class="btn-pill" id="btn-mode">Horario</button>
         <button class="btn-close" id="btn-close" title="Cerrar">
@@ -1180,7 +1411,13 @@
       <div class="timer-column">
         <div class="date-row">
           <span class="date-main" id="lbl-date">-- --</span>
-          <span class="clock-badge" id="lbl-time">00:00:00</span>
+          <div class="date-sub-row">
+            <span class="clock-badge" id="lbl-time">00:00:00</span>
+            <div class="weather-pill" id="weather-pill" title="Clima actual (clic para configurar)">
+              <span class="weather-icon" id="weather-icon">🌤️</span>
+              <span class="weather-temp" id="weather-temp">--°C</span>
+            </div>
+          </div>
         </div>
 
         <div class="logo-hub" id="logo-hub" title="Personalizar GIF y color de fondo">
@@ -1251,68 +1488,199 @@
       </div>
     </div>
 
-    <!-- Modal Personalizar Logo & Fondo -->
-    <div class="theme-modal-overlay" id="theme-modal-overlay">
-      <div class="editor-top">
-        <span class="editor-heading">Personalizar Logo & Fondo</span>
-        <button class="btn-close" id="btn-close-theme-modal">
+    <!-- Modal Integral de Configuración, Temas y Clima -->
+    <div class="settings-modal-overlay" id="settings-modal-overlay">
+      <div class="settings-modal-header">
+        <div class="settings-modal-title-group">
+          <span class="settings-modal-title">Configuración</span>
+          <span class="settings-modal-sub">Personaliza apariencia, temas, clima y opciones</span>
+        </div>
+        <button class="btn-close" id="btn-close-settings-modal" title="Cerrar">
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         </button>
       </div>
 
-      <!-- Sección 1: Elegir GIF o Imagen -->
-      <div class="theme-section">
-        <span class="theme-section-title">Imagen o GIF del Logo</span>
-        <div class="theme-btn-row">
-          <input type="file" id="inp-logo-file" accept="image/gif,image/png,image/jpeg,image/webp" style="display:none">
-          <button class="btn-secondary" id="btn-browse-logo">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
-            Elegir archivo local...
-          </button>
-          <button class="btn-secondary" id="btn-reset-logo" title="Restaurar el logo original del proyecto">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-            Original
-          </button>
-        </div>
-        <div style="display: flex; gap: calc(var(--s) * 4px); margin-top: calc(var(--s) * 4px);">
-          <input type="text" id="inp-logo-url" class="text-field" placeholder="o pega una URL de GIF o imagen..." style="font-size: calc(var(--s) * 11px); padding: calc(var(--s) * 4px) calc(var(--s) * 8px);">
-          <button class="btn-secondary" id="btn-apply-url" style="padding: calc(var(--s) * 4px) calc(var(--s) * 10px);">Aplicar</button>
-        </div>
+      <!-- Barra de Pestañas -->
+      <div class="settings-tabs">
+        <button class="settings-tab-btn active" data-tab="tab-themes">🎨 Temas</button>
+        <button class="settings-tab-btn" data-tab="tab-logo">🖼️ Logo / GIF</button>
+        <button class="settings-tab-btn" data-tab="tab-weather">🌤️ Clima</button>
+        <button class="settings-tab-btn" data-tab="tab-general">⚙️ Ajustes</button>
       </div>
 
-      <!-- Sección 2: Color de Fondo & Autodetección -->
-      <div class="theme-section">
-        <span class="theme-section-title">Color de Fondo del Widget</span>
-        <label class="theme-switch-row">
-          <input type="checkbox" id="chk-auto-bg" checked>
-          <span>Autodetectar color desde el GIF / Imagen</span>
-        </label>
-        <div class="theme-color-row" id="manual-color-container">
-          <input type="color" id="inp-bg-color" class="theme-color-input" value="#000000" title="Elegir color personalizado">
-          <div class="color-swatches-preset">
-            <div class="preset-swatch active" data-color="#000000" style="background:#000000" title="Negro Puro"></div>
-            <div class="preset-swatch" data-color="#08080a" style="background:#08080a" title="Obsidiana"></div>
-            <div class="preset-swatch" data-color="#121216" style="background:#121216" title="Grafito"></div>
-            <div class="preset-swatch" data-color="#070c18" style="background:#070c18" title="Azul Medianoche"></div>
-            <div class="preset-swatch" data-color="#11071c" style="background:#11071c" title="Púrpura Profundo"></div>
-            <div class="preset-swatch" data-color="#07140e" style="background:#07140e" title="Esmeralda Dark"></div>
+      <!-- TAB 1: TEMAS -->
+      <div class="settings-tab-pane active" id="tab-themes">
+        <div class="theme-section">
+          <span class="theme-section-title">Temas Predefinidos</span>
+          <div class="theme-cards-grid" id="theme-cards-container">
+            <!-- Cards generadas por JS -->
+          </div>
+        </div>
+
+        <div class="theme-section">
+          <span class="theme-section-title">Color de Fondo</span>
+          <div class="theme-color-row">
+            <input type="color" id="inp-bg-color" class="theme-color-input" value="#000000" title="Color de fondo personalizado">
+            <div class="color-swatches-preset">
+              <div class="preset-swatch active" data-color="#000000" style="background:#000000" title="Negro Puro"></div>
+              <div class="preset-swatch" data-color="#0a0b12" style="background:#0a0b12" title="Obsidiana Cyber"></div>
+              <div class="preset-swatch" data-color="#121216" style="background:#121216" title="Grafito Apple"></div>
+              <div class="preset-swatch" data-color="#06120b" style="background:#06120b" title="Esmeralda Dark"></div>
+              <div class="preset-swatch" data-color="#150808" style="background:#150808" title="Atardecer Rojizo"></div>
+              <div class="preset-swatch" data-color="#0e0618" style="background:#0e0618" title="Nébula Púrpura"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="theme-section">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="theme-section-title">Color del Rayo Láser</span>
+            <input type="color" id="inp-laser-color" class="theme-color-input" value="#ff453a" title="Color de la línea de tiempo">
           </div>
         </div>
       </div>
 
-      <!-- Sección 3: Difuminado / Vignette -->
-      <div class="theme-section">
-        <div class="slider-row">
-          <div class="slider-header">
-            <span class="theme-section-title">Difuminado de Bordes (Fade)</span>
-            <span id="lbl-vignette-val" style="font-size: calc(var(--s) * 10px); color: #38bdf8; font-weight: 700;">85%</span>
+      <!-- TAB 2: LOGO / GIF -->
+      <div class="settings-tab-pane" id="tab-logo">
+        <div class="theme-section">
+          <span class="theme-section-title">Imagen o GIF de Marca</span>
+          <div class="theme-btn-row">
+            <input type="file" id="inp-logo-file" accept="image/gif,image/png,image/jpeg,image/webp" style="display:none">
+            <button class="btn-secondary" id="btn-browse-logo">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+              Elegir archivo local...
+            </button>
+            <button class="btn-secondary" id="btn-reset-logo" title="Restaurar el logo original de la app">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              Original
+            </button>
           </div>
-          <input type="range" id="rng-vignette" class="theme-slider" min="0" max="100" value="85">
+          <div style="display: flex; gap: calc(var(--s) * 4px); margin-top: calc(var(--s) * 4px);">
+            <input type="text" id="inp-logo-url" class="text-field" placeholder="o pega una URL de GIF o imagen..." style="font-size: calc(var(--s) * 11px); padding: calc(var(--s) * 4px) calc(var(--s) * 8px);">
+            <button class="btn-secondary" id="btn-apply-url" style="padding: calc(var(--s) * 4px) calc(var(--s) * 10px);">Aplicar</button>
+          </div>
+        </div>
+
+        <div class="theme-section">
+          <span class="theme-section-title">Difuminado y Fondo</span>
+          <label class="theme-switch-row">
+            <input type="checkbox" id="chk-auto-bg" checked>
+            <span>Autodetectar color de fondo desde el GIF/Imagen</span>
+          </label>
+          <div class="slider-row" style="margin-top: calc(var(--s) * 4px);">
+            <div class="slider-header">
+              <span class="theme-section-title">Difuminado de Bordes (Fade)</span>
+              <span id="lbl-vignette-val" style="font-size: calc(var(--s) * 10px); color: #38bdf8; font-weight: 700;">85%</span>
+            </div>
+            <input type="range" id="rng-vignette" class="theme-slider" min="0" max="100" value="85">
+          </div>
         </div>
       </div>
 
-      <div class="footer-actions">
-        <button class="action-btn btn-save" id="btn-close-theme">Listo</button>
+      <!-- TAB 3: CLIMA (OPEN-METEO) -->
+      <div class="settings-tab-pane" id="tab-weather">
+        <div class="theme-section">
+          <label class="theme-switch-row">
+            <input type="checkbox" id="chk-weather-enabled" checked>
+            <span style="font-weight:700;">Mostrar clima en la barra de fecha</span>
+          </label>
+        </div>
+
+        <div class="theme-section">
+          <span class="theme-section-title">Ubicación (Open-Meteo)</span>
+          <div style="display:flex; flex-direction:column; gap:calc(var(--s) * 6px);">
+            <select id="sel-weather-city" class="settings-select">
+              <option value="-17.7833,-63.1821|Santa Cruz, Bolivia">Santa Cruz de la Sierra, Bolivia</option>
+              <option value="-16.5000,-68.1500|La Paz, Bolivia">La Paz, Bolivia</option>
+              <option value="-17.3895,-66.1568|Cochabamba, Bolivia">Cochabamba, Bolivia</option>
+              <option value="-19.0333,-65.2627|Sucre, Bolivia">Sucre, Bolivia</option>
+              <option value="-21.5355,-64.7296|Tarija, Bolivia">Tarija, Bolivia</option>
+              <option value="-34.6037,-58.3816|Buenos Aires, Argentina">Buenos Aires, Argentina</option>
+              <option value="-33.4489,-70.6693|Santiago, Chile">Santiago, Chile</option>
+              <option value="-12.0464,-77.0428|Lima, Perú">Lima, Perú</option>
+              <option value="4.7110,-74.0721|Bogotá, Colombia">Bogotá, Colombia</option>
+              <option value="19.4326,-99.1332|Ciudad de México">Ciudad de México, México</option>
+              <option value="40.4168,-3.7038|Madrid, España">Madrid, España</option>
+              <option value="25.7617,-80.1918|Miami, EE.UU.">Miami, Estados Unidos</option>
+              <option value="custom">Coordenadas personalizadas...</option>
+            </select>
+
+            <div id="weather-custom-coords" style="display:none; gap:calc(var(--s)*4px); align-items:center;">
+              <input type="number" id="inp-weather-lat" class="text-field" placeholder="Lat (-17.78)" step="0.0001" style="font-size:calc(var(--s)*10px); padding:calc(var(--s)*4px);">
+              <input type="number" id="inp-weather-lon" class="text-field" placeholder="Lon (-63.18)" step="0.0001" style="font-size:calc(var(--s)*10px); padding:calc(var(--s)*4px);">
+              <button class="btn-secondary" id="btn-apply-coords" style="font-size:calc(var(--s)*10px);">Guardar</button>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <button class="btn-secondary" id="btn-weather-gps" style="font-size:calc(var(--s)*10px);">
+                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+                📍 Usar mi GPS
+              </button>
+              <div style="display:flex; gap:calc(var(--s)*4px); align-items:center;">
+                <label style="font-size:calc(var(--s)*10px); color:#cbd5e1; cursor:pointer;"><input type="radio" name="temp-unit" value="c" id="rad-unit-c" checked> °C</label>
+                <label style="font-size:calc(var(--s)*10px); color:#cbd5e1; cursor:pointer;"><input type="radio" name="temp-unit" value="f" id="rad-unit-f"> °F</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="weather-preview-box">
+          <div class="weather-preview-main">
+            <div>
+              <div class="weather-preview-temp" id="preview-weather-temp">--°C</div>
+              <div class="weather-preview-desc" id="preview-weather-desc">Cargando pronóstico...</div>
+            </div>
+            <button class="btn-secondary" id="btn-weather-refresh" title="Actualizar datos de Open-Meteo" style="font-size:calc(var(--s)*10px); padding:calc(var(--s)*4px) calc(var(--s)*8px);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              Refrescar
+            </button>
+          </div>
+          <div class="weather-preview-grid">
+            <div>Sensación: <span id="preview-weather-apparent" style="font-weight:700; color:#ffffff;">--</span></div>
+            <div>Humedad: <span id="preview-weather-humidity" style="font-weight:700; color:#ffffff;">--</span></div>
+            <div>Viento: <span id="preview-weather-wind" style="font-weight:700; color:#ffffff;">--</span></div>
+            <div>Lluvia: <span id="preview-weather-precip" style="font-weight:700; color:#ffffff;">--</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: GENERAL / AJUSTES -->
+      <div class="settings-tab-pane" id="tab-general">
+        <div class="theme-section">
+          <span class="theme-section-title">Formato de Reloj</span>
+          <label class="theme-switch-row">
+            <input type="checkbox" id="chk-clock-12h">
+            <span>Usar formato de 12 horas (AM/PM)</span>
+          </label>
+        </div>
+
+        <div class="theme-section">
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="theme-section-title">Volumen de Alarma</span>
+              <span id="lbl-alarm-volume-val" style="font-size:calc(var(--s)*10px); color:#38bdf8; font-weight:700;">100%</span>
+            </div>
+            <input type="range" id="rng-alarm-volume" class="theme-slider" min="0" max="100" value="100">
+          </div>
+          <div style="margin-top:calc(var(--s)*4px);">
+            <button class="btn-secondary" id="btn-test-sound" style="font-size:calc(var(--s)*10px);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              Probar Alarma
+            </button>
+          </div>
+        </div>
+
+        <div class="theme-section">
+          <span class="theme-section-title">Texto del Temporizador</span>
+          <div style="display:flex; gap:calc(var(--s)*4px); align-items:center;">
+            <input type="text" id="inp-timer-tagline" class="text-field" value="Faltan:" placeholder="Ej: Faltan: o Quedan:">
+            <button class="btn-secondary" id="btn-apply-tagline">Guardar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-actions" style="margin-top:calc(var(--s)*4px);">
+        <button class="action-btn btn-save" id="btn-close-settings">Listo</button>
       </div>
     </div>
     <audio id="snd-alarm" src="alarm.mp3" preload="auto"></audio>
@@ -1485,11 +1853,29 @@
       try {
         const snap = await invoke('get_snapshot');
         document.getElementById('lbl-date').textContent = snap.date_title;
-        document.getElementById('lbl-time').textContent = snap.current_time_str;
+
+        // Formato 12h / 24h
+        if (typeof appSettings !== 'undefined' && appSettings.clock12h) {
+          const parts = (snap.current_time_str || '').split(':');
+          if (parts.length >= 2) {
+            let h = parseInt(parts[0], 10);
+            const m = parts[1];
+            const s = parts[2] || '00';
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12 || 12;
+            document.getElementById('lbl-time').textContent = `${String(h).padStart(2, '0')}:${m}:${s} ${ampm}`;
+          } else {
+            document.getElementById('lbl-time').textContent = snap.current_time_str;
+          }
+        } else {
+          document.getElementById('lbl-time').textContent = snap.current_time_str;
+        }
+
         document.getElementById('lbl-countdown').textContent = snap.countdown_str;
         const tagline = document.getElementById('lbl-timer-tagline');
         if (tagline) {
-          tagline.textContent = snap.is_free_day ? 'Estado:' : 'Faltan:';
+          const customTag = (typeof appSettings !== 'undefined' && appSettings.timerTagline) ? appSettings.timerTagline : 'Faltan:';
+          tagline.textContent = snap.is_free_day ? 'Estado:' : customTag;
         }
         const blockNameEl = document.getElementById('lbl-block-name');
         blockNameEl.textContent = snap.block_name;
@@ -1973,55 +2359,264 @@
     };
 
     // ==========================================
-    // SISTEMA DE PERSONALIZACIÓN DE LOGO Y FONDO
+    // SISTEMA DE AJUSTES, TEMAS & CLIMA (OPEN-METEO)
     // ==========================================
     const DEFAULT_LOGO_SRC = 'bg-logo.gif';
-    const THEME_STORAGE_KEY = 'yaf_custom_theme_v1';
+    const SETTINGS_STORAGE_KEY = 'yaf_settings_v2';
+    const LEGACY_THEME_STORAGE_KEY = 'yaf_custom_theme_v1';
 
-    let currentThemeConfig = {
-      logoSrc: DEFAULT_LOGO_SRC,
-      bgColor: '#000000',
-      autoBg: true,
-      vignette: 85
+    const PRESET_THEMES = {
+      'midnight': {
+        name: 'Midnight',
+        bgColor: '#000000',
+        cardBg: '#2c2c2e',
+        cardBorder: 'rgba(255, 255, 255, 0.02)',
+        laserColor: '#ff453a',
+        laserGlow: 'rgba(255, 69, 58, 0.6)',
+        dots: ['#000000', '#2c2c2e', '#ff453a']
+      },
+      'cyberpunk': {
+        name: 'Cyberpunk',
+        bgColor: '#0a0b12',
+        cardBg: '#13182b',
+        cardBorder: 'rgba(0, 240, 255, 0.2)',
+        laserColor: '#00f0ff',
+        laserGlow: 'rgba(0, 240, 255, 0.75)',
+        dots: ['#0a0b12', '#13182b', '#00f0ff']
+      },
+      'apple-graphite': {
+        name: 'Apple Grafito',
+        bgColor: '#121214',
+        cardBg: '#222226',
+        cardBorder: 'rgba(255, 255, 255, 0.06)',
+        laserColor: '#30d158',
+        laserGlow: 'rgba(48, 209, 88, 0.6)',
+        dots: ['#121214', '#222226', '#30d158']
+      },
+      'forest': {
+        name: 'Esmeralda',
+        bgColor: '#06120b',
+        cardBg: '#0e2216',
+        cardBorder: 'rgba(52, 211, 153, 0.18)',
+        laserColor: '#10b981',
+        laserGlow: 'rgba(16, 185, 129, 0.65)',
+        dots: ['#06120b', '#0e2216', '#10b981']
+      },
+      'sunset': {
+        name: 'Atardecer',
+        bgColor: '#150808',
+        cardBg: '#281313',
+        cardBorder: 'rgba(255, 122, 0, 0.2)',
+        laserColor: '#ff6b00',
+        laserGlow: 'rgba(255, 107, 0, 0.75)',
+        dots: ['#150808', '#281313', '#ff6b00']
+      },
+      'nebula': {
+        name: 'Nébula',
+        bgColor: '#0e0618',
+        cardBg: '#1c1033',
+        cardBorder: 'rgba(168, 85, 247, 0.2)',
+        laserColor: '#a855f7',
+        laserGlow: 'rgba(168, 85, 247, 0.75)',
+        dots: ['#0e0618', '#1c1033', '#a855f7']
+      }
     };
 
-    function loadSavedTheme() {
+    let appSettings = {
+      themeId: 'midnight',
+      bgColor: '#000000',
+      cardBg: '#2c2c2e',
+      cardBorder: 'rgba(255, 255, 255, 0.02)',
+      laserColor: '#ff453a',
+      laserGlow: 'rgba(255, 69, 58, 0.6)',
+      logoSrc: DEFAULT_LOGO_SRC,
+      autoBg: true,
+      vignette: 85,
+      weather: {
+        enabled: true,
+        cityName: 'Santa Cruz, Bolivia',
+        lat: -17.7833,
+        lon: -63.1821,
+        unit: 'c'
+      },
+      clock12h: false,
+      alarmVolume: 100,
+      timerTagline: 'Faltan:'
+    };
+
+    const WMO_WEATHER_MAP = {
+      0: { desc: 'Despejado', icon: '☀️' },
+      1: { desc: 'Mayormente despejado', icon: '🌤️' },
+      2: { desc: 'Parcialmente nublado', icon: '⛅' },
+      3: { desc: 'Nublado', icon: '☁️' },
+      45: { desc: 'Niebla', icon: '🌫️' },
+      48: { desc: 'Niebla con escarcha', icon: '🌫️' },
+      51: { desc: 'Llovizna ligera', icon: '🌦️' },
+      53: { desc: 'Llovizna moderada', icon: '🌧️' },
+      55: { desc: 'Llovizna densa', icon: '🌧️' },
+      61: { desc: 'Lluvia ligera', icon: '🌦️' },
+      63: { desc: 'Lluvia moderada', icon: '🌧️' },
+      65: { desc: 'Lluvia fuerte', icon: '🌧️' },
+      71: { desc: 'Nevada ligera', icon: '🌨️' },
+      73: { desc: 'Nevada moderada', icon: '🌨️' },
+      75: { desc: 'Nevada intensa', icon: '❄️' },
+      80: { desc: 'Chubascos leves', icon: '🌦️' },
+      81: { desc: 'Chubascos moderados', icon: '🌧️' },
+      82: { desc: 'Chubascos violentos', icon: '⛈️' },
+      95: { desc: 'Tormenta eléctrica', icon: '⛈️' },
+      96: { desc: 'Tormenta con granizo leve', icon: '⛈️' },
+      99: { desc: 'Tormenta con granizo fuerte', icon: '⛈️' }
+    };
+
+    function getWeatherInfo(code, isDay = 1) {
+      let item = WMO_WEATHER_MAP[code] || { desc: 'Variable', icon: '🌤️' };
+      if (!isDay && (code === 0 || code === 1)) {
+        return { desc: item.desc, icon: '🌙' };
+      }
+      return item;
+    }
+
+    let weatherCache = {
+      data: null,
+      timestamp: 0
+    };
+
+    function loadSavedSettings() {
       try {
-        const saved = localStorage.getItem(THEME_STORAGE_KEY);
+        const saved = localStorage.getItem(SETTINGS_STORAGE_KEY);
         if (saved) {
           const parsed = JSON.parse(saved);
-          currentThemeConfig = { ...currentThemeConfig, ...parsed };
+          appSettings = {
+            ...appSettings,
+            ...parsed,
+            weather: { ...appSettings.weather, ...(parsed.weather || {}) }
+          };
+        } else {
+          const leg = localStorage.getItem(LEGACY_THEME_STORAGE_KEY);
+          if (leg) {
+            const legParsed = JSON.parse(leg);
+            if (legParsed.logoSrc) appSettings.logoSrc = legParsed.logoSrc;
+            if (legParsed.bgColor) appSettings.bgColor = legParsed.bgColor;
+            if (legParsed.autoBg !== undefined) appSettings.autoBg = legParsed.autoBg;
+            if (legParsed.vignette !== undefined) appSettings.vignette = legParsed.vignette;
+          }
         }
       } catch (e) {
-        console.warn('Error cargando tema guardado:', e);
+        console.warn('Error cargando ajustes:', e);
       }
-      applyTheme(currentThemeConfig.autoBg);
+      applySettingsToDOM(appSettings.autoBg);
     }
 
-    function saveThemeConfig() {
+    function saveSettings() {
       try {
-        localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(currentThemeConfig));
+        localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(appSettings));
       } catch (e) {
-        console.warn('Error guardando tema:', e);
+        console.warn('Error guardando ajustes:', e);
       }
     }
 
-    function openThemeModal() {
-      const modal = document.getElementById('theme-modal-overlay');
-      if (modal) {
-        modal.classList.add('active');
-        document.getElementById('chk-auto-bg').checked = currentThemeConfig.autoBg;
-        document.getElementById('inp-bg-color').value = currentThemeConfig.bgColor;
-        document.getElementById('rng-vignette').value = currentThemeConfig.vignette;
-        document.getElementById('lbl-vignette-val').textContent = `${currentThemeConfig.vignette}%`;
-        updateActivePresetSwatch(currentThemeConfig.bgColor);
+    function applySettingsToDOM(detectColor = false) {
+      document.documentElement.style.setProperty('--bg-surface', appSettings.bgColor);
+      document.documentElement.style.setProperty('--card-bg', appSettings.cardBg);
+      document.documentElement.style.setProperty('--card-border', appSettings.cardBorder);
+      document.documentElement.style.setProperty('--laser-color', appSettings.laserColor);
+      document.documentElement.style.setProperty('--laser-glow', appSettings.laserGlow);
+      document.body.style.background = appSettings.bgColor;
+
+      const imgLogo = document.getElementById('img-logo');
+      if (imgLogo && appSettings.logoSrc) {
+        if (!imgLogo.src.endsWith(appSettings.logoSrc)) {
+          imgLogo.src = appSettings.logoSrc;
+        }
       }
+
+      const vignette = document.getElementById('logo-vignette');
+      if (vignette) {
+        vignette.style.opacity = appSettings.vignette / 100;
+        vignette.style.background = `radial-gradient(ellipse at center, transparent 32%, ${appSettings.bgColor} 92%)`;
+      }
+
+      const audio = document.getElementById('snd-alarm');
+      if (audio) {
+        audio.volume = Math.max(0, Math.min(1, appSettings.alarmVolume / 100));
+      }
+
+      if (detectColor && appSettings.autoBg) {
+        detectAndApplyBgColor();
+      }
+
+      updateActivePresetSwatch(appSettings.bgColor);
+      updateActiveThemeCard(appSettings.themeId);
     }
 
-    function closeThemeModal() {
-      const modal = document.getElementById('theme-modal-overlay');
-      if (modal) modal.classList.remove('active');
-      saveThemeConfig();
+    function renderThemeCards() {
+      const container = document.getElementById('theme-cards-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      Object.entries(PRESET_THEMES).forEach(([id, theme]) => {
+        const card = document.createElement('div');
+        card.className = `theme-card ${appSettings.themeId === id ? 'active' : ''}`;
+        card.dataset.themeId = id;
+
+        const preview = document.createElement('div');
+        preview.className = 'theme-card-preview';
+        preview.style.background = theme.bgColor;
+        preview.style.borderColor = theme.cardBorder;
+
+        theme.dots.forEach(color => {
+          const dot = document.createElement('div');
+          dot.className = 'preview-dot';
+          dot.style.background = color;
+          preview.appendChild(dot);
+        });
+
+        const name = document.createElement('div');
+        name.className = 'theme-card-name';
+        name.textContent = theme.name;
+
+        card.appendChild(preview);
+        card.appendChild(name);
+
+        card.onclick = () => {
+          selectPresetTheme(id);
+        };
+
+        container.appendChild(card);
+      });
+    }
+
+    function updateActiveThemeCard(activeId) {
+      document.querySelectorAll('.theme-card').forEach(card => {
+        if (card.dataset.themeId === activeId) {
+          card.classList.add('active');
+        } else {
+          card.classList.remove('active');
+        }
+      });
+    }
+
+    function selectPresetTheme(id) {
+      const theme = PRESET_THEMES[id];
+      if (!theme) return;
+
+      appSettings.themeId = id;
+      appSettings.bgColor = theme.bgColor;
+      appSettings.cardBg = theme.cardBg;
+      appSettings.cardBorder = theme.cardBorder;
+      appSettings.laserColor = theme.laserColor;
+      appSettings.laserGlow = theme.laserGlow;
+      appSettings.autoBg = false;
+
+      const chkAuto = document.getElementById('chk-auto-bg');
+      if (chkAuto) chkAuto.checked = false;
+      const inpBg = document.getElementById('inp-bg-color');
+      if (inpBg) inpBg.value = theme.bgColor;
+      const inpLaser = document.getElementById('inp-laser-color');
+      if (inpLaser) inpLaser.value = theme.laserColor;
+
+      applySettingsToDOM(false);
+      saveSettings();
     }
 
     function updateActivePresetSwatch(color) {
@@ -2032,44 +2627,6 @@
           sw.classList.remove('active');
         }
       });
-    }
-
-    function applyTheme(detectColor = false) {
-      const imgLogo = document.getElementById('img-logo');
-      const vignette = document.getElementById('logo-vignette');
-      const rngVignette = document.getElementById('rng-vignette');
-      const lblVignette = document.getElementById('lbl-vignette-val');
-
-      if (imgLogo && currentThemeConfig.logoSrc) {
-        if (!imgLogo.src.endsWith(currentThemeConfig.logoSrc)) {
-          imgLogo.src = currentThemeConfig.logoSrc;
-        }
-      }
-
-      if (rngVignette) rngVignette.value = currentThemeConfig.vignette;
-      if (lblVignette) lblVignette.textContent = `${currentThemeConfig.vignette}%`;
-
-      if (detectColor && currentThemeConfig.autoBg) {
-        detectAndApplyBgColor();
-      } else {
-        setWidgetBackgroundColor(currentThemeConfig.bgColor);
-      }
-
-      if (vignette) {
-        const opacity = currentThemeConfig.vignette / 100;
-        vignette.style.opacity = opacity;
-        vignette.style.background = `radial-gradient(ellipse at center, transparent 32%, ${currentThemeConfig.bgColor} 92%)`;
-      }
-    }
-
-    function setWidgetBackgroundColor(color) {
-      document.documentElement.style.setProperty('--bg-surface', color);
-      document.body.style.background = color;
-      const vignette = document.getElementById('logo-vignette');
-      if (vignette) {
-        vignette.style.background = `radial-gradient(ellipse at center, transparent 32%, ${color} 92%)`;
-      }
-      updateActivePresetSwatch(color);
     }
 
     function detectAndApplyBgColor() {
@@ -2113,11 +2670,12 @@
             const g = Math.round(gTotal / count);
             const b = Math.round(bTotal / count);
             const hex = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
-            currentThemeConfig.bgColor = hex;
-            setWidgetBackgroundColor(hex);
+            appSettings.bgColor = hex;
+            appSettings.themeId = 'custom';
+            applySettingsToDOM(false);
             const inpColor = document.getElementById('inp-bg-color');
             if (inpColor) inpColor.value = hex;
-            saveThemeConfig();
+            saveSettings();
           }
         } catch (e) {
           console.warn('Detección de color omitida:', e);
@@ -2131,13 +2689,183 @@
       }
     }
 
-    // Eventos del personalizador
-    document.getElementById('logo-hub').onclick = (e) => {
-      openThemeModal();
+    // Modal de Configuración y Tabs
+    function openSettingsModal(defaultTab = 'tab-themes') {
+      const modal = document.getElementById('settings-modal-overlay');
+      if (!modal) return;
+      modal.classList.add('active');
+
+      renderThemeCards();
+      document.getElementById('chk-auto-bg').checked = appSettings.autoBg;
+      document.getElementById('inp-bg-color').value = appSettings.bgColor;
+      document.getElementById('inp-laser-color').value = appSettings.laserColor;
+      document.getElementById('rng-vignette').value = appSettings.vignette;
+      document.getElementById('lbl-vignette-val').textContent = `${appSettings.vignette}%`;
+
+      document.getElementById('chk-weather-enabled').checked = appSettings.weather.enabled;
+      document.getElementById('rad-unit-c').checked = appSettings.weather.unit === 'c';
+      document.getElementById('rad-unit-f').checked = appSettings.weather.unit === 'f';
+      document.getElementById('inp-weather-lat').value = appSettings.weather.lat;
+      document.getElementById('inp-weather-lon').value = appSettings.weather.lon;
+
+      const selCity = document.getElementById('sel-weather-city');
+      let matched = false;
+      for (let opt of selCity.options) {
+        if (opt.value.startsWith(`${appSettings.weather.lat},${appSettings.weather.lon}`)) {
+          selCity.value = opt.value;
+          matched = true;
+          break;
+        }
+      }
+      if (!matched) {
+        selCity.value = 'custom';
+        document.getElementById('weather-custom-coords').style.display = 'flex';
+      } else {
+        document.getElementById('weather-custom-coords').style.display = 'none';
+      }
+
+      document.getElementById('chk-clock-12h').checked = appSettings.clock12h;
+      document.getElementById('rng-alarm-volume').value = appSettings.alarmVolume;
+      document.getElementById('lbl-alarm-volume-val').textContent = `${appSettings.alarmVolume}%`;
+      document.getElementById('inp-timer-tagline').value = appSettings.timerTagline || 'Faltan:';
+
+      switchTab(defaultTab);
+      fetchWeather(false);
+    }
+
+    function closeSettingsModal() {
+      const modal = document.getElementById('settings-modal-overlay');
+      if (modal) modal.classList.remove('active');
+      saveSettings();
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.settings-tab-btn').forEach(btn => {
+        if (btn.dataset.tab === tabId) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      document.querySelectorAll('.settings-tab-pane').forEach(pane => {
+        if (pane.id === tabId) {
+          pane.classList.add('active');
+        } else {
+          pane.classList.remove('active');
+        }
+      });
+    }
+
+    // Open-Meteo Weather
+    async function fetchWeather(force = false) {
+      const pill = document.getElementById('weather-pill');
+      if (!appSettings.weather.enabled) {
+        if (pill) pill.style.display = 'none';
+        return;
+      }
+
+      const now = Date.now();
+      if (!force && weatherCache.data && (now - weatherCache.timestamp < 15 * 60 * 1000)) {
+        renderWeather(weatherCache.data);
+        return;
+      }
+
+      const { lat, lon } = appSettings.weather;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m&timezone=auto`;
+
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        weatherCache.data = data;
+        weatherCache.timestamp = now;
+        renderWeather(data);
+      } catch (err) {
+        console.warn('Error fetching weather:', err);
+        if (weatherCache.data) {
+          renderWeather(weatherCache.data);
+        } else if (pill) {
+          pill.style.display = 'inline-flex';
+          document.getElementById('weather-icon').textContent = '⚠️';
+          document.getElementById('weather-temp').textContent = '--';
+        }
+      }
+    }
+
+    function renderWeather(data) {
+      const pill = document.getElementById('weather-pill');
+      if (!pill) return;
+
+      if (!appSettings.weather.enabled) {
+        pill.style.display = 'none';
+        return;
+      }
+
+      pill.style.display = 'inline-flex';
+      const cur = data.current;
+      if (!cur) return;
+
+      const info = getWeatherInfo(cur.weather_code, cur.is_day);
+      let tempVal = cur.temperature_2m;
+      let unitSymbol = '°C';
+
+      if (appSettings.weather.unit === 'f') {
+        tempVal = (tempVal * 9/5) + 32;
+        unitSymbol = '°F';
+      }
+
+      const formattedTemp = Math.round(tempVal) + unitSymbol;
+      document.getElementById('weather-icon').textContent = info.icon;
+      document.getElementById('weather-temp').textContent = formattedTemp;
+      pill.title = `${appSettings.weather.cityName}: ${info.desc}, ${formattedTemp} (Clic para configurar)`;
+
+      const prevTemp = document.getElementById('preview-weather-temp');
+      if (prevTemp) {
+        prevTemp.textContent = `${info.icon} ${formattedTemp}`;
+        document.getElementById('preview-weather-desc').textContent = `${info.desc} en ${appSettings.weather.cityName}`;
+
+        let appTemp = cur.apparent_temperature;
+        if (appSettings.weather.unit === 'f') appTemp = (appTemp * 9/5) + 32;
+        document.getElementById('preview-weather-apparent').textContent = `${Math.round(appTemp)}${unitSymbol}`;
+        document.getElementById('preview-weather-humidity').textContent = `${cur.relative_humidity_2m}%`;
+        document.getElementById('preview-weather-wind').textContent = `${cur.wind_speed_10m} km/h`;
+        document.getElementById('preview-weather-precip').textContent = `${cur.precipitation} mm`;
+      }
+    }
+
+    // ==========================================
+    // EVENT LISTENERS DE CONFIGURACIÓN & CLIMA
+    // ==========================================
+    document.getElementById('btn-settings').onclick = () => {
+      openSettingsModal('tab-themes');
     };
 
-    document.getElementById('btn-close-theme-modal').onclick = closeThemeModal;
-    document.getElementById('btn-close-theme').onclick = closeThemeModal;
+    document.getElementById('btn-close-settings-modal').onclick = closeSettingsModal;
+    document.getElementById('btn-close-settings').onclick = closeSettingsModal;
+
+    document.querySelectorAll('.settings-tab-btn').forEach(btn => {
+      btn.onclick = () => switchTab(btn.dataset.tab);
+    });
+
+    document.getElementById('logo-hub').onclick = () => {
+      openSettingsModal('tab-logo');
+    };
+
+    const editBadge = document.getElementById('btn-edit-logo');
+    if (editBadge) {
+      editBadge.onclick = (e) => {
+        e.stopPropagation();
+        openSettingsModal('tab-logo');
+      };
+    }
+
+    const weatherPill = document.getElementById('weather-pill');
+    if (weatherPill) {
+      weatherPill.onclick = () => {
+        openSettingsModal('tab-weather');
+      };
+    }
 
     document.getElementById('btn-browse-logo').onclick = () => {
       document.getElementById('inp-logo-file').click();
@@ -2148,9 +2876,9 @@
       if (file) {
         const reader = new FileReader();
         reader.onload = (event) => {
-          currentThemeConfig.logoSrc = event.target.result;
-          applyTheme(currentThemeConfig.autoBg);
-          saveThemeConfig();
+          appSettings.logoSrc = event.target.result;
+          applySettingsToDOM(appSettings.autoBg);
+          saveSettings();
         };
         reader.readAsDataURL(file);
       }
@@ -2159,66 +2887,191 @@
     document.getElementById('btn-apply-url').onclick = () => {
       const url = document.getElementById('inp-logo-url').value.trim();
       if (url) {
-        currentThemeConfig.logoSrc = url;
-        applyTheme(currentThemeConfig.autoBg);
-        saveThemeConfig();
+        appSettings.logoSrc = url;
+        applySettingsToDOM(appSettings.autoBg);
+        saveSettings();
       }
     };
 
     document.getElementById('btn-reset-logo').onclick = () => {
-      currentThemeConfig.logoSrc = DEFAULT_LOGO_SRC;
-      currentThemeConfig.bgColor = '#000000';
-      currentThemeConfig.autoBg = true;
-      currentThemeConfig.vignette = 85;
+      appSettings.logoSrc = DEFAULT_LOGO_SRC;
+      appSettings.bgColor = '#000000';
+      appSettings.themeId = 'midnight';
+      appSettings.autoBg = true;
+      appSettings.vignette = 85;
       document.getElementById('chk-auto-bg').checked = true;
       document.getElementById('inp-logo-url').value = '';
-      applyTheme(false);
-      saveThemeConfig();
+      applySettingsToDOM(false);
+      saveSettings();
     };
 
     document.getElementById('chk-auto-bg').onchange = (e) => {
-      currentThemeConfig.autoBg = e.target.checked;
-      if (currentThemeConfig.autoBg) {
+      appSettings.autoBg = e.target.checked;
+      if (appSettings.autoBg) {
         detectAndApplyBgColor();
       }
-      saveThemeConfig();
+      saveSettings();
     };
 
     document.getElementById('inp-bg-color').oninput = (e) => {
-      currentThemeConfig.bgColor = e.target.value;
-      currentThemeConfig.autoBg = false;
+      appSettings.bgColor = e.target.value;
+      appSettings.autoBg = false;
+      appSettings.themeId = 'custom';
       document.getElementById('chk-auto-bg').checked = false;
-      setWidgetBackgroundColor(currentThemeConfig.bgColor);
-      saveThemeConfig();
+      applySettingsToDOM(false);
+      saveSettings();
+    };
+
+    document.getElementById('inp-laser-color').oninput = (e) => {
+      appSettings.laserColor = e.target.value;
+      appSettings.laserGlow = `${e.target.value}99`;
+      appSettings.themeId = 'custom';
+      applySettingsToDOM(false);
+      saveSettings();
     };
 
     document.querySelectorAll('.preset-swatch').forEach(sw => {
       sw.onclick = () => {
         const color = sw.dataset.color;
-        currentThemeConfig.bgColor = color;
-        currentThemeConfig.autoBg = false;
+        appSettings.bgColor = color;
+        appSettings.autoBg = false;
+        appSettings.themeId = 'custom';
         document.getElementById('chk-auto-bg').checked = false;
         document.getElementById('inp-bg-color').value = color;
-        setWidgetBackgroundColor(color);
-        saveThemeConfig();
+        applySettingsToDOM(false);
+        saveSettings();
       };
     });
 
     document.getElementById('rng-vignette').oninput = (e) => {
       const val = parseInt(e.target.value) || 0;
-      currentThemeConfig.vignette = val;
+      appSettings.vignette = val;
       document.getElementById('lbl-vignette-val').textContent = `${val}%`;
       const vignette = document.getElementById('logo-vignette');
       if (vignette) {
         vignette.style.opacity = val / 100;
       }
-      saveThemeConfig();
+      saveSettings();
     };
 
-    loadSavedTheme();
+    // Weather Controls
+    document.getElementById('chk-weather-enabled').onchange = (e) => {
+      appSettings.weather.enabled = e.target.checked;
+      fetchWeather(true);
+      saveSettings();
+    };
+
+    document.getElementById('sel-weather-city').onchange = (e) => {
+      const val = e.target.value;
+      if (val === 'custom') {
+        document.getElementById('weather-custom-coords').style.display = 'flex';
+      } else {
+        document.getElementById('weather-custom-coords').style.display = 'none';
+        const [coords, name] = val.split('|');
+        const [lat, lon] = coords.split(',').map(Number);
+        appSettings.weather.lat = lat;
+        appSettings.weather.lon = lon;
+        appSettings.weather.cityName = name;
+        saveSettings();
+        fetchWeather(true);
+      }
+    };
+
+    document.getElementById('btn-apply-coords').onclick = () => {
+      const lat = parseFloat(document.getElementById('inp-weather-lat').value);
+      const lon = parseFloat(document.getElementById('inp-weather-lon').value);
+      if (!isNaN(lat) && !isNaN(lon)) {
+        appSettings.weather.lat = lat;
+        appSettings.weather.lon = lon;
+        appSettings.weather.cityName = `Coord: ${lat.toFixed(2)}, ${lon.toFixed(2)}`;
+        saveSettings();
+        fetchWeather(true);
+      }
+    };
+
+    document.getElementById('btn-weather-gps').onclick = () => {
+      if (navigator.geolocation) {
+        const btn = document.getElementById('btn-weather-gps');
+        const origText = btn.innerHTML;
+        btn.textContent = '📍 Localizando...';
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            btn.textContent = '📍 GPS Obtenido';
+            appSettings.weather.lat = parseFloat(pos.coords.latitude.toFixed(4));
+            appSettings.weather.lon = parseFloat(pos.coords.longitude.toFixed(4));
+            appSettings.weather.cityName = 'Mi Ubicación';
+            document.getElementById('inp-weather-lat').value = appSettings.weather.lat;
+            document.getElementById('inp-weather-lon').value = appSettings.weather.lon;
+            document.getElementById('sel-weather-city').value = 'custom';
+            document.getElementById('weather-custom-coords').style.display = 'flex';
+            saveSettings();
+            fetchWeather(true);
+            setTimeout(() => { btn.innerHTML = origText; }, 2000);
+          },
+          (err) => {
+            alert('No se pudo acceder a la ubicación: ' + err.message);
+            btn.innerHTML = origText;
+          },
+          { timeout: 8000 }
+        );
+      } else {
+        alert('Geolocalización no disponible');
+      }
+    };
+
+    document.getElementById('rad-unit-c').onchange = (e) => {
+      if (e.target.checked) {
+        appSettings.weather.unit = 'c';
+        saveSettings();
+        if (weatherCache.data) renderWeather(weatherCache.data);
+      }
+    };
+
+    document.getElementById('rad-unit-f').onchange = (e) => {
+      if (e.target.checked) {
+        appSettings.weather.unit = 'f';
+        saveSettings();
+        if (weatherCache.data) renderWeather(weatherCache.data);
+      }
+    };
+
+    document.getElementById('btn-weather-refresh').onclick = () => {
+      fetchWeather(true);
+    };
+
+    // General Controls
+    document.getElementById('chk-clock-12h').onchange = (e) => {
+      appSettings.clock12h = e.target.checked;
+      saveSettings();
+      pollSnapshot();
+    };
+
+    document.getElementById('rng-alarm-volume').oninput = (e) => {
+      const val = parseInt(e.target.value) || 0;
+      appSettings.alarmVolume = val;
+      document.getElementById('lbl-alarm-volume-val').textContent = `${val}%`;
+      const audio = document.getElementById('snd-alarm');
+      if (audio) audio.volume = val / 100;
+      saveSettings();
+    };
+
+    document.getElementById('btn-test-sound').onclick = () => {
+      playAlarm();
+    };
+
+    document.getElementById('btn-apply-tagline').onclick = () => {
+      const val = document.getElementById('inp-timer-tagline').value.trim() || 'Faltan:';
+      appSettings.timerTagline = val;
+      saveSettings();
+      pollSnapshot();
+    };
+
+    loadSavedSettings();
     renderPalette();
     pollSnapshot();
     setInterval(pollSnapshot, 1000);
+    fetchWeather(false);
+    setInterval(() => fetchWeather(false), 15 * 60 * 1000);
   </script>
 </body>
 </html>

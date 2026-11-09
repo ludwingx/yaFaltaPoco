@@ -43,26 +43,48 @@ Inspirado en la elegancia visual de **Linear** y las interfaces de **Apple**, co
 ### 🌟 ¿Qué lo hace tan peculiar y genial?
 
 #### 🔴 1. El Láser Rojo en Tiempo Real
-Nada de aburridas barras estáticas. Un haz láser rojo neón (`#ff453a`) corta visualmente la cápsula de tu actividad actual y avanza milimétricamente en tiempo real para que veas tu progreso de un vistazo.
+Nada de aburridas barras estáticas. Un haz láser brillante corta visualmente la cápsula de tu actividad actual y avanza milimétricamente en tiempo real con efecto neón para que veas tu progreso de un solo vistazo.
 
-#### 🎨 2. Tu Propio GIF & Fondo Camaleónico (¡Nuevo!)
-¿Quieres a tu personaje de anime favorito, un gatito programador o el logo de tu empresa?
-- **Haz clic directamente en el logo** para abrir el personalizador visual.
-- Sube cualquier **GIF o imagen** local (o pega una URL directa).
-- **Autodetección mágica de color:** La app analiza los píxeles perimetrales del GIF y adapta el color de fondo del widget de forma automática.
-- **Difuminado de bordes (*Fade*):** Un sutil viñeteado radial fusiona tu GIF con el fondo negro para que se vea como si fuera parte nativa de la interfaz.
+#### 🎨 2. Temas Visuales y Modo Camaleónico (¡Nuevo!)
+Elige la estética que mejor combine con tu setup o tu estado de ánimo:
+- **6 Temas Integrados:**
+  - 🌌 **Midnight:** El clásico y elegante negro profundo con láser rojo.
+  - ⚡ **Cyberpunk Neon:** Fondo azul obsidiana con láser cian electro y bordes glow.
+  - 🍏 **Apple Grafito:** Paleta inspirada en macOS con láser verde esmeralda suave.
+  - 🌲 **Esmeralda Forest:** Tonalidades orgánicas oscuras con láser verde menta.
+  - 🌅 **Atardecer Solar:** Tonos cálidos café/rojizos con láser naranja crepuscular.
+  - 🔮 **Nébula Púrpura:** Mística espacial con láser violeta fluorescente.
+- **Selector libre de colores:** Personaliza el fondo y el color del láser como quieras.
+- **Autodetección mágica de color:** La app analiza tu GIF o imagen y calibra automáticamente el color de fondo para una integración perfecta.
+- **Difuminado de bordes (*Fade*):** Viñeteado radial graduable (0% - 100%) para difuminar cualquier imagen o GIF con el fondo.
 
-#### ⏱️ 3. Temporizador con *"Faltan:"*
-Un contador regresivo minimalista que te mantiene al tanto de los segundos que restan para que suene la campana. Sin distracciones, sin números gigantes molestos.
+#### 🌤️ 3. Clima en Vivo con Open-Meteo (¡Nuevo!)
+¿Cómo está el día afuera de la oficina?
+- **Píldora climática en la cabecera:** Temperatura actual e icono meteorológico dinámico (☀️, 🌤️, ⛅, 🌧️, ⛈️, ❄️, 🌙).
+- **Sin necesidad de API Key:** Integrado con el servicio libre mundial de **Open-Meteo**.
+- **Panel con datos meteorológicos:** Sensación térmica (*feels-like*), humedad relativa, velocidad del viento y precipitaciones.
+- **Ubicación flexible:** Selector de ciudades populares (Santa Cruz de la Sierra, La Paz, Cochabamba, Buenos Aires, Santiago, Lima, Bogotá, CDMX, Madrid, Miami...), botón de detección automática por **GPS** o coordenadas manuales.
+- **Unidades:** Alterna entre Celsius (°C) y Fahrenheit (°F) con un solo toque.
 
-#### 🌴 4. Domingo Free Oficial
+#### ⏱️ 4. Temporizador con *"Faltan:"* y Modo 12h/24h
+Un contador regresivo minimalista que te mantiene al tanto de los segundos que restan para que suene la campana. Puedes alternar entre formato militar de 24h o formato de 12 horas con indicador AM/PM.
+
+#### ⚙️ 5. Centro de Ajustes Integral
+Un nuevo botón de configuración (`⚙️`) en la barra superior te da acceso directo a 4 pestañas:
+1. **🎨 Temas:** Presets de colores y personalización del haz láser.
+2. **🖼️ Logo / GIF:** Selector de imagen o GIF local/URL y viñeteado.
+3. **🌤️ Clima:** Activar/desactivar, configuración de ubicación y pronóstico.
+4. **⚙️ Ajustes:** Volumen de la alarma con botón de prueba, formato de reloj y texto personalizable para el temporizador.
+
+#### 🌴 6. Domingo Free Oficial
 Porque los domingos están hechos para descansar: la app detecta automáticamente el domingo y silencia las alertas de trabajo, mostrándote el mensaje: *"¡Domingo Free! 🎉"* con temática de relax.
 
-#### 🔔 5. Alarma Sonora con Control Táctil
+#### 🔔 7. Alarma Sonora con Control Táctil y Volumen
 - **Clic izquierdo** en la campana (`🔔`): Prueba instantánea del sonido.
 - **Clic derecho** en la campana: Silencia o reactiva las notificaciones sonoras.
+- **Slider de volumen en ajustes:** Gradúa el volumen desde 0% hasta 100%.
 
-#### 📐 6. Redimensionamiento Responsivo
+#### 📐 8. Redimensionamiento Responsivo
 Arrastra la esquina inferior derecha o los bordes. Todas las fuentes, cápsulas y espacios se recalculan con precisión matemática mediante CSS dinámico.
 
 ---
@@ -86,7 +108,9 @@ Simplemente ejecuta [`yafaltapoco.exe`](./yafaltapoco.exe) manteniendo `WebView2
 |---|---|
 | **Arrastrar desde arriba** | Mueve el widget libremente por cualquier parte de tu pantalla. |
 | **Arrastrar esquina SE** | Cambia el tamaño del widget con escalado responsivo suave. |
-| **Clic en el GIF / Logo** | 🎨 Abre el personalizador para elegir tu propio GIF y color de fondo. |
+| **Clic en `⚙️` (Configuración)** | Abre el panel integral con pestañas de Temas, GIF, Clima y Ajustes. |
+| **Clic en la píldora de Clima (`🌤️ 27°C`)** | Abre directamente los detalles y ajustes del clima. |
+| **Clic en el GIF / Logo** | Abre directamente el personalizador de GIF y fondo. |
 | **Clic en `Horario` / `Temporizador`** | Alterna entre agenda diaria por bloques o temporizador directo a una hora meta. |
 | **Clic en `[ ➕ Crear turno ]`** | Abre el formulario modal para programar una nueva actividad. |
 | **Clic sobre una tarjeta** | Edita el nombre, horario o color de ese turno. |

@@ -157,6 +157,13 @@
       transform: scale(1.08);
     }
 
+    .btn-close svg, .btn-icon svg {
+      width: calc(var(--s) * 12px);
+      height: calc(var(--s) * 12px);
+      stroke-width: 2px;
+      display: block;
+    }
+
     @keyframes alarm-pulse {
       0%, 100% { transform: scale(1); text-shadow: 0 0 16px rgba(59, 130, 246, 0.45); }
       50% { transform: scale(1.06); text-shadow: 0 0 24px #38bdf8, 0 0 40px #38bdf8; color: #38bdf8; }
@@ -212,7 +219,7 @@
       color: var(--text-muted);
     }
 
-    /* GIF de marca prominente y visible arriba del temporizador (sin máscara circular ni glow circular) */
+    /* GIF de marca con zoom prominente arriba de la hora */
     .logo-hub {
       display: flex;
       align-items: center;
@@ -220,14 +227,14 @@
       margin: auto 0;
       position: relative;
       background: transparent;
-      padding: calc(var(--s) * 2px) 0;
+      padding: 0;
       width: 100%;
+      height: calc(var(--s) * 130px);
+      overflow: hidden;
     }
 
     .logo-gif-img {
-      max-width: calc(var(--s) * 180px);
-      max-height: calc(var(--s) * 130px);
-      width: calc(var(--s) * 155px);
+      width: calc(var(--s) * 175px);
       height: auto;
       object-fit: contain;
       border-radius: 0 !important;
@@ -237,6 +244,8 @@
       background: transparent;
       pointer-events: none;
       display: block;
+      transform: scale(1.65);
+      transform-origin: center center;
     }
 
     .countdown-hub {
@@ -377,11 +386,17 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: calc(var(--s) * 10px);
       color: #8e8e93;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
       position: relative;
       z-index: 2;
+    }
+
+    .pole-node svg {
+      width: calc(var(--s) * 11px);
+      height: calc(var(--s) * 11px);
+      stroke-width: 2.2px;
+      display: block;
     }
 
     /* Fila de Timeline (Gutter + Rail + Card) */
@@ -467,8 +482,18 @@
     }
 
     .capsule-icon {
-      font-size: calc(var(--s) * 14px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       line-height: 1;
+      width: 100%;
+    }
+
+    .capsule-icon svg {
+      width: calc(var(--s) * 16px);
+      height: calc(var(--s) * 16px);
+      stroke-width: 2.2px;
+      display: block;
     }
 
     /* Tarjeta Derecha (Estilo Apple Graphite como en la imagen) */
@@ -540,9 +565,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: calc(var(--s) * 12px);
-      font-weight: 800;
       transition: all 0.15s ease;
+    }
+
+    .card-check svg {
+      width: calc(var(--s) * 13px);
+      height: calc(var(--s) * 13px);
+      stroke-width: 3px;
+      display: block;
     }
 
     /* Rayo Láser Rojo Horizontal */
@@ -633,6 +663,13 @@
       gap: calc(var(--s) * 6px);
       width: fit-content;
       transition: all 0.15s ease;
+    }
+
+    .btn-create-event svg {
+      width: calc(var(--s) * 13px);
+      height: calc(var(--s) * 13px);
+      stroke-width: 2.5px;
+      display: block;
     }
 
     .btn-create-event:hover {
@@ -886,9 +923,13 @@
         <span class="brand-dot"></span>YA FALTA POCO
       </div>
       <div class="top-actions">
-        <button class="btn-icon" id="btn-sound" title="Sonido activado (clic para probar, clic derecho para silenciar)">🔔</button>
+        <button class="btn-icon" id="btn-sound" title="Sonido activado (clic para probar, clic derecho para silenciar)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+        </button>
         <button class="btn-pill" id="btn-mode">Horario</button>
-        <button class="btn-close" id="btn-close" title="Cerrar">✕</button>
+        <button class="btn-close" id="btn-close" title="Cerrar">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
       </div>
     </div>
 
@@ -929,7 +970,9 @@
     <div class="editor-overlay" id="editor-overlay">
       <div class="editor-top">
         <span class="editor-heading" id="modal-title">Nuevo Bloque</span>
-        <button class="btn-close" id="btn-close-modal">✕</button>
+        <button class="btn-close" id="btn-close-modal">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
       </div>
 
       <div class="form-group">
@@ -1155,7 +1198,7 @@
 
         const soundBtn = document.getElementById('btn-sound');
         if (soundBtn) {
-          soundBtn.textContent = snap.sound_enabled ? '🔔' : '🔇';
+          soundBtn.innerHTML = snap.sound_enabled ? LUCIDE_ICONS.bell : LUCIDE_ICONS.bellOff;
           soundBtn.title = snap.sound_enabled 
             ? 'Sonido activado (clic para probar, clic derecho para silenciar)' 
             : 'Sonido silenciado (clic para activar)';
@@ -1167,17 +1210,39 @@
       }
     }
 
+    const LUCIDE_ICONS = {
+      sun: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`,
+      moon: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`,
+      bell: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>`,
+      bellOff: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.7 3A6 6 0 0 1 18 8a21.3 21.3 0 0 0 .6 5"/><path d="M17 17H3s3-2 3-9a4.67 4.67 0 0 1 .3-1.7"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/><line x1="2" x2="22" y1="2" y2="22"/></svg>`,
+      check: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`,
+      plus: `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>`,
+      laptop: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"/></svg>`,
+      coffee: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v2"/><path d="M14 2v2"/><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h12Zm0 0h2a3 3 0 0 1 3 3v1a3 3 0 0 1-3 3h-2"/><path d="M6 2v2"/></svg>`,
+      utensils: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2v6a3 3 0 0 1-3 3 3 3 0 0 1-3-3V2"/><path d="M15 2v10"/><path d="M15 15v7"/><path d="M5 2v10a3 3 0 0 0 3 3 3 3 0 0 0 3-3V2"/><path d="M8 2v10"/><path d="M8 15v7"/></svg>`,
+      shower: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 4 2.5 2.5"/><path d="M13.5 6.5a4.95 4.95 0 0 0-7 7L11 18l7-7-4.5-4.5Z"/><path d="m15 5 6-2"/><path d="m14 19 .5.5"/><path d="m17 16 .5.5"/><path d="m11 22 .5.5"/></svg>`,
+      dumbbell: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1a3 3 0 0 0-4.24 0l-.88.88a1 1 0 0 1-1.42 0l-4.24-4.24a1 1 0 0 1 0-1.42l.88-.88a3 3 0 0 0 0-4.24L10.1 6.1"/><path d="m3 3 1 1a3 3 0 0 0 4.24 0l.88-.88a1 1 0 0 1 1.42 0l4.24 4.24a1 1 0 0 1 0 1.42l-.88.88a3 3 0 0 0 0 4.24l1 1"/></svg>`,
+      mail: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>`,
+      video: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.934a.5.5 0 0 0-.777-.416L16 11"/><rect width="14" height="12" x="2" y="6" rx="2"/></svg>`,
+      book: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
+      code: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`,
+      zap: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>`,
+      palmtree: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 8c0-2.76-2.46-5-5.5-5S2 5.24 2 8h2a3.5 3.5 0 0 1 7 0h2Z"/><path d="M13 7.14A5.82 5.82 0 0 1 16.5 6c3.04 0 5.5 2.24 5.5 5h-2a3.5 3.5 0 0 0-7 0v-3.86Z"/><path d="M5.8 11.3A3.5 3.5 0 0 0 9 13v9"/><path d="M15 13a3.5 3.5 0 0 0 3.2-1.7"/></svg>`,
+      x: `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`
+    };
+
     function getBlockIcon(title) {
       const t = (title || '').toLowerCase();
-      if (t.includes('almuerzo') || t.includes('comida') || t.includes('lunch') || t.includes('cena')) return '🍽️';
-      if (t.includes('desayuno') || t.includes('cafe') || t.includes('café') || t.includes('break')) return '☕';
-      if (t.includes('gym') || t.includes('workout') || t.includes('ejercicio') || t.includes('correr') || t.includes('entreno')) return '🏃';
-      if (t.includes('ducha') || t.includes('shower') || t.includes('baño') || t.includes('bano')) return '🚿';
-      if (t.includes('email') || t.includes('correo') || t.includes('mensaje')) return '✉️';
-      if (t.includes('meet') || t.includes('reunion') || t.includes('reunión') || t.includes('call') || t.includes('llamada')) return '📞';
-      if (t.includes('brain') || t.includes('code') || t.includes('prog') || t.includes('dev') || t.includes('trabajo')) return '💻';
-      if (t.includes('estudio') || t.includes('leer') || t.includes('read') || t.includes('libro')) return '📖';
-      return '⚡';
+      if (t.includes('almuerzo') || t.includes('comida') || t.includes('lunch') || t.includes('cena')) return LUCIDE_ICONS.utensils;
+      if (t.includes('desayuno') || t.includes('cafe') || t.includes('café') || t.includes('break')) return LUCIDE_ICONS.coffee;
+      if (t.includes('gym') || t.includes('workout') || t.includes('ejercicio') || t.includes('correr') || t.includes('entreno')) return LUCIDE_ICONS.dumbbell;
+      if (t.includes('ducha') || t.includes('shower') || t.includes('baño') || t.includes('bano')) return LUCIDE_ICONS.shower;
+      if (t.includes('email') || t.includes('correo') || t.includes('mensaje') || t.includes('mail')) return LUCIDE_ICONS.mail;
+      if (t.includes('meet') || t.includes('reunion') || t.includes('reunión') || t.includes('call') || t.includes('llamada')) return LUCIDE_ICONS.video;
+      if (t.includes('brain') || t.includes('trabajo') || t.includes('work')) return LUCIDE_ICONS.laptop;
+      if (t.includes('code') || t.includes('prog') || t.includes('dev')) return LUCIDE_ICONS.code;
+      if (t.includes('estudio') || t.includes('leer') || t.includes('read') || t.includes('libro')) return LUCIDE_ICONS.book;
+      return LUCIDE_ICONS.zap;
     }
 
     function formatBlockDuration(startH, startM, endH, endM) {
@@ -1244,7 +1309,7 @@
         const freeCard = document.createElement('div');
         freeCard.className = 'free-day-banner';
         freeCard.innerHTML = `
-          <div class="free-day-badge">🌴 DOMINGO FREE</div>
+          <div class="free-day-badge">${LUCIDE_ICONS.palmtree} DOMINGO FREE</div>
           <div class="free-day-text">Día de descanso. Los turnos de trabajo están activos de lunes a sábado.</div>
         `;
         container.appendChild(freeCard);
@@ -1260,14 +1325,14 @@
       const pad = (num) => String(num).padStart(2, '0');
       const nowStrFormatted = `${pad(h)}:${pad(m)}`;
 
-      // Marcador inicial sol ☀️ (Alineado con el riel central)
+      // Marcador inicial sol (Alineado con el riel central)
       const topPole = document.createElement('div');
       topPole.className = 'timeline-pole-row';
       topPole.innerHTML = `
         <div class="time-gutter"></div>
         <div class="rail-container">
           <div class="rail-line-back top-stem"></div>
-          <div class="pole-node">☀️</div>
+          <div class="pole-node">${LUCIDE_ICONS.sun}</div>
         </div>
       `;
       container.appendChild(topPole);
@@ -1293,9 +1358,9 @@
         const row = document.createElement('div');
         row.className = 'timeline-row' + (isActive ? ' active' : '') + (isCompleted ? ' completed' : '');
 
-        // Checkbox: completado = fondo sólido rosa-rojo con ✓; pendiente = borde hollow con color del bloque
+        // Checkbox: completado = fondo sólido rosa-rojo con check Lucide; pendiente = borde hollow con color del bloque
         const checkboxHtml = isCompleted
-          ? `<div class="card-check" style="background: #ff375f; color: #fff;">✓</div>`
+          ? `<div class="card-check" style="background: #ff375f; color: #fff;">${LUCIDE_ICONS.check}</div>`
           : `<div class="card-check" style="border: calc(var(--s) * 2.2px) solid rgb(${colRgb}); background: transparent;"></div>`;
 
         // Cápsula: completado = gris oscuro discreto #323235; activo/pendiente = color sólido vibrante
@@ -1308,7 +1373,7 @@
           <div class="rail-container">
             <div class="rail-line-back"></div>
             <div class="rail-capsule" style="background: ${capsuleBg};">
-              <span class="capsule-icon" style="${isCompleted ? 'color: #ff375f; opacity: 0.9;' : ''}">${icon}</span>
+              <span class="capsule-icon" style="color: ${isCompleted ? '#ff375f' : '#ffffff'};">${icon}</span>
             </div>
           </div>
           <div class="card-box">
@@ -1327,19 +1392,19 @@
         container.appendChild(row);
       });
 
-      // Marcador final y footer con Luna 🌙 (Alineado con el riel central)
+      // Marcador final y footer con Luna (Alineado con el riel central)
       const bottomArea = document.createElement('div');
       bottomArea.className = 'timeline-bottom-area';
       bottomArea.innerHTML = `
         <div class="time-gutter"></div>
         <div class="rail-container bottom-rail">
           <div class="rail-line-back bottom-stem"></div>
-          <div class="pole-node bottom">🌙</div>
+          <div class="pole-node bottom">${LUCIDE_ICONS.moon}</div>
         </div>
         <div class="timeline-footer-content">
           <div class="end-of-day-line" id="lbl-end-of-day">Fin de la jornada: --</div>
           <button class="btn-create-event" id="btn-create-in-stream">
-            <span class="btn-plus-icon">+</span> Crear turno
+            ${LUCIDE_ICONS.plus} Crear turno
           </button>
         </div>
       `;

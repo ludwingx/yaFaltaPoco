@@ -54,21 +54,6 @@
       box-sizing: border-box;
     }
 
-    /* Logo GIF de Fondo Sutil (Watermark) */
-    .bg-watermark {
-      position: absolute;
-      inset: 0;
-      background-image: url('bg-logo.gif');
-      background-repeat: no-repeat;
-      background-position: center center;
-      background-size: min(72%, calc(var(--s) * 380px));
-      opacity: 0.15;
-      pointer-events: none;
-      z-index: 0;
-      mix-blend-mode: screen;
-      filter: contrast(1.15) brightness(1.1);
-    }
-
     /* Barra Superior */
     .top-bar {
       display: flex;
@@ -180,8 +165,8 @@
     /* Grid de Contenido */
     .content-layout {
       display: grid;
-      grid-template-columns: minmax(calc(var(--s) * 150px), calc(var(--s) * 215px)) 1fr;
-      gap: calc(var(--s) * 16px);
+      grid-template-columns: minmax(calc(var(--s) * 160px), calc(var(--s) * 205px)) 1fr;
+      gap: calc(var(--s) * 14px);
       flex: 1;
       min-height: 0;
       height: calc(100% - calc(var(--s) * 32px));
@@ -189,29 +174,31 @@
       z-index: 1;
     }
 
-    /* Tarjeta Izquierda (Hero) */
-    .card-hero {
-      background: linear-gradient(180deg, rgba(8, 10, 15, 0.84) 45%, rgba(18, 52, 155, 0.74) 100%);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border-radius: calc(var(--s) * 18px);
-      border: 1px solid var(--border-subtle);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      padding: calc(var(--s) * 14px);
+    /* Columna Izquierda: Logo prominente + Temporizador minimalista (sin card) */
+    .timer-column {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      padding: calc(var(--s) * 4px) calc(var(--s) * 8px);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      position: relative;
+      align-items: center;
+      text-align: center;
       height: 100%;
+      position: relative;
+      user-select: none;
     }
 
     .date-row {
       display: flex;
       flex-direction: column;
+      align-items: center;
+      gap: calc(var(--s) * 2px);
     }
 
     .date-main {
-      font-size: calc(var(--s) * 17px);
+      font-size: calc(var(--s) * 16px);
       font-weight: 800;
       color: var(--text-white);
       letter-spacing: -0.3px;
@@ -223,7 +210,25 @@
       font-family: 'JetBrains Mono', monospace;
       font-size: calc(var(--s) * 12px);
       color: var(--text-muted);
-      margin-top: calc(var(--s) * 4px);
+    }
+
+    /* GIF de marca prominente y visible arriba del temporizador */
+    .logo-hub {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: auto 0;
+      position: relative;
+    }
+
+    .logo-gif-img {
+      width: calc(var(--s) * 94px);
+      height: calc(var(--s) * 94px);
+      object-fit: contain;
+      border-radius: 50%;
+      filter: drop-shadow(0 0 calc(var(--s) * 20px) rgba(59, 130, 246, 0.55));
+      transition: transform 0.2s ease;
+      pointer-events: none;
     }
 
     .countdown-hub {
@@ -232,9 +237,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      margin-top: auto;
-      margin-bottom: auto;
-      padding-top: calc(var(--s) * 6px);
+      margin-bottom: calc(var(--s) * 6px);
     }
 
     .timer-display {
@@ -256,10 +259,9 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      margin-inline: auto;
     }
 
-    /* Columna Derecha (Agenda) */
+    /* Columna Derecha (Agenda estilo Timeline de referencia) */
     .agenda-section {
       display: flex;
       flex-direction: column;
@@ -268,112 +270,281 @@
       min-height: 0;
     }
 
+    .agenda-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: calc(var(--s) * 6px);
+      padding: 0 2px;
+      flex-shrink: 0;
+    }
+
     .agenda-title {
       font-size: calc(var(--s) * 11px);
       font-weight: 700;
       letter-spacing: calc(var(--s) * 1.5px);
       color: var(--text-dim);
       text-transform: uppercase;
-      margin-bottom: calc(var(--s) * 6px);
-      padding-left: 2px;
     }
 
-    .schedule-stream {
+    .agenda-count-badge {
+      font-size: calc(var(--s) * 9.5px);
+      font-weight: 600;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.05);
+      padding: calc(var(--s) * 1px) calc(var(--s) * 7px);
+      border-radius: calc(var(--s) * 8px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .timeline-stream {
       flex: 1;
       min-height: 0;
       overflow-y: auto;
+      overflow-x: hidden;
       display: flex;
       flex-direction: column;
-      gap: calc(var(--s) * 5px);
       padding-right: calc(var(--s) * 4px);
-      padding-bottom: calc(var(--s) * 36px);
+      position: relative;
     }
 
-    .schedule-stream::-webkit-scrollbar {
+    .timeline-stream::-webkit-scrollbar {
       width: calc(var(--s) * 4px);
     }
-    .schedule-stream::-webkit-scrollbar-thumb {
+    .timeline-stream::-webkit-scrollbar-thumb {
       background: rgba(255, 255, 255, 0.1);
       border-radius: 4px;
     }
 
-    /* Fila de Bloque: Minimalista y elegante */
-    .block-row {
+    /* Extremos de la Vía (Sun / Moon) */
+    .timeline-pole {
       display: flex;
       align-items: center;
+      height: calc(var(--s) * 14px);
+      padding-left: calc(var(--s) * 12px);
+      flex-shrink: 0;
+    }
+    .pole-icon {
+      font-size: calc(var(--s) * 10px);
+      line-height: 1;
+      opacity: 0.6;
+      filter: grayscale(0.2);
+    }
+
+    /* Fila de Timeline */
+    .timeline-row {
+      display: flex;
+      align-items: stretch;
       gap: calc(var(--s) * 10px);
-      padding: calc(var(--s) * 6px) calc(var(--s) * 10px);
-      border-radius: calc(var(--s) * 9px);
-      cursor: pointer;
       position: relative;
-      transition: background 0.15s, border-color 0.15s;
-      background: rgba(255, 255, 255, 0.025);
-      border: 1px solid rgba(255, 255, 255, 0.04);
+      margin-bottom: calc(var(--s) * 6px);
     }
 
-    .block-row:hover {
-      background: rgba(255, 255, 255, 0.06);
-      border-color: rgba(255, 255, 255, 0.08);
-    }
-
-    .block-row.active {
-      background: rgba(37, 99, 235, 0.15);
-      border-color: rgba(59, 130, 246, 0.35);
-    }
-
-    .block-row.completed {
-      opacity: 0.5;
-    }
-
-    .block-row.completed .block-name-text {
-      text-decoration: line-through;
-    }
-
-    .accent-bar {
-      width: calc(var(--s) * 3.5px);
-      height: calc(var(--s) * 24px);
-      border-radius: 2px;
+    /* Columna del Riel */
+    .timeline-rail {
+      width: calc(var(--s) * 34px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
       flex-shrink: 0;
     }
 
-    .block-info {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      gap: 2px;
-      min-width: 0;
+    .rail-track-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(var(--s) * 2px);
+      background: rgba(255, 255, 255, 0.1);
+      z-index: 1;
     }
 
-    .block-name-text {
+    .timeline-capsule {
+      width: calc(var(--s) * 32px);
+      height: calc(var(--s) * 42px);
+      border-radius: calc(var(--s) * 12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: calc(var(--s) * 15px);
+      position: relative;
+      z-index: 2;
+      margin: auto 0;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+      transition: transform 0.15s, box-shadow 0.15s;
+      flex-shrink: 0;
+    }
+
+    .timeline-row.active .timeline-capsule {
+      transform: scale(1.08);
+    }
+
+    .timeline-row.completed .timeline-capsule {
+      opacity: 0.5;
+      filter: grayscale(0.5);
+    }
+
+    /* Tarjeta de Contenido */
+    .timeline-card {
+      flex: 1;
+      min-width: 0;
+      background: #141720;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: calc(var(--s) * 12px);
+      padding: calc(var(--s) * 8px) calc(var(--s) * 12px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: calc(var(--s) * 8px);
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, transform 0.12s;
+    }
+
+    .timeline-card:hover {
+      background: #1a1e2b;
+      border-color: rgba(255, 255, 255, 0.1);
+      transform: translateX(calc(var(--s) * 2px));
+    }
+
+    .timeline-row.active .timeline-card {
+      background: rgba(30, 41, 59, 0.7);
+      border-color: rgba(59, 130, 246, 0.4);
+      box-shadow: 0 0 calc(var(--s) * 14px) rgba(59, 130, 246, 0.15);
+    }
+
+    .timeline-row.completed .timeline-card {
+      opacity: 0.55;
+    }
+
+    .card-body {
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--s) * 2px);
+      min-width: 0;
+      flex: 1;
+    }
+
+    .card-title {
       font-size: calc(var(--s) * 13px);
-      font-weight: 600;
-      color: #f1f5f9;
+      font-weight: 700;
+      color: #f8fafc;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .block-time-range {
+    .timeline-row.completed .card-title {
+      text-decoration: line-through;
+      color: #64748b;
+    }
+
+    .card-time {
       font-family: 'JetBrains Mono', monospace;
       font-size: calc(var(--s) * 10.5px);
       color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: calc(var(--s) * 4px);
     }
 
-    .block-row.active .block-time-range {
+    .timeline-row.active .card-time {
       color: #60a5fa;
       font-weight: 600;
     }
 
-    .status-badge {
+    .card-duration {
+      color: var(--text-dim);
+      font-size: calc(var(--s) * 10px);
+      opacity: 0.85;
+    }
+
+    /* Checkbox / Indicador en la tarjeta */
+    .card-checkbox {
+      width: calc(var(--s) * 18px);
+      height: calc(var(--s) * 18px);
+      border-radius: calc(var(--s) * 5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: calc(var(--s) * 11px);
+      font-weight: 800;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+
+    /* Línea Indicadora de Hora Actual (como en la imagen con 08:18 roja) */
+    .timeline-now-divider {
+      display: flex;
+      align-items: center;
+      gap: calc(var(--s) * 6px);
+      margin: calc(var(--s) * -2px) 0 calc(var(--s) * 4px) calc(var(--s) * 2px);
+      position: relative;
+      z-index: 10;
+    }
+
+    .now-time-tag {
+      font-family: 'JetBrains Mono', monospace;
       font-size: calc(var(--s) * 9px);
       font-weight: 700;
-      text-transform: uppercase;
-      padding: calc(var(--s) * 2px) calc(var(--s) * 6px);
-      border-radius: calc(var(--s) * 8px);
-      background: rgba(59, 130, 246, 0.2);
-      color: #93c5fd;
-      letter-spacing: 0.5px;
+      color: #f87171;
+      background: rgba(239, 68, 68, 0.18);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      padding: calc(var(--s) * 1px) calc(var(--s) * 5px);
+      border-radius: calc(var(--s) * 4px);
+      line-height: 1.2;
       flex-shrink: 0;
+    }
+
+    .now-red-line {
+      flex: 1;
+      height: 1.5px;
+      background: linear-gradient(90deg, #ef4444 0%, rgba(239, 68, 68, 0.4) 75%, transparent 100%);
+      box-shadow: 0 0 6px rgba(239, 68, 68, 0.65);
+    }
+
+    /* Footer de la Agenda (Fin de jornada + Botón Crear) */
+    .timeline-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: calc(var(--s) * 6px);
+      padding-top: calc(var(--s) * 4px);
+      flex-shrink: 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .end-of-day-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: calc(var(--s) * 10px);
+      color: var(--text-dim);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: calc(var(--s) * 230px);
+    }
+
+    .btn-create-event {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #f1f5f9;
+      font-size: calc(var(--s) * 11px);
+      font-weight: 600;
+      padding: calc(var(--s) * 3px) calc(var(--s) * 10px);
+      border-radius: calc(var(--s) * 7px);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: calc(var(--s) * 5px);
+      transition: all 0.15s ease;
+    }
+
+    .btn-create-event:hover {
+      background: rgba(255, 255, 255, 0.13);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: translateY(-1px);
     }
 
     .free-day-banner {
@@ -413,45 +584,6 @@
       margin-top: calc(var(--s) * 4px);
       margin-bottom: calc(var(--s) * 4px);
       padding-left: 2px;
-    }
-
-    .day-pill {
-      font-size: calc(var(--s) * 8.5px);
-      font-weight: 600;
-      padding: calc(var(--s) * 2px) calc(var(--s) * 6px);
-      border-radius: calc(var(--s) * 6px);
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      color: var(--text-dim);
-      margin-left: auto;
-      flex-shrink: 0;
-    }
-
-    /* Botón Flotante "+" Circular con aro luminoso */
-    .fab-add {
-      position: absolute;
-      right: calc(var(--s) * 4px);
-      bottom: calc(var(--s) * 2px);
-      width: calc(var(--s) * 34px);
-      height: calc(var(--s) * 34px);
-      border-radius: 50%;
-      background: #000000;
-      border: 2px solid var(--green-ring);
-      color: #ffffff;
-      font-size: calc(var(--s) * 20px);
-      font-weight: 300;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 0 12px rgba(52, 211, 153, 0.4);
-      transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-      z-index: 5;
-    }
-
-    .fab-add:hover {
-      transform: scale(1.08);
-      box-shadow: 0 0 18px rgba(52, 211, 153, 0.65);
     }
 
     /* Manijas de Redimensionamiento */
@@ -647,9 +779,6 @@
 </head>
 <body>
   <div class="widget-container">
-    <!-- Marca de agua sutil de fondo (Logo GIF) -->
-    <div class="bg-watermark"></div>
-
     <!-- Barra Superior -->
     <div class="top-bar" data-tauri-drag-region>
       <div class="brand-tag" data-tauri-drag-region>
@@ -664,11 +793,15 @@
 
     <!-- Contenido -->
     <div class="content-layout">
-      <!-- Tarjeta Izquierda (Hero) -->
-      <div class="card-hero">
+      <!-- Columna Izquierda: Logo prominente + Temporizador minimalista (sin card) -->
+      <div class="timer-column">
         <div class="date-row">
           <span class="date-main" id="lbl-date">-- --</span>
           <span class="clock-badge" id="lbl-time">00:00:00</span>
+        </div>
+
+        <div class="logo-hub">
+          <img src="bg-logo.gif" alt="Workspace Logo" class="logo-gif-img">
         </div>
 
         <div class="countdown-hub">
@@ -677,16 +810,23 @@
         </div>
       </div>
 
-      <!-- Sección Derecha (Agenda) -->
+      <!-- Columna Derecha: Timeline de Turnos (Inspirado en la imagen de referencia) -->
       <div class="agenda-section">
-        <div class="agenda-title">HOY</div>
-
-        <div class="schedule-stream" id="schedule-container">
-          <!-- Bloques inyectados dinámicamente -->
+        <div class="agenda-header-row">
+          <span class="agenda-title">HOY</span>
+          <span class="agenda-count-badge" id="lbl-agenda-badge">3 turnos</span>
         </div>
 
-        <!-- Botón Flotante "+" -->
-        <button class="fab-add" id="btn-open-editor" title="Añadir Bloque">+</button>
+        <div class="timeline-stream" id="schedule-container">
+          <!-- Bloques y timeline inyectados dinámicamente -->
+        </div>
+
+        <div class="timeline-footer">
+          <div class="end-of-day-label" id="lbl-end-of-day">Fin de jornada: --</div>
+          <button class="btn-create-event" id="btn-open-editor">
+            <span style="font-weight:700">+</span> Crear turno
+          </button>
+        </div>
       </div>
     </div>
 
@@ -831,27 +971,106 @@
       }
     }
 
+    function getBlockIcon(title) {
+      const t = (title || '').toLowerCase();
+      if (t.includes('almuerzo') || t.includes('comida') || t.includes('lunch') || t.includes('cena')) return '🍽️';
+      if (t.includes('desayuno') || t.includes('cafe') || t.includes('café') || t.includes('break')) return '☕';
+      if (t.includes('gym') || t.includes('workout') || t.includes('ejercicio') || t.includes('correr') || t.includes('entreno')) return '🏃';
+      if (t.includes('ducha') || t.includes('shower') || t.includes('baño') || t.includes('bano')) return '🚿';
+      if (t.includes('email') || t.includes('correo') || t.includes('mensaje')) return '✉️';
+      if (t.includes('meet') || t.includes('reunion') || t.includes('reunión') || t.includes('call') || t.includes('llamada')) return '📞';
+      if (t.includes('brain') || t.includes('code') || t.includes('prog') || t.includes('dev') || t.includes('trabajo')) return '💻';
+      if (t.includes('estudio') || t.includes('leer') || t.includes('read') || t.includes('libro')) return '📖';
+      return '⚡';
+    }
+
+    function formatBlockDuration(startH, startM, endH, endM) {
+      let mins = (endH * 60 + endM) - (startH * 60 + startM);
+      if (mins < 0) mins += 24 * 60;
+      if (mins >= 60) {
+        const h = Math.floor(mins / 60);
+        const m = mins % 60;
+        return m > 0 ? `${h}h ${m}m` : `${h}h`;
+      }
+      return `${mins} min`;
+    }
+
+    function updateEndOfDay(blocks, timeStr, isFreeDay) {
+      const el = document.getElementById('lbl-end-of-day');
+      if (!el) return;
+      if (isFreeDay) {
+        el.textContent = 'Día de descanso 🌴';
+        return;
+      }
+      if (!blocks || blocks.length === 0) {
+        el.textContent = 'Sin turnos hoy';
+        return;
+      }
+
+      const [nowH, nowM, nowS] = (timeStr || '00:00:00').split(':').map(Number);
+      const nowTotalSecs = nowH * 3600 + nowM * 60 + (nowS || 0);
+
+      let maxEndMins = 0;
+      blocks.forEach(b => {
+        const endM = b.end_hour * 60 + b.end_min;
+        if (endM > maxEndMins) maxEndMins = endM;
+      });
+
+      const maxEndSecs = maxEndMins * 60;
+      const diffSecs = maxEndSecs - nowTotalSecs;
+
+      if (diffSecs <= 0) {
+        el.textContent = 'Fin de jornada: Concluida ✨';
+        return;
+      }
+
+      const h = Math.floor(diffSecs / 3600);
+      const m = Math.floor((diffSecs % 3600) / 60);
+      const s = diffSecs % 60;
+
+      if (h > 0) {
+        el.textContent = `Fin de jornada: ${h} hrs, ${m} min, ${s} s`;
+      } else {
+        el.textContent = `Fin de jornada: ${m} min, ${s} s`;
+      }
+    }
+
     function renderScheduleStream(blocks, timeStr, isFreeDay) {
       const container = document.getElementById('schedule-container');
       container.innerHTML = '';
+
+      const countBadge = document.getElementById('lbl-agenda-badge');
+      if (countBadge) {
+        countBadge.textContent = isFreeDay ? 'Día Libre' : `${blocks.length} turnos`;
+      }
+
+      updateEndOfDay(blocks, timeStr, isFreeDay);
 
       if (isFreeDay) {
         const freeCard = document.createElement('div');
         freeCard.className = 'free-day-banner';
         freeCard.innerHTML = `
           <div class="free-day-badge">🌴 DOMINGO FREE</div>
-          <div class="free-day-text">Día de descanso. Los bloques de trabajo están activos de lunes a sábado.</div>
+          <div class="free-day-text">Día de descanso. Los turnos de trabajo están activos de lunes a sábado.</div>
         `;
         container.appendChild(freeCard);
 
         const subTitle = document.createElement('div');
         subTitle.className = 'stream-section-divider';
-        subTitle.textContent = 'Bloques Semanales (Lun - Sáb)';
+        subTitle.textContent = 'Horario Semanal (Lun - Sáb)';
         container.appendChild(subTitle);
       }
 
-      const [h, m] = timeStr.split(':').map(Number);
+      const [h, m] = (timeStr || '00:00').split(':').map(Number);
       const nowTotal = h * 60 + m;
+      const pad = (num) => String(num).padStart(2, '0');
+      const nowStrFormatted = `${pad(h)}:${pad(m)}`;
+
+      // Marcador inicial sol ☀️
+      const topPole = document.createElement('div');
+      topPole.className = 'timeline-pole';
+      topPole.innerHTML = '<span class="pole-icon">☀️</span>';
+      container.appendChild(topPole);
 
       blocks.forEach((block, idx) => {
         const start = block.start_hour * 60 + block.start_min;
@@ -860,25 +1079,54 @@
         const isActive = !isFreeDay && (nowTotal >= start && nowTotal < end);
         const isCompleted = !isFreeDay && (nowTotal >= end);
 
-        const row = document.createElement('div');
-        row.className = 'block-row' + (isActive ? ' active' : '') + (isCompleted ? ' completed' : '');
-        row.onclick = () => openModal(idx, block);
+        // Si este bloque está activo ahora, insertamos la línea roja de hora actual antes de él
+        if (isActive) {
+          const nowDivider = document.createElement('div');
+          nowDivider.className = 'timeline-now-divider';
+          nowDivider.innerHTML = `
+            <span class="now-time-tag">${nowStrFormatted}</span>
+            <div class="now-red-line"></div>
+          `;
+          container.appendChild(nowDivider);
+        }
 
-        const pad = (num) => String(num).padStart(2, '0');
-        const rangeText = `${pad(block.start_hour)}:${pad(block.start_min)} - ${pad(block.end_hour)}:${pad(block.end_min)}`;
+        const row = document.createElement('div');
+        row.className = 'timeline-row' + (isActive ? ' active' : '') + (isCompleted ? ' completed' : '');
+
+        const icon = getBlockIcon(block.title);
+        const rangeText = `${pad(block.start_hour)}:${pad(block.start_min)}–${pad(block.end_hour)}:${pad(block.end_min)}`;
+        const durText = formatBlockDuration(block.start_hour, block.start_min, block.end_hour, block.end_min);
+        const colRgb = `${block.color.r}, ${block.color.g}, ${block.color.b}`;
+
+        const checkboxHtml = isCompleted
+          ? `<div class="card-checkbox" style="background: rgb(${colRgb}); border: 2px solid rgb(${colRgb}); color: #fff;">✓</div>`
+          : `<div class="card-checkbox" style="border: 2px solid rgb(${colRgb}); background: transparent;"></div>`;
 
         row.innerHTML = `
-          <div class="accent-bar" style="background: rgb(${block.color.r}, ${block.color.g}, ${block.color.b})"></div>
-          <div class="block-info">
-            <span class="block-name-text">${block.title}</span>
-            <span class="block-time-range">${rangeText}</span>
+          <div class="timeline-rail">
+            <div class="rail-track-line"></div>
+            <div class="timeline-capsule" style="background: rgb(${colRgb}); box-shadow: 0 4px 14px rgba(${colRgb}, 0.4);">
+              <span>${icon}</span>
+            </div>
           </div>
-          ${isActive ? '<span class="status-badge">En curso</span>' : ''}
-          ${isFreeDay ? '<span class="day-pill">Lun - Sáb</span>' : ''}
+          <div class="timeline-card">
+            <div class="card-body">
+              <span class="card-title">${block.title}</span>
+              <span class="card-time">${rangeText} <span class="card-duration">(${durText})</span></span>
+            </div>
+            ${checkboxHtml}
+          </div>
         `;
 
+        row.querySelector('.timeline-card').onclick = () => openModal(idx, block);
         container.appendChild(row);
       });
+
+      // Marcador final luna 🌙
+      const bottomPole = document.createElement('div');
+      bottomPole.className = 'timeline-pole';
+      bottomPole.innerHTML = '<span class="pole-icon">🌙</span>';
+      container.appendChild(bottomPole);
     }
 
     function openModal(idx, block) {
@@ -984,7 +1232,7 @@
     // Native OS Window Dragging
     document.addEventListener('mousedown', (e) => {
       if (e.button !== 0) return;
-      if (e.target.closest('button, input, select, textarea, .block-row, .editor-overlay, .swatch, .resize-handle')) {
+      if (e.target.closest('button, input, select, textarea, .block-row, .timeline-card, .timeline-capsule, .btn-create-event, .editor-overlay, .swatch, .resize-handle')) {
         return;
       }
       invoke('drag_window');

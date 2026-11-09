@@ -220,13 +220,14 @@
       margin: auto 0;
       position: relative;
       background: transparent;
-      padding: 0;
+      padding: calc(var(--s) * 2px) 0;
+      width: 100%;
     }
 
     .logo-gif-img {
-      max-width: calc(var(--s) * 125px);
-      max-height: calc(var(--s) * 90px);
-      width: auto;
+      max-width: calc(var(--s) * 180px);
+      max-height: calc(var(--s) * 130px);
+      width: calc(var(--s) * 155px);
       height: auto;
       object-fit: contain;
       border-radius: 0 !important;
@@ -239,12 +240,24 @@
     }
 
     .countdown-hub {
-      text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       margin-bottom: calc(var(--s) * 6px);
+      width: 100%;
+      position: relative;
+    }
+
+    .timer-tagline {
+      align-self: flex-start;
+      font-size: calc(var(--s) * 11px);
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: calc(var(--s) * 0.8px);
+      margin-bottom: calc(var(--s) * 2px);
+      padding-left: calc(var(--s) * 8px);
     }
 
     .timer-display {
@@ -322,23 +335,38 @@
       border-radius: 4px;
     }
 
-    /* Top Sun Node Row */
+    /* Top Sun Node Row (Alineado perfectamente con el riel central) */
     .timeline-pole-row {
       display: flex;
       align-items: center;
-      margin-bottom: calc(var(--s) * 6px);
+      gap: calc(var(--s) * 8px);
+      margin-bottom: calc(var(--s) * 4px);
       flex-shrink: 0;
     }
-    .timeline-pole-gutter {
+    .timeline-pole-row .time-gutter {
       width: calc(var(--s) * 36px);
+      height: calc(var(--s) * 20px);
+      padding: 0;
       flex-shrink: 0;
     }
-    .timeline-pole-rail {
+    .timeline-pole-row .rail-container {
       width: calc(var(--s) * 32px);
+      height: calc(var(--s) * 20px);
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+    }
+    .timeline-pole-row .rail-line-back.top-stem {
+      position: absolute;
+      top: 50%;
+      bottom: calc(var(--s) * -8px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(var(--s) * 2px);
+      background: #343438;
+      z-index: 1;
     }
     .pole-node {
       width: calc(var(--s) * 18px);
@@ -352,6 +380,8 @@
       font-size: calc(var(--s) * 10px);
       color: #8e8e93;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+      position: relative;
+      z-index: 2;
     }
 
     /* Fila de Timeline (Gutter + Rail + Card) */
@@ -528,7 +558,7 @@
       pointer-events: none;
     }
 
-    /* Bloque Inferior: Fin de jornada y Botón Crear + Luna */
+    /* Bloque Inferior: Fin de jornada y Botón Crear + Luna (Alineado perfectamente con el riel central) */
     .timeline-bottom-area {
       display: flex;
       align-items: flex-start;
@@ -538,26 +568,37 @@
       position: relative;
     }
 
-    .timeline-rail-continuation {
+    .timeline-bottom-area .time-gutter {
+      width: calc(var(--s) * 36px);
+      height: calc(var(--s) * 56px);
+      flex-shrink: 0;
+      padding: 0;
+    }
+
+    .timeline-bottom-area .rail-container.bottom-rail {
       width: calc(var(--s) * 32px);
-      margin-left: calc(var(--s) * 36px);
+      height: calc(var(--s) * 56px);
       position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: flex-end;
+      padding-bottom: calc(var(--s) * 2px);
       flex-shrink: 0;
-      height: 100%;
-      min-height: calc(var(--s) * 54px);
     }
 
-    .timeline-rail-continuation .rail-line-back {
+    .timeline-bottom-area .rail-line-back.bottom-stem {
+      position: absolute;
       top: calc(var(--s) * -8px);
       bottom: calc(var(--s) * 10px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(var(--s) * 2px);
+      background: #343438;
+      z-index: 1;
     }
 
-    .timeline-rail-continuation .pole-node.bottom {
-      margin-top: auto;
-      margin-bottom: calc(var(--s) * 2px);
+    .timeline-bottom-area .pole-node.bottom {
       z-index: 2;
     }
 
@@ -865,6 +906,7 @@
         </div>
 
         <div class="countdown-hub">
+          <div class="timer-tagline" id="lbl-timer-tagline">Faltan:</div>
           <div class="timer-display" id="lbl-countdown">--:--:--</div>
           <div class="timer-sublabel" id="lbl-block-name">Cargando...</div>
         </div>
@@ -1091,6 +1133,10 @@
         document.getElementById('lbl-date').textContent = snap.date_title;
         document.getElementById('lbl-time').textContent = snap.current_time_str;
         document.getElementById('lbl-countdown').textContent = snap.countdown_str;
+        const tagline = document.getElementById('lbl-timer-tagline');
+        if (tagline) {
+          tagline.textContent = snap.is_free_day ? 'Estado:' : 'Faltan:';
+        }
         const blockNameEl = document.getElementById('lbl-block-name');
         blockNameEl.textContent = snap.block_name;
         if (snap.mode === 'Temporizador') {
@@ -1170,7 +1216,7 @@
       const diffSecs = maxEndSecs - nowTotalSecs;
 
       if (diffSecs <= 0) {
-        el.textContent = 'Fin del día: Concluido ✨';
+        el.textContent = 'Jornada concluida ✨';
         return;
       }
 
@@ -1179,9 +1225,9 @@
       const s = diffSecs % 60;
 
       if (h > 0) {
-        el.textContent = `End of day: ${h} hrs, ${m} min, ${s} secs`;
+        el.textContent = `Fin de la jornada: ${h} hrs, ${m} min, ${s} s`;
       } else {
-        el.textContent = `End of day: ${m} min, ${s} secs`;
+        el.textContent = `Fin de la jornada: ${m} min, ${s} s`;
       }
     }
 
@@ -1214,12 +1260,13 @@
       const pad = (num) => String(num).padStart(2, '0');
       const nowStrFormatted = `${pad(h)}:${pad(m)}`;
 
-      // Marcador inicial sol ☀️
+      // Marcador inicial sol ☀️ (Alineado con el riel central)
       const topPole = document.createElement('div');
       topPole.className = 'timeline-pole-row';
       topPole.innerHTML = `
-        <div class="timeline-pole-gutter"></div>
-        <div class="timeline-pole-rail">
+        <div class="time-gutter"></div>
+        <div class="rail-container">
+          <div class="rail-line-back top-stem"></div>
           <div class="pole-node">☀️</div>
         </div>
       `;
@@ -1280,16 +1327,17 @@
         container.appendChild(row);
       });
 
-      // Marcador final y footer con Luna 🌙
+      // Marcador final y footer con Luna 🌙 (Alineado con el riel central)
       const bottomArea = document.createElement('div');
       bottomArea.className = 'timeline-bottom-area';
       bottomArea.innerHTML = `
-        <div class="timeline-rail-continuation">
-          <div class="rail-line-back"></div>
+        <div class="time-gutter"></div>
+        <div class="rail-container bottom-rail">
+          <div class="rail-line-back bottom-stem"></div>
           <div class="pole-node bottom">🌙</div>
         </div>
         <div class="timeline-footer-content">
-          <div class="end-of-day-line" id="lbl-end-of-day">End of day: --</div>
+          <div class="end-of-day-line" id="lbl-end-of-day">Fin de la jornada: --</div>
           <button class="btn-create-event" id="btn-create-in-stream">
             <span class="btn-plus-icon">+</span> Crear turno
           </button>

@@ -275,6 +275,8 @@ fn save_block(
     color_r: u8,
     color_g: u8,
     color_b: u8,
+    icon: Option<String>,
+    card_bg: Option<String>,
     monday: bool,
     tuesday: bool,
     wednesday: bool,
@@ -284,7 +286,7 @@ fn save_block(
     sunday: bool,
 ) {
     let mut cfg = state.config.lock().unwrap();
-    let block = TimeBlock {
+    let mut block = TimeBlock {
         id: format!("b_{}", Local::now().timestamp_millis()),
         title,
         start_hour,
@@ -292,6 +294,8 @@ fn save_block(
         end_hour,
         end_min,
         color: ColorRgb::new(color_r, color_g, color_b),
+        icon,
+        card_bg,
         days: WeekdayFilter {
             monday,
             tuesday,
@@ -308,6 +312,7 @@ fn save_block(
 
     if let Some(idx) = index {
         if idx < cfg.blocks.len() {
+            block.id = cfg.blocks[idx].id.clone();
             cfg.blocks[idx] = block;
         }
     } else {

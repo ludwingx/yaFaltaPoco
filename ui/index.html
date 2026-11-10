@@ -48,7 +48,7 @@
       height: 100%;
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
-      border-radius: calc(var(--s) * 24px);
+      border-radius: 0;
       box-shadow: 0 16px 40px rgba(0, 0, 0, 0.95);
       padding: calc(var(--s) * 12px) calc(var(--s) * 16px) calc(var(--s) * 12px) calc(var(--s) * 16px);
       display: flex;
@@ -89,7 +89,7 @@
     .brand-dot {
       width: calc(var(--s) * 7px);
       height: calc(var(--s) * 7px);
-      border-radius: 50%;
+      border-radius: 0;
       background: #06b6d4;
       box-shadow: 0 0 calc(var(--s) * 8px) #06b6d4;
     }
@@ -107,7 +107,7 @@
       font-size: calc(var(--s) * 11px);
       font-weight: 600;
       padding: calc(var(--s) * 3px) calc(var(--s) * 9px);
-      border-radius: calc(var(--s) * 16px);
+      border-radius: 0;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -123,7 +123,7 @@
     .btn-close {
       width: calc(var(--s) * 22px);
       height: calc(var(--s) * 22px);
-      border-radius: 50%;
+      border-radius: 0;
       background: rgba(255, 255, 255, 0.04);
       border: none;
       color: var(--text-dim);
@@ -143,7 +143,7 @@
     .btn-icon {
       width: calc(var(--s) * 22px);
       height: calc(var(--s) * 22px);
-      border-radius: 50%;
+      border-radius: 0;
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid var(--border-subtle);
       color: var(--text-muted);
@@ -156,9 +156,23 @@
     }
 
     .btn-icon:hover {
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.14);
       color: var(--text-white);
-      transform: scale(1.08);
+    }
+
+    .btn-icon#btn-sound.sound-active {
+      color: #22d3ee;
+      background: rgba(6, 182, 212, 0.18);
+      border-color: rgba(6, 182, 212, 0.55);
+      box-shadow: 0 0 calc(var(--s) * 9px) rgba(6, 182, 212, 0.65);
+    }
+
+    .btn-icon#btn-sound.sound-muted {
+      color: #64748b;
+      opacity: 0.5;
+      background: rgba(255, 255, 255, 0.02);
+      border-color: var(--border-subtle);
+      box-shadow: none;
     }
 
     .btn-close svg, .btn-icon svg {
@@ -171,6 +185,48 @@
     @keyframes alarm-pulse {
       0%, 100% { transform: scale(1); text-shadow: 0 0 16px rgba(59, 130, 246, 0.45); }
       50% { transform: scale(1.06); text-shadow: 0 0 24px #38bdf8, 0 0 40px #38bdf8; color: #38bdf8; }
+    }
+
+    /* Ultimos 10 minutos: Numeros rojos y deformacion FX tipo temblor */
+    .timer-display.timer-danger-red {
+      color: #ff3b30 !important;
+      text-shadow: 0 0 calc(var(--s) * 16px) rgba(255, 59, 48, 0.9),
+                   0 0 calc(var(--s) * 32px) rgba(255, 69, 58, 0.45) !important;
+    }
+
+    @keyframes timer-quake-burst {
+      0% { transform: translate(0, 0) skew(0deg) scale(1); }
+      15% { transform: translate(-3px, 2px) skew(-2deg) scale(1.03); }
+      30% { transform: translate(3px, -2px) skew(2.5deg) scale(0.97); }
+      45% { transform: translate(-2px, -3px) skew(-1.5deg) scale(1.02); }
+      60% { transform: translate(3px, 1.5px) skew(1deg) scale(0.99); }
+      75% { transform: translate(-1px, 2px) skew(-0.5deg) scale(1.01); }
+      100% { transform: translate(0, 0) skew(0deg) scale(1); }
+    }
+
+    @keyframes timer-quake-continuous {
+      0% { transform: translate(0, 0) skew(0deg); }
+      20% { transform: translate(-2px, 1.5px) skew(-2.5deg) scale(1.02); }
+      40% { transform: translate(2.5px, -1.5px) skew(2.5deg) scale(0.98); }
+      60% { transform: translate(-2.5px, -2px) skew(-2deg) scale(1.03); }
+      80% { transform: translate(2px, 2px) skew(1.5deg) scale(0.99); }
+      100% { transform: translate(0, 0) skew(0deg); }
+    }
+
+    .timer-display.quake-burst {
+      animation: timer-quake-burst 0.9s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+    }
+
+    .timer-display.quake-continuous {
+      animation: timer-quake-continuous 0.35s infinite ease-in-out;
+    }
+
+    /* Si el usuario hace hover sobre cualquier componente interactivo o sobre el temporizador, detener el temblor */
+    body.is-hovering-component .timer-display,
+    .timer-hero:hover .timer-display,
+    .timer-display:hover {
+      animation: none !important;
+      transform: none !important;
     }
 
     /* Grid de Contenido */
@@ -199,6 +255,82 @@
       height: 100%;
       position: relative;
       user-select: none;
+    }
+
+    /* 3 Cards de Clima Superior (SCZ, Viento, Lluvia) */
+    .weather-strip {
+      display: flex;
+      gap: calc(var(--s) * 5px);
+      width: 100%;
+      margin-bottom: calc(var(--s) * 6px);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .weather-card {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 0;
+      padding: calc(var(--s) * 4px) calc(var(--s) * 6px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: calc(var(--s) * 2px);
+      min-width: 0;
+      transition: all 0.15s ease;
+    }
+
+    .weather-card:hover {
+      background: rgba(255, 255, 255, 0.09);
+      border-color: rgba(34, 211, 238, 0.45);
+      box-shadow: 0 0 calc(var(--s) * 8px) rgba(34, 211, 238, 0.18);
+    }
+
+    .w-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: calc(var(--s) * 3px);
+      width: 100%;
+    }
+
+    .w-card-icon {
+      font-size: calc(var(--s) * 14px);
+      line-height: 1;
+    }
+
+    .w-card-label {
+      font-size: calc(var(--s) * 8px);
+      font-weight: 700;
+      color: #94a3b8;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .w-card-bottom {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: calc(var(--s) * 1.5px);
+      line-height: 1;
+    }
+
+    .w-card-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: calc(var(--s) * 12px);
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .w-card-unit {
+      font-size: calc(var(--s) * 8.5px);
+      font-weight: 600;
+      color: #94a3b8;
     }
 
     .date-row {
@@ -231,40 +363,6 @@
       color: var(--text-muted);
     }
 
-    .weather-pill {
-      display: none;
-      align-items: center;
-      gap: calc(var(--s) * 3px);
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.09);
-      border-radius: calc(var(--s) * 10px);
-      padding: calc(var(--s) * 1px) calc(var(--s) * 6px);
-      font-size: calc(var(--s) * 10px);
-      font-weight: 600;
-      color: #94a3b8;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      user-select: none;
-    }
-
-    .weather-pill:hover {
-      background: rgba(255, 255, 255, 0.12);
-      color: #ffffff;
-      border-color: rgba(255, 255, 255, 0.22);
-      transform: translateY(-0.5px);
-    }
-
-    .weather-icon {
-      font-size: calc(var(--s) * 11px);
-      line-height: 1;
-    }
-
-    .weather-temp {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: calc(var(--s) * 10.5px);
-      color: #cbd5e1;
-    }
-
     /* GIF de marca con zoom prominente arriba de la hora y difuminado */
     .logo-hub {
       display: flex;
@@ -277,8 +375,8 @@
       width: 100%;
       height: calc(var(--s) * 130px);
       overflow: hidden;
-      cursor: pointer;
-      border-radius: calc(var(--s) * 14px);
+      cursor: default;
+      border-radius: 0;
     }
 
     .logo-gif-img {
@@ -308,46 +406,6 @@
       z-index: 2;
       background: radial-gradient(ellipse at center, transparent 32%, var(--bg-surface) 92%);
       transition: background 0.3s ease, opacity 0.25s ease;
-    }
-
-    .logo-edit-badge {
-      position: absolute;
-      bottom: calc(var(--s) * 6px);
-      background: rgba(18, 18, 22, 0.88);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      color: #e2e8f0;
-      padding: calc(var(--s) * 3px) calc(var(--s) * 8px);
-      border-radius: calc(var(--s) * 12px);
-      font-size: calc(var(--s) * 9.5px);
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: calc(var(--s) * 4px);
-      opacity: 0;
-      transform: translateY(calc(var(--s) * 4px));
-      transition: all 0.2s ease;
-      z-index: 5;
-      cursor: pointer;
-    }
-
-    .logo-hub:hover .logo-edit-badge {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .logo-edit-badge:hover {
-      background: rgba(35, 35, 42, 0.96);
-      color: #ffffff;
-      border-color: rgba(255, 255, 255, 0.35);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-    }
-
-    .logo-edit-badge svg {
-      width: calc(var(--s) * 11px);
-      height: calc(var(--s) * 11px);
-      display: block;
     }
 
     .countdown-hub {
@@ -424,7 +482,7 @@
       color: #8e8e93;
       background: #222225;
       padding: calc(var(--s) * 1px) calc(var(--s) * 8px);
-      border-radius: calc(var(--s) * 10px);
+      border-radius: 0;
     }
 
     .timeline-stream {
@@ -443,26 +501,26 @@
     }
     .timeline-stream::-webkit-scrollbar-thumb {
       background: rgba(255, 255, 255, 0.12);
-      border-radius: 4px;
+      border-radius: 0;
     }
 
     /* Top Sun Node Row (Alineado perfectamente con el riel central) */
     .timeline-pole-row {
       display: flex;
       align-items: center;
-      gap: calc(var(--s) * 8px);
-      margin-bottom: calc(var(--s) * 4px);
+      gap: calc(var(--s) * 6px);
+      margin-bottom: calc(var(--s) * 2px);
       flex-shrink: 0;
     }
     .timeline-pole-row .time-gutter {
-      width: calc(var(--s) * 38px);
-      height: calc(var(--s) * 20px);
+      width: calc(var(--s) * 26px);
+      height: calc(var(--s) * 16px);
       padding: 0;
       flex-shrink: 0;
     }
     .timeline-pole-row .rail-container {
-      width: calc(var(--s) * 32px);
-      height: calc(var(--s) * 20px);
+      width: calc(var(--s) * 22px);
+      height: calc(var(--s) * 16px);
       position: relative;
       display: flex;
       align-items: center;
@@ -472,7 +530,7 @@
     .timeline-pole-row .rail-line-back.top-stem {
       position: absolute;
       top: 50%;
-      bottom: calc(var(--s) * -8px);
+      bottom: calc(var(--s) * -6px);
       left: 50%;
       transform: translateX(-50%);
       width: calc(var(--s) * 2px);
@@ -480,9 +538,9 @@
       z-index: 1;
     }
     .pole-node {
-      width: calc(var(--s) * 18px);
-      height: calc(var(--s) * 18px);
-      border-radius: 50%;
+      width: calc(var(--s) * 13px);
+      height: calc(var(--s) * 13px);
+      border-radius: 0;
       background: #242426;
       border: 1px solid #38383c;
       display: flex;
@@ -495,8 +553,8 @@
     }
 
     .pole-node svg {
-      width: calc(var(--s) * 11px);
-      height: calc(var(--s) * 11px);
+      width: calc(var(--s) * 8.5px);
+      height: calc(var(--s) * 8.5px);
       stroke-width: 2.2px;
       display: block;
     }
@@ -505,22 +563,22 @@
     .timeline-row {
       display: flex;
       align-items: stretch;
-      gap: calc(var(--s) * 8px);
+      gap: calc(var(--s) * 6px);
       position: relative;
-      margin-bottom: calc(var(--s) * 8px);
-      min-height: calc(var(--s) * 58px);
+      margin-bottom: calc(var(--s) * 4px);
+      min-height: calc(var(--s) * 36px);
     }
 
     /* Gutter Izquierdo (Horas 08, 09, 10... y Laser Tag 08:18) */
     .time-gutter {
-      width: calc(var(--s) * 38px);
+      width: calc(var(--s) * 26px);
       position: relative;
       flex-shrink: 0;
     }
 
     .gutter-hour {
       position: absolute;
-      right: calc(var(--s) * 4px);
+      right: calc(var(--s) * 3px);
       transform: translateY(-50%);
       font-family: 'JetBrains Mono', monospace;
       line-height: 1;
@@ -530,29 +588,55 @@
     }
 
     .gutter-hour.start-hour {
-      font-size: calc(var(--s) * 16px);
-      font-weight: 800;
-      color: #8e8e93;
-      letter-spacing: -0.4px;
+      font-size: calc(var(--s) * 10px);
+      font-weight: 700;
+      color: #9ca3af;
+      letter-spacing: -0.3px;
     }
 
     .timeline-row.completed .gutter-hour.start-hour {
-      color: #55555d;
+      color: #4b5563;
     }
 
     .gutter-hour.intermediate-hour {
-      font-size: calc(var(--s) * 11px);
+      font-size: calc(var(--s) * 8.5px);
       font-weight: 600;
-      color: #484850;
+      color: #6b7280;
       letter-spacing: -0.2px;
     }
 
     .timeline-row.completed .gutter-hour.intermediate-hour {
-      color: #36363c;
+      color: #374151;
     }
 
     .gutter-hour.hidden-by-laser {
       opacity: 0.15;
+    }
+
+    /* Marcas de 15 minutos en el gutter (-) */
+    .gutter-tick {
+      position: absolute;
+      right: calc(var(--s) * 5px);
+      transform: translateY(-50%);
+      font-family: 'JetBrains Mono', monospace;
+      line-height: 1;
+      user-select: none;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      color: rgba(255, 255, 255, 0.18);
+      font-size: calc(var(--s) * 7.5px);
+      font-weight: 500;
+    }
+
+    .gutter-tick.tick-30 {
+      color: rgba(255, 255, 255, 0.38);
+      font-weight: 700;
+      font-size: calc(var(--s) * 8.5px);
+      right: calc(var(--s) * 4px);
+    }
+
+    .gutter-tick.hidden-by-laser {
+      opacity: 0.1;
     }
 
     .laser-time-tag {
@@ -560,7 +644,7 @@
       right: 0;
       transform: translateY(-50%);
       font-family: 'JetBrains Mono', monospace;
-      font-size: calc(var(--s) * 10px);
+      font-size: calc(var(--s) * 8.5px);
       font-weight: 700;
       color: var(--laser-color);
       line-height: 1;
@@ -568,7 +652,7 @@
       text-shadow: 0 0 6px var(--laser-glow);
       background: rgba(14, 14, 16, 0.92);
       padding: 1px 3px;
-      border-radius: 3px;
+      border-radius: 0;
       border: 1px solid var(--laser-color);
       white-space: nowrap;
       user-select: none;
@@ -577,7 +661,7 @@
 
     /* Columna del Riel */
     .rail-container {
-      width: calc(var(--s) * 32px);
+      width: calc(var(--s) * 22px);
       position: relative;
       display: flex;
       align-items: center;
@@ -587,8 +671,8 @@
 
     .rail-line-back {
       position: absolute;
-      top: calc(var(--s) * -8px);
-      bottom: calc(var(--s) * -8px);
+      top: calc(var(--s) * -6px);
+      bottom: calc(var(--s) * -6px);
       left: 50%;
       transform: translateX(-50%);
       width: calc(var(--s) * 2px);
@@ -597,19 +681,25 @@
     }
 
     .rail-capsule {
-      width: calc(var(--s) * 32px);
+      width: calc(var(--s) * 22px);
       height: 100%;
-      min-height: calc(var(--s) * 56px);
-      border-radius: calc(var(--s) * 13px);
+      min-height: calc(var(--s) * 36px);
+      border-radius: 0;
       display: flex;
       align-items: flex-start;
       justify-content: center;
-      padding-top: calc(var(--s) * 8px);
+      padding-top: calc(var(--s) * 5px);
       position: relative;
       z-index: 2;
       flex-shrink: 0;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
-      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      transition: filter 0.15s, box-shadow 0.15s;
+    }
+
+    .rail-capsule:hover {
+      filter: brightness(1.22);
+      box-shadow: 0 0 calc(var(--s) * 8px) rgba(255, 255, 255, 0.25);
     }
 
     .capsule-icon {
@@ -621,9 +711,9 @@
     }
 
     .capsule-icon svg {
-      width: calc(var(--s) * 16px);
-      height: calc(var(--s) * 16px);
-      stroke-width: 2.2px;
+      width: calc(var(--s) * 12px);
+      height: calc(var(--s) * 12px);
+      stroke-width: 2px;
       display: block;
     }
 
@@ -633,33 +723,34 @@
       min-width: 0;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: calc(var(--s) * 14px);
-      padding: calc(var(--s) * 10px) calc(var(--s) * 14px);
+      border-radius: 0;
+      padding: calc(var(--s) * 6px) calc(var(--s) * 10px);
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      gap: calc(var(--s) * 8px);
+      gap: calc(var(--s) * 6px);
       cursor: pointer;
       position: relative;
       z-index: 2;
-      transition: background 0.15s, transform 0.12s;
+      transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
     }
 
     .card-box:hover {
       background: #343438;
-      transform: translateX(calc(var(--s) * 1px));
+      border-color: rgba(255, 255, 255, 0.22);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
     }
 
     .card-info {
       display: flex;
       flex-direction: column;
-      gap: calc(var(--s) * 3px);
+      gap: calc(var(--s) * 2px);
       min-width: 0;
       flex: 1;
     }
 
     .card-title-text {
-      font-size: calc(var(--s) * 14px);
+      font-size: calc(var(--s) * 11.5px);
       font-weight: 700;
       color: #ffffff;
       white-space: nowrap;
@@ -674,7 +765,7 @@
     }
 
     .card-sub-text {
-      font-size: calc(var(--s) * 12px);
+      font-size: calc(var(--s) * 10px);
       color: #8e8e93;
       display: flex;
       align-items: center;
@@ -684,25 +775,25 @@
 
     .card-duration-text {
       color: #8e8e93;
-      font-size: calc(var(--s) * 11px);
+      font-size: calc(var(--s) * 9.5px);
     }
 
     /* Checkbox estilo iOS */
     .card-check {
-      width: calc(var(--s) * 20px);
-      height: calc(var(--s) * 20px);
-      border-radius: calc(var(--s) * 5px);
+      width: calc(var(--s) * 14px);
+      height: calc(var(--s) * 14px);
+      border-radius: 0;
       flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-top: calc(var(--s) * 2px);
+      margin-top: calc(var(--s) * 1px);
       transition: all 0.15s ease;
     }
 
     .card-check svg {
-      width: calc(var(--s) * 13px);
-      height: calc(var(--s) * 13px);
+      width: calc(var(--s) * 9px);
+      height: calc(var(--s) * 9px);
       stroke-width: 3px;
       display: block;
     }
@@ -710,7 +801,7 @@
     /* Rayo Láser Horizontal */
     .laser-line-beam {
       position: absolute;
-      left: calc(var(--s) * 38px);
+      left: calc(var(--s) * 28px);
       right: 0;
       height: 1.5px;
       background: var(--laser-color);
@@ -719,39 +810,38 @@
       pointer-events: none;
     }
 
-    /* Bloque Inferior: Fin de jornada y Botón Crear + Luna (Alineado perfectamente con el riel central) */
+    /* Bloque Inferior: Fin de jornada y Botón Crear + Luna */
     .timeline-bottom-area {
       display: flex;
-      align-items: flex-start;
-      gap: calc(var(--s) * 8px);
-      margin-top: calc(var(--s) * 4px);
+      align-items: center;
+      gap: calc(var(--s) * 6px);
+      margin-top: calc(var(--s) * 2px);
       flex-shrink: 0;
       position: relative;
     }
 
     .timeline-bottom-area .time-gutter {
-      width: calc(var(--s) * 38px);
-      height: calc(var(--s) * 56px);
+      width: calc(var(--s) * 26px);
+      height: calc(var(--s) * 26px);
       flex-shrink: 0;
       padding: 0;
     }
 
     .timeline-bottom-area .rail-container.bottom-rail {
-      width: calc(var(--s) * 32px);
-      height: calc(var(--s) * 56px);
+      width: calc(var(--s) * 22px);
+      height: calc(var(--s) * 26px);
       position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-end;
-      padding-bottom: calc(var(--s) * 2px);
+      justify-content: center;
       flex-shrink: 0;
     }
 
     .timeline-bottom-area .rail-line-back.bottom-stem {
       position: absolute;
-      top: calc(var(--s) * -8px);
-      bottom: calc(var(--s) * 10px);
+      top: calc(var(--s) * -6px);
+      bottom: 50%;
       left: 50%;
       transform: translateX(-50%);
       width: calc(var(--s) * 2px);
@@ -767,13 +857,13 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: calc(var(--s) * 6px);
-      padding: calc(var(--s) * 4px) 0;
+      gap: calc(var(--s) * 4px);
+      padding: calc(var(--s) * 2px) 0;
     }
 
     .end-of-day-line {
       font-family: 'JetBrains Mono', monospace;
-      font-size: calc(var(--s) * 11px);
+      font-size: calc(var(--s) * 9.5px);
       color: #8e8e93;
       white-space: nowrap;
       overflow: hidden;
@@ -784,10 +874,20 @@
       background: #2c2c2e;
       border: 1px solid #3a3a3c;
       color: #d1d1d6;
-      font-size: calc(var(--s) * 11px);
+      font-size: calc(var(--s) * 9.5px);
+      font-weight: 600;
+      padding: calc(var(--s) * 3px) calc(var(--s) * 8px);
+      border-radius: 0;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: calc(var(--s) * 5px);
+      width: fit-content;
+      transition: all 0.15s ease;
+    }
       font-weight: 600;
       padding: calc(var(--s) * 5px) calc(var(--s) * 12px);
-      border-radius: calc(var(--s) * 8px);
+      border-radius: 0;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
@@ -806,8 +906,8 @@
     .btn-create-event:hover {
       background: #3a3a3c;
       color: #ffffff;
-      border-color: #48484a;
-      transform: translateY(-1px);
+      border-color: #58585c;
+      box-shadow: 0 0 calc(var(--s) * 6px) rgba(255, 255, 255, 0.12);
     }
 
     .btn-plus-icon {
@@ -819,7 +919,7 @@
     .free-day-banner {
       background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(6, 182, 212, 0.08));
       border: 1px solid rgba(52, 211, 153, 0.3);
-      border-radius: calc(var(--s) * 11px);
+      border-radius: 0;
       padding: calc(var(--s) * 8px) calc(var(--s) * 11px);
       display: flex;
       flex-direction: column;
@@ -881,7 +981,6 @@
 
     .resize-handle.corner-se:hover .resize-grip {
       border-color: #38bdf8;
-      transform: scale(1.2);
     }
 
     .resize-handle.edge-r {
@@ -907,16 +1006,16 @@
     /* Modal Editor Integrado */
     .editor-overlay {
       position: absolute;
-      inset: calc(var(--s) * 10px) calc(var(--s) * 14px);
-      background: rgba(4, 5, 8, 0.98);
+      inset: calc(var(--s) * 8px) calc(var(--s) * 12px);
+      background: rgba(8, 10, 15, 0.98);
       border: 1px solid var(--border-subtle);
-      border-radius: calc(var(--s) * 18px);
-      padding: calc(var(--s) * 14px) calc(var(--s) * 18px);
+      border-radius: 0;
+      padding: calc(var(--s) * 10px) calc(var(--s) * 14px);
       display: none;
       flex-direction: column;
       justify-content: space-between;
       z-index: 30;
-      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.95);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.98);
     }
 
     .editor-overlay.visible {
@@ -927,12 +1026,25 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: calc(var(--s) * 4px);
+      flex-shrink: 0;
     }
 
     .editor-heading {
-      font-size: calc(var(--s) * 14px);
+      font-size: calc(var(--s) * 13.5px);
       font-weight: 700;
       color: var(--text-white);
+    }
+
+    .editor-scroll-body {
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--s) * 8px);
+      overflow-y: auto;
+      max-height: calc(100% - calc(var(--s) * 54px));
+      padding-right: calc(var(--s) * 4px);
+      margin: calc(var(--s) * 4px) 0;
+      flex: 1;
     }
 
     .form-group {
@@ -942,20 +1054,23 @@
     }
 
     .form-label {
-      font-size: calc(var(--s) * 12px);
-      font-weight: 600;
+      font-size: calc(var(--s) * 11px);
+      font-weight: 700;
       color: var(--text-muted);
-      width: calc(var(--s) * 55px);
+      width: calc(var(--s) * 72px);
+      flex-shrink: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
     }
 
     .text-field {
       flex: 1;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border-subtle);
-      border-radius: calc(var(--s) * 8px);
+      border-radius: 0;
       padding: calc(var(--s) * 5px) calc(var(--s) * 10px);
       color: #ffffff;
-      font-size: calc(var(--s) * 12.5px);
+      font-size: calc(var(--s) * 12px);
       outline: none;
     }
 
@@ -973,7 +1088,7 @@
       width: calc(var(--s) * 48px);
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border-subtle);
-      border-radius: calc(var(--s) * 7px);
+      border-radius: 0;
       padding: calc(var(--s) * 4px) calc(var(--s) * 5px);
       color: #ffffff;
       font-family: 'JetBrains Mono', monospace;
@@ -988,21 +1103,136 @@
 
     .palette-row {
       display: flex;
-      gap: calc(var(--s) * 7px);
+      gap: calc(var(--s) * 6px);
+      flex-wrap: wrap;
     }
 
     .swatch {
-      width: calc(var(--s) * 20px);
-      height: calc(var(--s) * 20px);
-      border-radius: calc(var(--s) * 5px);
+      width: calc(var(--s) * 18px);
+      height: calc(var(--s) * 18px);
+      border-radius: 0;
       cursor: pointer;
       border: 2px solid transparent;
       transition: transform 0.15s;
     }
 
-    .swatch:hover, .swatch.selected {
+    .swatch:hover {
       border-color: #ffffff;
-      transform: scale(1.15);
+      box-shadow: 0 0 calc(var(--s) * 6px) rgba(255, 255, 255, 0.4);
+    }
+    .swatch.selected {
+      border-color: #ffffff;
+      outline: 2px solid #ffffff;
+    }
+
+    /* Selector de Iconos para Turnos */
+    .icon-selector-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--s) * 4px);
+    }
+
+    .icon-chip-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: calc(var(--s) * 4px);
+    }
+
+    .icon-chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 0;
+      padding: calc(var(--s) * 2.5px) calc(var(--s) * 6px);
+      color: #cbd5e1;
+      font-size: calc(var(--s) * 10.5px);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: calc(var(--s) * 3px);
+      transition: all 0.15s;
+      user-select: none;
+    }
+
+    .icon-chip svg {
+      width: calc(var(--s) * 12px);
+      height: calc(var(--s) * 12px);
+      display: block;
+    }
+
+    .icon-chip:hover, .icon-chip.active {
+      background: rgba(34, 211, 238, 0.18);
+      border-color: #22d3ee;
+      color: #ffffff;
+    }
+
+    /* Selector de Fondo para Tarjeta 2 */
+    .card-bg-options-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: calc(var(--s) * 5px);
+      align-items: center;
+    }
+
+    .card-bg-chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 0;
+      padding: calc(var(--s) * 2.5px) calc(var(--s) * 7px);
+      color: #cbd5e1;
+      font-size: calc(var(--s) * 10.5px);
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: calc(var(--s) * 4px);
+      transition: all 0.15s;
+      user-select: none;
+    }
+
+    .card-bg-chip .chip-dot {
+      width: calc(var(--s) * 10px);
+      height: calc(var(--s) * 10px);
+      border-radius: 0;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    .card-bg-chip:hover, .card-bg-chip.active {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: #ffffff;
+      color: #ffffff;
+    }
+
+    /* Live Preview en el editor */
+    .editor-preview-wrap {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 0;
+      padding: calc(var(--s) * 6px) calc(var(--s) * 8px);
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--s) * 4px);
+      margin-top: calc(var(--s) * 2px);
+    }
+
+    .editor-live-row {
+      display: flex;
+      gap: calc(var(--s) * 8px);
+      align-items: stretch;
+      min-height: calc(var(--s) * 42px);
+    }
+
+    .editor-live-row .preview-capsule {
+      width: calc(var(--s) * 28px);
+      min-height: calc(var(--s) * 42px);
+      height: auto;
+      cursor: default;
+    }
+
+    .editor-live-row .preview-box {
+      cursor: default;
+      padding: calc(var(--s) * 6px) calc(var(--s) * 10px);
     }
 
     .footer-actions {
@@ -1010,11 +1240,12 @@
       justify-content: flex-end;
       gap: calc(var(--s) * 8px);
       margin-top: calc(var(--s) * 4px);
+      flex-shrink: 0;
     }
 
     .action-btn {
       padding: calc(var(--s) * 5px) calc(var(--s) * 14px);
-      border-radius: calc(var(--s) * 7px);
+      border-radius: 0;
       font-size: calc(var(--s) * 12px);
       font-weight: 600;
       border: none;
@@ -1057,7 +1288,7 @@
       overflow-y: auto;
       background: #141417;
       border: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: calc(var(--s) * 16px);
+      border-radius: 0;
       padding: calc(var(--s) * 14px);
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95);
       z-index: 100;
@@ -1101,7 +1332,7 @@
       gap: calc(var(--s) * 4px);
       background: rgba(255, 255, 255, 0.04);
       padding: calc(var(--s) * 3px);
-      border-radius: calc(var(--s) * 8px);
+      border-radius: 0;
       border: 1px solid rgba(255, 255, 255, 0.06);
     }
 
@@ -1110,7 +1341,7 @@
       padding: calc(var(--s) * 5px) calc(var(--s) * 6px);
       background: transparent;
       border: none;
-      border-radius: calc(var(--s) * 6px);
+      border-radius: 0;
       color: #94a3b8;
       font-size: calc(var(--s) * 10px);
       font-weight: 600;
@@ -1150,7 +1381,7 @@
     .theme-card {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: calc(var(--s) * 9px);
+      border-radius: 0;
       padding: calc(var(--s) * 6px);
       display: flex;
       flex-direction: column;
@@ -1161,9 +1392,8 @@
     }
 
     .theme-card:hover {
-      background: rgba(255, 255, 255, 0.07);
-      border-color: rgba(255, 255, 255, 0.2);
-      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.25);
     }
 
     .theme-card.active {
@@ -1175,7 +1405,7 @@
     .theme-card-preview {
       width: 100%;
       height: calc(var(--s) * 22px);
-      border-radius: calc(var(--s) * 5px);
+      border-radius: 0;
       border: 1px solid transparent;
       display: flex;
       align-items: center;
@@ -1186,7 +1416,7 @@
     .preview-dot {
       width: calc(var(--s) * 6px);
       height: calc(var(--s) * 6px);
-      border-radius: 50%;
+      border-radius: 0;
     }
 
     .theme-card-name {
@@ -1206,7 +1436,7 @@
       gap: calc(var(--s) * 5px);
       background: rgba(255, 255, 255, 0.03);
       padding: calc(var(--s) * 8px) calc(var(--s) * 10px);
-      border-radius: calc(var(--s) * 9px);
+      border-radius: 0;
       border: 1px solid rgba(255, 255, 255, 0.05);
     }
 
@@ -1230,7 +1460,7 @@
       border: 1px solid rgba(255, 255, 255, 0.12);
       color: #ffffff;
       padding: calc(var(--s) * 4px) calc(var(--s) * 10px);
-      border-radius: calc(var(--s) * 7px);
+      border-radius: 0;
       font-size: calc(var(--s) * 10.5px);
       font-weight: 600;
       cursor: pointer;
@@ -1274,7 +1504,7 @@
       appearance: none;
       width: calc(var(--s) * 24px);
       height: calc(var(--s) * 24px);
-      border-radius: 50%;
+      border-radius: 0;
       border: 2px solid rgba(255, 255, 255, 0.35);
       cursor: pointer;
       background: transparent;
@@ -1287,7 +1517,7 @@
     }
     .theme-color-input::-webkit-color-swatch {
       border: none;
-      border-radius: 50%;
+      border-radius: 0;
     }
 
     .color-swatches-preset {
@@ -1300,15 +1530,19 @@
     .preset-swatch {
       width: calc(var(--s) * 18px);
       height: calc(var(--s) * 18px);
-      border-radius: 50%;
+      border-radius: 0;
       cursor: pointer;
       border: 2px solid rgba(255, 255, 255, 0.15);
       transition: transform 0.15s, border-color 0.15s;
     }
 
-    .preset-swatch:hover, .preset-swatch.active {
-      transform: scale(1.18);
+    .preset-swatch:hover {
       border-color: #ffffff;
+      box-shadow: 0 0 calc(var(--s) * 6px) rgba(255, 255, 255, 0.4);
+    }
+    .preset-swatch.active {
+      border-color: #ffffff;
+      outline: 2px solid #ffffff;
     }
 
     .slider-row {
@@ -1336,7 +1570,7 @@
       border: 1px solid rgba(255, 255, 255, 0.14);
       color: #ffffff;
       padding: calc(var(--s) * 4px) calc(var(--s) * 8px);
-      border-radius: calc(var(--s) * 7px);
+      border-radius: 0;
       font-size: calc(var(--s) * 11px);
       font-family: inherit;
       outline: none;
@@ -1351,7 +1585,7 @@
     .weather-preview-box {
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: calc(var(--s) * 9px);
+      border-radius: 0;
       padding: calc(var(--s) * 8px) calc(var(--s) * 10px);
       display: flex;
       flex-direction: column;
@@ -1392,7 +1626,7 @@
         <span class="brand-dot"></span>YA FALTA POCO
       </div>
       <div class="top-actions">
-        <button class="btn-icon" id="btn-sound" title="Sonido activado (clic para probar, clic derecho para silenciar)">
+        <button class="btn-icon" id="btn-sound" title="Activar o desactivar sonido de notificación (Clic para alternar)">
           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
         </button>
         <button class="btn-icon" id="btn-settings" title="Configuración, Temas y Clima">
@@ -1409,24 +1643,49 @@
     <div class="content-layout">
       <!-- Columna Izquierda: Logo prominente + Temporizador minimalista (sin card) -->
       <div class="timer-column">
-        <div class="date-row">
-          <span class="date-main" id="lbl-date">-- --</span>
-          <div class="date-sub-row">
-            <span class="clock-badge" id="lbl-time">00:00:00</span>
-            <div class="weather-pill" id="weather-pill" title="Clima actual (clic para configurar)">
-              <span class="weather-icon" id="weather-icon">🌤️</span>
-              <span class="weather-temp" id="weather-temp">--°C</span>
+        <!-- Widget Clima Superior: 3 Cards (SCZ / Temperatura, Viento, Lluvia) -->
+        <div class="weather-strip" id="weather-strip" title="Clima en Santa Cruz de la Sierra (SCZ) - Clic para configurar">
+          <div class="weather-card" id="w-card-temp">
+            <div class="w-card-top">
+              <span class="w-card-icon" id="w-icon-temp">☀️</span>
+              <span class="w-card-label" id="w-city-label">SCZ</span>
+            </div>
+            <div class="w-card-bottom">
+              <span class="w-card-val" id="w-val-temp">--</span><span class="w-card-unit" id="w-unit-temp">°C</span>
+            </div>
+          </div>
+
+          <div class="weather-card" id="w-card-wind">
+            <div class="w-card-top">
+              <span class="w-card-icon" id="w-icon-wind">💨</span>
+              <span class="w-card-label">VIENTO</span>
+            </div>
+            <div class="w-card-bottom">
+              <span class="w-card-val" id="w-val-wind">--</span><span class="w-card-unit">km/h</span>
+            </div>
+          </div>
+
+          <div class="weather-card" id="w-card-rain">
+            <div class="w-card-top">
+              <span class="w-card-icon" id="w-icon-rain">🌧️</span>
+              <span class="w-card-label">LLUVIA</span>
+            </div>
+            <div class="w-card-bottom">
+              <span class="w-card-val" id="w-val-rain">--</span><span class="w-card-unit">%</span>
             </div>
           </div>
         </div>
 
-        <div class="logo-hub" id="logo-hub" title="Personalizar GIF y color de fondo">
+        <div class="date-row">
+          <span class="date-main" id="lbl-date">-- --</span>
+          <div class="date-sub-row">
+            <span class="clock-badge" id="lbl-time">00:00:00</span>
+          </div>
+        </div>
+
+        <div class="logo-hub" id="logo-hub">
           <img src="bg-logo.gif" alt="Workspace Logo" class="logo-gif-img" id="img-logo">
           <div class="logo-vignette" id="logo-vignette"></div>
-          <button class="logo-edit-badge" id="btn-edit-logo">
-            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"/><path d="m14 7 3 3"/></svg>
-            <span>Personalizar</span>
-          </button>
         </div>
 
         <div class="countdown-hub">
@@ -1452,33 +1711,102 @@
     <!-- Modal Editor Integrado -->
     <div class="editor-overlay" id="editor-overlay">
       <div class="editor-top">
-        <span class="editor-heading" id="modal-title">Nuevo Bloque</span>
+        <span class="editor-heading" id="modal-title">Editar Turno</span>
         <button class="btn-close" id="btn-close-modal">
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         </button>
       </div>
 
-      <div class="form-group">
-        <span class="form-label">Nombre</span>
-        <input type="text" id="inp-title" class="text-field" placeholder="Nombre de la actividad">
-      </div>
-
-      <div class="form-group">
-        <span class="form-label">Horario</span>
-        <div class="time-inputs">
-          <input type="number" id="inp-start-h" class="time-field" min="0" max="23" value="08">
-          <span style="color:var(--text-dim)">:</span>
-          <input type="number" id="inp-start-m" class="time-field" min="0" max="59" value="00">
-          <span style="color:var(--text-dim); margin: 0 4px">hasta</span>
-          <input type="number" id="inp-end-h" class="time-field" min="0" max="23" value="12">
-          <span style="color:var(--text-dim)">:</span>
-          <input type="number" id="inp-end-m" class="time-field" min="0" max="59" value="00">
+      <div class="editor-scroll-body">
+        <div class="form-group">
+          <span class="form-label">Nombre</span>
+          <input type="text" id="inp-title" class="text-field" placeholder="Nombre de la actividad">
         </div>
-      </div>
 
-      <div class="form-group">
-        <span class="form-label">Color</span>
-        <div class="palette-row" id="palette-row"></div>
+        <div class="form-group">
+          <span class="form-label">Horario</span>
+          <div class="time-inputs">
+            <input type="number" id="inp-start-h" class="time-field" min="0" max="23" value="08">
+            <span style="color:var(--text-dim)">:</span>
+            <input type="number" id="inp-start-m" class="time-field" min="0" max="59" value="00">
+            <span style="color:var(--text-dim); margin: 0 4px">hasta</span>
+            <input type="number" id="inp-end-h" class="time-field" min="0" max="23" value="12">
+            <span style="color:var(--text-dim)">:</span>
+            <input type="number" id="inp-end-m" class="time-field" min="0" max="59" value="00">
+          </div>
+        </div>
+
+        <!-- Selector de Icono de la Tarea -->
+        <div class="form-group" style="align-items: flex-start;">
+          <span class="form-label" style="padding-top: calc(var(--s)*4px);">Icono</span>
+          <div class="icon-selector-wrap">
+            <div class="icon-chip-grid" id="icon-chip-grid">
+              <!-- Generado dinamicamente: Auto, laptop, coffee, utensils, shower, etc. -->
+            </div>
+            <div style="display:flex; align-items:center; gap:calc(var(--s)*6px); margin-top:calc(var(--s)*4px);">
+              <span style="font-size:calc(var(--s)*10px); color:var(--text-dim);">O emoji:</span>
+              <input type="text" id="inp-custom-icon" class="text-field" placeholder="Ej: 🚀, 💻, 🎯" maxlength="4" style="width:calc(var(--s)*80px); text-align:center; padding:calc(var(--s)*3px);">
+            </div>
+          </div>
+        </div>
+
+        <!-- Color de Tarjeta 1 (Icono / Capsula) -->
+        <div class="form-group" style="align-items: flex-start;">
+          <span class="form-label" style="padding-top: calc(var(--s)*4px);">Icono Color</span>
+          <div style="display:flex; flex-direction:column; gap:calc(var(--s)*5px); flex:1;">
+            <div class="palette-row" id="palette-row"></div>
+            <div style="display:flex; align-items:center; gap:calc(var(--s)*6px);">
+              <span style="font-size:calc(var(--s)*10px); color:var(--text-dim);">Color exacto:</span>
+              <input type="color" id="inp-icon-color-custom" class="theme-color-input" value="#22d3ee" style="width:calc(var(--s)*20px); height:calc(var(--s)*20px);">
+            </div>
+          </div>
+        </div>
+
+        <!-- Fondo de Tarjeta 2 (Tarjeta de Turno / Tarea) -->
+        <div class="form-group" style="align-items: flex-start;">
+          <span class="form-label" style="padding-top: calc(var(--s)*4px);">Fondo Tarea</span>
+          <div style="display:flex; flex-direction:column; gap:calc(var(--s)*5px); flex:1;">
+            <div class="card-bg-options-row" id="card-bg-options-row">
+              <div class="card-bg-chip active" data-bg="transparent" title="Transparente (sin color de fondo)">
+                <span class="chip-dot" style="background:transparent; border:1px dashed #888;"></span>
+                <span>Transparente</span>
+              </div>
+              <div class="card-bg-chip" data-bg="#000000" title="Negro Puro">
+                <span class="chip-dot" style="background:#000000; border:1px solid #444;"></span>
+                <span>Negro</span>
+              </div>
+              <div class="card-bg-chip" data-bg="#1c1c1e" title="Gris Carbón">
+                <span class="chip-dot" style="background:#1c1c1e; border:1px solid #333;"></span>
+                <span>Gris Oscuro</span>
+              </div>
+              <div class="card-bg-chip" data-bg="theme" title="Tema Actual">
+                <span class="chip-dot" style="background:var(--card-bg); border:1px solid rgba(255,255,255,0.2);"></span>
+                <span>Tema</span>
+              </div>
+              <div class="card-bg-chip" data-bg="custom" id="chip-bg-custom" title="Color personalizado">
+                <input type="color" id="inp-card-bg-custom" class="theme-color-input" value="#1a202c" style="width:calc(var(--s)*16px); height:calc(var(--s)*16px);">
+                <span>Color</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vista previa en vivo -->
+        <div class="editor-preview-wrap">
+          <span style="font-size:calc(var(--s)*9.5px); font-weight:700; color:var(--text-dim); text-transform:uppercase;">Vista previa</span>
+          <div class="editor-live-row" id="editor-live-preview">
+            <div class="rail-capsule preview-capsule" id="prev-capsule">
+              <span class="capsule-icon" id="prev-icon"></span>
+            </div>
+            <div class="card-box preview-box" id="prev-card-box">
+              <div class="card-info">
+                <span class="card-title-text" id="prev-title">Mi Turno</span>
+                <span class="card-sub-text" id="prev-sub">08:00–12:00</span>
+              </div>
+              <div class="card-check" id="prev-check" style="border: 2px solid #22d3ee; background: transparent;"></div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="footer-actions">
@@ -1503,7 +1831,6 @@
       <!-- Barra de Pestañas -->
       <div class="settings-tabs">
         <button class="settings-tab-btn active" data-tab="tab-themes">🎨 Temas</button>
-        <button class="settings-tab-btn" data-tab="tab-logo">🖼️ Logo / GIF</button>
         <button class="settings-tab-btn" data-tab="tab-weather">🌤️ Clima</button>
         <button class="settings-tab-btn" data-tab="tab-general">⚙️ Ajustes</button>
       </div>
@@ -1519,6 +1846,10 @@
 
         <div class="theme-section">
           <span class="theme-section-title">Color de Fondo</span>
+          <label class="theme-switch-row" style="margin-bottom: calc(var(--s) * 4px);">
+            <input type="checkbox" id="chk-auto-bg">
+            <span>Detectar fondo automáticamente del logo</span>
+          </label>
           <div class="theme-color-row">
             <input type="color" id="inp-bg-color" class="theme-color-input" value="#000000" title="Color de fondo personalizado">
             <div class="color-swatches-preset">
@@ -1538,38 +1869,11 @@
             <input type="color" id="inp-laser-color" class="theme-color-input" value="#ff453a" title="Color de la línea de tiempo">
           </div>
         </div>
-      </div>
-
-      <!-- TAB 2: LOGO / GIF -->
-      <div class="settings-tab-pane" id="tab-logo">
-        <div class="theme-section">
-          <span class="theme-section-title">Imagen o GIF de Marca</span>
-          <div class="theme-btn-row">
-            <input type="file" id="inp-logo-file" accept="image/gif,image/png,image/jpeg,image/webp" style="display:none">
-            <button class="btn-secondary" id="btn-browse-logo">
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
-              Elegir archivo local...
-            </button>
-            <button class="btn-secondary" id="btn-reset-logo" title="Restaurar el logo original de la app">
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-              Original
-            </button>
-          </div>
-          <div style="display: flex; gap: calc(var(--s) * 4px); margin-top: calc(var(--s) * 4px);">
-            <input type="text" id="inp-logo-url" class="text-field" placeholder="o pega una URL de GIF o imagen..." style="font-size: calc(var(--s) * 11px); padding: calc(var(--s) * 4px) calc(var(--s) * 8px);">
-            <button class="btn-secondary" id="btn-apply-url" style="padding: calc(var(--s) * 4px) calc(var(--s) * 10px);">Aplicar</button>
-          </div>
-        </div>
 
         <div class="theme-section">
-          <span class="theme-section-title">Difuminado y Fondo</span>
-          <label class="theme-switch-row">
-            <input type="checkbox" id="chk-auto-bg" checked>
-            <span>Autodetectar color de fondo desde el GIF/Imagen</span>
-          </label>
-          <div class="slider-row" style="margin-top: calc(var(--s) * 4px);">
+          <div class="slider-row">
             <div class="slider-header">
-              <span class="theme-section-title">Difuminado de Bordes (Fade)</span>
+              <span class="theme-section-title">Difuminado de Bordes del Logo</span>
               <span id="lbl-vignette-val" style="font-size: calc(var(--s) * 10px); color: #38bdf8; font-weight: 700;">85%</span>
             </div>
             <input type="range" id="rng-vignette" class="theme-slider" min="0" max="100" value="85">
@@ -1577,7 +1881,7 @@
         </div>
       </div>
 
-      <!-- TAB 3: CLIMA (OPEN-METEO) -->
+      <!-- TAB 2: CLIMA (OPEN-METEO) -->
       <div class="settings-tab-pane" id="tab-weather">
         <div class="theme-section">
           <label class="theme-switch-row">
@@ -1590,7 +1894,7 @@
           <span class="theme-section-title">Ubicación (Open-Meteo)</span>
           <div style="display:flex; flex-direction:column; gap:calc(var(--s) * 6px);">
             <select id="sel-weather-city" class="settings-select">
-              <option value="-17.7833,-63.1821|Santa Cruz, Bolivia">Santa Cruz de la Sierra, Bolivia</option>
+              <option value="-17.7833,-63.1821|Santa Cruz de la Sierra, Bolivia">Santa Cruz de la Sierra (SCZ), Bolivia</option>
               <option value="-16.5000,-68.1500|La Paz, Bolivia">La Paz, Bolivia</option>
               <option value="-17.3895,-66.1568|Cochabamba, Bolivia">Cochabamba, Bolivia</option>
               <option value="-19.0333,-65.2627|Sucre, Bolivia">Sucre, Bolivia</option>
@@ -1696,6 +2000,10 @@
   <script>
     const hasTauri = typeof window !== 'undefined' && window.__TAURI__ && window.__TAURI__.core;
 
+    // Estado de hover sobre componentes para evitar temblores al interactuar
+    let isHoveringInteractive = false;
+    const INTERACTIVE_SELECTOR = 'button, input, select, textarea, .card-box, .rail-capsule, .timeline-row, .weather-card, .weather-strip, .timer-hero, .timer-display, #lbl-countdown, #lbl-time, #lbl-block-name, .btn-pill, .btn-icon, .btn-close, .btn-create-event, .settings-tab-btn, .theme-card, .icon-chip, .card-bg-chip, .swatch, .preset-swatch, .logo-container, .brand-cluster, .resize-handle';
+
     // Entorno de desarrollo para previsualización instantánea en navegador sin compilar
     let devMockState = {
       mode: 'Horario',
@@ -1767,13 +2075,17 @@
         devMockState.sound_enabled = !devMockState.sound_enabled;
       } else if (cmd === 'save_block') {
         const newBlock = {
-          id: `block-${Date.now()}`,
+          id: (args.index !== null && args.index !== undefined && devMockState.blocks[args.index])
+            ? devMockState.blocks[args.index].id
+            : `block-${Date.now()}`,
           title: args.title || 'Nuevo Turno',
           start_hour: args.startHour,
           start_min: args.startMin,
           end_hour: args.endHour,
           end_min: args.endMin,
           color: { r: args.colorR, g: args.colorG, b: args.colorB },
+          icon: args.icon || null,
+          card_bg: args.cardBg || null,
           days: { monday: true, tuesday: true, wednesday: true, thursday: true, friday: true, saturday: true, sunday: false }
         };
         if (args.index !== null && args.index !== undefined && devMockState.blocks[args.index]) {
@@ -1795,19 +2107,43 @@
 
     let currentEditingIndex = null;
     let activeColor = { r: 59, g: 130, b: 246 };
+    let activeIcon = 'auto';
+    let activeCardBg = 'transparent';
 
     const COLOR_PRESETS = [
-      { r: 10, g: 132, b: 255 },  // Azul vibrante (Shower)
-      { r: 255, g: 159, b: 10 },  // Ámbar / Naranja (Breakfast)
-      { r: 191, g: 90, b: 242 },  // Púrpura (Check Email)
-      { r: 255, g: 55, b: 95 },   // Rosa / Coral (Workout)
-      { r: 48, g: 209, b: 88 },   // Verde
-      { r: 100, g: 210, b: 255 }, // Cian
-      { r: 255, g: 214, b: 10 }   // Amarillo
+      { r: 10, g: 132, b: 255 },  // Azul vibrante
+      { r: 34, g: 211, b: 238 },  // Cian Neón
+      { r: 255, g: 159, b: 10 },  // Ámbar / Naranja
+      { r: 191, g: 90, b: 242 },  // Púrpura
+      { r: 255, g: 55, b: 95 },   // Rosa Coral
+      { r: 48, g: 209, b: 88 },   // Verde Esmeralda
+      { r: 255, g: 214, b: 10 },  // Amarillo
+      { r: 148, g: 163, b: 184 }, // Gris Plata
+      { r: 255, g: 255, b: 255 }  // Blanco Puro
+    ];
+
+    const AVAILABLE_ICONS = [
+      { id: 'auto', label: 'Auto' },
+      { id: 'laptop', label: 'Trabajo' },
+      { id: 'coffee', label: 'Café' },
+      { id: 'utensils', label: 'Comida' },
+      { id: 'shower', label: 'Ducha' },
+      { id: 'dumbbell', label: 'Gym' },
+      { id: 'mail', label: 'Email' },
+      { id: 'video', label: 'Meet' },
+      { id: 'book', label: 'Estudio' },
+      { id: 'code', label: 'Código' },
+      { id: 'zap', label: 'Enfoque' },
+      { id: 'target', label: 'Meta' },
+      { id: 'music', label: 'Música' },
+      { id: 'palmtree', label: 'Libre' },
+      { id: 'cart', label: 'Compras' },
+      { id: 'rocket', label: 'Proyecto' }
     ];
 
     function renderPalette() {
       const row = document.getElementById('palette-row');
+      if (!row) return;
       row.innerHTML = '';
       COLOR_PRESETS.forEach(col => {
         const swatch = document.createElement('div');
@@ -1816,9 +2152,119 @@
         swatch.onclick = () => {
           activeColor = col;
           renderPalette();
+          updateEditorPreview();
         };
         row.appendChild(swatch);
       });
+      const customInp = document.getElementById('inp-icon-color-custom');
+      if (customInp) {
+        const hex = '#' + [activeColor.r, activeColor.g, activeColor.b].map(x => x.toString(16).padStart(2, '0')).join('');
+        customInp.value = hex;
+      }
+    }
+
+    function renderIconChips() {
+      const grid = document.getElementById('icon-chip-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      AVAILABLE_ICONS.forEach(item => {
+        const chip = document.createElement('div');
+        chip.className = 'icon-chip' + (activeIcon === item.id ? ' active' : '');
+        const iconSvg = item.id === 'auto' ? '✨' : (LUCIDE_ICONS[item.id] || '📌');
+        chip.innerHTML = `${iconSvg} <span>${item.label}</span>`;
+        chip.onclick = () => {
+          activeIcon = item.id;
+          document.getElementById('inp-custom-icon').value = '';
+          renderIconChips();
+          updateEditorPreview();
+        };
+        grid.appendChild(chip);
+      });
+    }
+
+    function renderCardBgChips() {
+      const row = document.getElementById('card-bg-options-row');
+      if (!row) return;
+      const chips = row.querySelectorAll('.card-bg-chip');
+      chips.forEach(chip => {
+        const bg = chip.dataset.bg;
+        if (bg === 'custom') {
+          const isCustom = activeCardBg && !['transparent', '#000000', '#1c1c1e', 'theme'].includes(activeCardBg);
+          chip.classList.toggle('active', isCustom);
+          if (isCustom) {
+            const customInp = document.getElementById('inp-card-bg-custom');
+            if (customInp) customInp.value = activeCardBg;
+          }
+        } else {
+          chip.classList.toggle('active', activeCardBg === bg);
+        }
+        chip.onclick = (e) => {
+          if (bg === 'custom') {
+            const customInp = document.getElementById('inp-card-bg-custom');
+            if (customInp) {
+              activeCardBg = customInp.value;
+              customInp.click();
+            }
+          } else {
+            activeCardBg = bg;
+          }
+          renderCardBgChips();
+          updateEditorPreview();
+        };
+      });
+
+      const customInp = document.getElementById('inp-card-bg-custom');
+      if (customInp) {
+        customInp.oninput = (e) => {
+          activeCardBg = e.target.value;
+          renderCardBgChips();
+          updateEditorPreview();
+        };
+      }
+    }
+
+    function updateEditorPreview() {
+      const title = document.getElementById('inp-title')?.value.trim() || 'Mi Turno';
+      const sh = String(document.getElementById('inp-start-h')?.value || 8).padStart(2, '0');
+      const sm = String(document.getElementById('inp-start-m')?.value || 0).padStart(2, '0');
+      const eh = String(document.getElementById('inp-end-h')?.value || 12).padStart(2, '0');
+      const em = String(document.getElementById('inp-end-m')?.value || 0).padStart(2, '0');
+
+      const customIconVal = document.getElementById('inp-custom-icon')?.value.trim();
+      const currentIconKey = customIconVal || activeIcon;
+
+      const prevTitle = document.getElementById('prev-title');
+      const prevSub = document.getElementById('prev-sub');
+      const prevCapsule = document.getElementById('prev-capsule');
+      const prevIcon = document.getElementById('prev-icon');
+      const prevCardBox = document.getElementById('prev-card-box');
+
+      if (prevTitle) prevTitle.textContent = title;
+      if (prevSub) prevSub.textContent = `${sh}:${sm}–${eh}:${em}`;
+      if (prevCapsule) {
+        prevCapsule.style.background = `rgb(${activeColor.r}, ${activeColor.g}, ${activeColor.b})`;
+      }
+      if (prevIcon) {
+        prevIcon.innerHTML = getBlockIcon(title, currentIconKey);
+      }
+      if (prevCardBox) {
+        if (activeCardBg === 'transparent') {
+          prevCardBox.style.background = 'transparent';
+          prevCardBox.style.border = '1px solid rgba(255, 255, 255, 0.08)';
+        } else if (activeCardBg === '#000000') {
+          prevCardBox.style.background = '#000000';
+          prevCardBox.style.border = '1px solid rgba(255, 255, 255, 0.08)';
+        } else if (activeCardBg === '#1c1c1e') {
+          prevCardBox.style.background = '#1c1c1e';
+          prevCardBox.style.border = '1px solid rgba(255, 255, 255, 0.08)';
+        } else if (activeCardBg === 'theme') {
+          prevCardBox.style.background = 'var(--card-bg)';
+          prevCardBox.style.border = '1px solid var(--card-border)';
+        } else {
+          prevCardBox.style.background = activeCardBg;
+          prevCardBox.style.border = '1px solid rgba(255, 255, 255, 0.12)';
+        }
+      }
     }
 
     const audioAlarm = document.getElementById('snd-alarm');
@@ -1871,7 +2317,40 @@
           document.getElementById('lbl-time').textContent = snap.current_time_str;
         }
 
-        document.getElementById('lbl-countdown').textContent = snap.countdown_str;
+        const cdEl = document.getElementById('lbl-countdown');
+        cdEl.textContent = snap.countdown_str;
+
+        // Ultimos 10 minutos y ultimo 1 minuto (rojo neon y FX de temblor)
+        const cdParts = (snap.countdown_str || '').split(':').map(Number);
+        let remSecs = null;
+        if (cdParts.length === 3 && !isNaN(cdParts[0]) && !isNaN(cdParts[1]) && !isNaN(cdParts[2])) {
+          remSecs = cdParts[0] * 3600 + cdParts[1] * 60 + cdParts[2];
+        }
+
+        if (remSecs !== null && remSecs > 0 && remSecs <= 600 && !snap.is_free_day) {
+          cdEl.classList.add('timer-danger-red');
+          if (isHoveringInteractive) {
+            cdEl.classList.remove('quake-continuous', 'quake-burst');
+          } else if (remSecs <= 60) {
+            // Ultimo minuto: tiembla continuo con deformacion FX cada segundo si no se esta interactuando
+            cdEl.classList.add('quake-continuous');
+            cdEl.classList.remove('quake-burst');
+          } else {
+            cdEl.classList.remove('quake-continuous');
+            // Cada minuto exacto: tiembla solo si no se esta interactuando
+            if (remSecs % 60 === 0) {
+              cdEl.classList.add('quake-burst');
+              setTimeout(() => {
+                if (!isHoveringInteractive) {
+                  cdEl.classList.remove('quake-burst');
+                }
+              }, 950);
+            }
+          }
+        } else {
+          cdEl.classList.remove('timer-danger-red', 'quake-continuous', 'quake-burst');
+        }
+
         const tagline = document.getElementById('lbl-timer-tagline');
         if (tagline) {
           const customTag = (typeof appSettings !== 'undefined' && appSettings.timerTagline) ? appSettings.timerTagline : 'Faltan:';
@@ -1895,13 +2374,17 @@
 
         const soundBtn = document.getElementById('btn-sound');
         if (soundBtn) {
+          soundBtn.className = snap.sound_enabled ? 'btn-icon sound-active' : 'btn-icon sound-muted';
           soundBtn.innerHTML = snap.sound_enabled ? LUCIDE_ICONS.bell : LUCIDE_ICONS.bellOff;
           soundBtn.title = snap.sound_enabled 
-            ? 'Sonido activado (clic para probar, clic derecho para silenciar)' 
-            : 'Sonido silenciado (clic para activar)';
+            ? 'Notificaciones activadas (clic para silenciar)' 
+            : 'Notificaciones silenciadas (clic para activar)';
         }
 
-        renderScheduleStream(snap.blocks, snap.current_time_str, snap.is_free_day);
+        // Solo refrescar la agenda si el editor de turnos no esta abierto
+        if (currentEditingIndex === null) {
+          renderScheduleStream(snap.blocks, snap.current_time_str, snap.is_free_day);
+        }
       } catch (e) {
         console.error(e);
       }
@@ -1924,11 +2407,21 @@
       book: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
       code: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`,
       zap: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>`,
+      target: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>`,
+      music: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`,
+      cart: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>`,
+      rocket: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>`,
       palmtree: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 8c0-2.76-2.46-5-5.5-5S2 5.24 2 8h2a3.5 3.5 0 0 1 7 0h2Z"/><path d="M13 7.14A5.82 5.82 0 0 1 16.5 6c3.04 0 5.5 2.24 5.5 5h-2a3.5 3.5 0 0 0-7 0v-3.86Z"/><path d="M5.8 11.3A3.5 3.5 0 0 0 9 13v9"/><path d="M15 13a3.5 3.5 0 0 0 3.2-1.7"/></svg>`,
+      wind: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/></svg>`,
+      droplets: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/><path d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97"/></svg>`,
       x: `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`
     };
 
-    function getBlockIcon(title) {
+    function getBlockIcon(title, customIcon) {
+      if (customIcon && customIcon !== 'auto') {
+        if (LUCIDE_ICONS[customIcon]) return LUCIDE_ICONS[customIcon];
+        return customIcon;
+      }
       const t = (title || '').toLowerCase();
       if (t.includes('almuerzo') || t.includes('comida') || t.includes('lunch') || t.includes('cena')) return LUCIDE_ICONS.utensils;
       if (t.includes('desayuno') || t.includes('cafe') || t.includes('café') || t.includes('break')) return LUCIDE_ICONS.coffee;
@@ -1939,6 +2432,8 @@
       if (t.includes('brain') || t.includes('trabajo') || t.includes('work')) return LUCIDE_ICONS.laptop;
       if (t.includes('code') || t.includes('prog') || t.includes('dev')) return LUCIDE_ICONS.code;
       if (t.includes('estudio') || t.includes('leer') || t.includes('read') || t.includes('libro')) return LUCIDE_ICONS.book;
+      if (t.includes('compra') || t.includes('shop') || t.includes('super')) return LUCIDE_ICONS.cart;
+      if (t.includes('musica') || t.includes('música') || t.includes('relax')) return LUCIDE_ICONS.music;
       return LUCIDE_ICONS.zap;
     }
 
@@ -2040,45 +2535,66 @@
         let durationMins = end - start;
         if (durationMins <= 0) durationMins += 24 * 60;
 
+        const isLastBlock = idx === blocks.length - 1;
         const isActive = !isFreeDay && (nowTotal >= start && nowTotal < end);
         const isCompleted = !isFreeDay && (nowTotal >= end);
 
-        const icon = getBlockIcon(block.title);
+        const icon = getBlockIcon(block.title, block.icon);
         const rangeText = `${pad(block.start_hour)}:${pad(block.start_min)}–${pad(block.end_hour)}:${pad(block.end_min)}`;
         const durText = formatBlockDuration(block.start_hour, block.start_min, block.end_hour, block.end_min);
         const colRgb = `${block.color.r}, ${block.color.g}, ${block.color.b}`;
 
-        // Altura proporcional para dar espacio y elegancia a todas las horas intermedias
-        const extraHours = Math.max(0, (durationMins - 60) / 60);
-        const rowHeightPx = Math.round(58 + extraHours * 24);
+        // Espacio vertical uniforme y desahogado entre horas (~36px por cada hora)
+        const durationHours = durationMins / 60;
+        const pxPerHour = 36;
+        const topPadding = 12;
+        const usableHeight = Math.max(28, Math.round(durationHours * pxPerHour));
+        const rowHeightPx = topPadding + usableHeight + 12;
 
-        const topPadding = 14;
-        const bottomPadding = 14;
-        const usableHeight = Math.max(20, rowHeightPx - topPadding - bottomPadding);
-
-        // Lista de horas a mostrar en el gutter izquierdo
-        const hoursToRender = [];
+        // Lista de items a mostrar en el gutter izquierdo (horas y marcas cada 15 min)
+        const gutterItems = [];
 
         // 1. Hora de inicio del turno (número principal, tamaño grande 16px)
         const startHourLabel = block.start_min === 0 ? pad(block.start_hour) : `${pad(block.start_hour)}:${pad(block.start_min)}`;
-        hoursToRender.push({
+        gutterItems.push({
+          type: 'start-hour',
           label: startHourLabel,
-          isStart: true,
-          y: topPadding
+          y: topPadding,
+          mins: start
         });
 
-        // 2. Todas las horas intermedias dentro del turno (números secundarios más pequeños 11px)
-        for (let hInt = block.start_hour + 1; hInt < block.end_hour; hInt++) {
-          const minDiff = (hInt * 60) - start;
-          if (minDiff > 0 && minDiff < durationMins) {
-            const fraction = minDiff / durationMins;
-            const y = Math.round(topPadding + fraction * usableHeight);
-            hoursToRender.push({
-              label: pad(hInt),
-              isStart: false,
-              y: y
+        // 2. Marcas intermedias cada 15 minutos (00 = hora, 15/30/45 = ticks '-')
+        for (let curM = start + 15; curM < end; curM += 15) {
+          const mDiff = curM - start;
+          const fraction = mDiff / durationMins;
+          const y = Math.round(topPadding + fraction * usableHeight);
+          if (curM % 60 === 0) {
+            gutterItems.push({
+              type: 'intermediate-hour',
+              label: pad(Math.floor(curM / 60) % 24),
+              y: y,
+              mins: curM
+            });
+          } else {
+            const isHalfHour = curM % 60 === 30;
+            gutterItems.push({
+              type: isHalfHour ? 'tick-30' : 'tick-15',
+              label: '-',
+              y: y,
+              mins: curM
             });
           }
+        }
+
+        // 3. Si es el último bloque del día, mostrar la hora final con la misma distancia uniforme exacta
+        if (isLastBlock) {
+          const endHourLabel = block.end_min === 0 ? pad(block.end_hour) : `${pad(block.end_hour)}:${pad(block.end_min)}`;
+          gutterItems.push({
+            type: 'intermediate-hour',
+            label: endHourLabel,
+            y: Math.round(topPadding + usableHeight),
+            mins: end
+          });
         }
 
         // Posición proporcional del rayo láser en tiempo real
@@ -2090,11 +2606,17 @@
         }
 
         let gutterHoursHtml = '';
-        hoursToRender.forEach(hItem => {
-          const isCoveredByLaser = isActive && laserY !== null && Math.abs(laserY - hItem.y) < 8;
-          const cls = hItem.isStart ? 'gutter-hour start-hour' : 'gutter-hour intermediate-hour';
+        gutterItems.forEach(item => {
+          const isCoveredByLaser = isActive && laserY !== null && Math.abs(laserY - item.y) < 5.5;
           const hiddenCls = isCoveredByLaser ? ' hidden-by-laser' : '';
-          gutterHoursHtml += `<div class="${cls}${hiddenCls}" style="top: calc(var(--s) * ${hItem.y}px);">${hItem.label}</div>`;
+          if (item.type === 'start-hour') {
+            gutterHoursHtml += `<div class="gutter-hour start-hour${hiddenCls}" style="top: calc(var(--s) * ${item.y}px);">${item.label}</div>`;
+          } else if (item.type === 'intermediate-hour') {
+            gutterHoursHtml += `<div class="gutter-hour intermediate-hour${hiddenCls}" style="top: calc(var(--s) * ${item.y}px);">${item.label}</div>`;
+          } else {
+            const cls = item.type === 'tick-30' ? 'gutter-tick tick-30' : 'gutter-tick tick-15';
+            gutterHoursHtml += `<div class="${cls}${hiddenCls}" style="top: calc(var(--s) * ${item.y}px);">${item.label}</div>`;
+          }
         });
 
         if (isActive && laserY !== null) {
@@ -2110,8 +2632,20 @@
           ? `<div class="card-check" style="background: #ff375f; color: #fff;">${LUCIDE_ICONS.check}</div>`
           : `<div class="card-check" style="border: calc(var(--s) * 2.2px) solid rgb(${colRgb}); background: transparent;"></div>`;
 
-        // Cápsula: completado = gris oscuro discreto #323235; activo/pendiente = color sólido vibrante
+        // Cápsula (Tarjeta 1: Icono): completado = gris oscuro; activo/pendiente = color sólido vibrante
         const capsuleBg = isCompleted ? '#323235' : `rgb(${colRgb})`;
+
+        // Tarjeta 2: Fondo personalizable (Transparente, Negro, Gris, Tema, Color)
+        let cardBoxBgStyle = '';
+        if (block.card_bg === 'transparent') {
+          cardBoxBgStyle = 'background: transparent !important; border: 1px solid rgba(255, 255, 255, 0.08) !important;';
+        } else if (block.card_bg === '#000000') {
+          cardBoxBgStyle = 'background: #000000 !important; border: 1px solid rgba(255, 255, 255, 0.08) !important;';
+        } else if (block.card_bg === '#1c1c1e') {
+          cardBoxBgStyle = 'background: #1c1c1e !important; border: 1px solid rgba(255, 255, 255, 0.08) !important;';
+        } else if (block.card_bg && block.card_bg !== 'theme') {
+          cardBoxBgStyle = `background: ${block.card_bg} !important; border: 1px solid rgba(255, 255, 255, 0.12) !important;`;
+        }
 
         row.innerHTML = `
           <div class="time-gutter">
@@ -2119,11 +2653,11 @@
           </div>
           <div class="rail-container">
             <div class="rail-line-back"></div>
-            <div class="rail-capsule" style="background: ${capsuleBg};">
+            <div class="rail-capsule" style="background: ${capsuleBg};" title="Clic para editar este turno">
               <span class="capsule-icon" style="color: ${isCompleted ? '#ff375f' : '#ffffff'};">${icon}</span>
             </div>
           </div>
-          <div class="card-box">
+          <div class="card-box" style="${cardBoxBgStyle}" title="Clic para editar este turno">
             <div class="card-info">
               <span class="card-title-text">${block.title}</span>
               <span class="card-sub-text">
@@ -2135,20 +2669,22 @@
           ${isActive && laserY !== null ? `<div class="laser-line-beam" style="top: calc(var(--s) * ${laserY}px);"></div>` : ''}
         `;
 
-        row.querySelector('.card-box').onclick = () => openModal(idx, block);
+        row.querySelector('.rail-capsule').onclick = (e) => {
+          e.stopPropagation();
+          openModal(idx, block);
+        };
+        row.querySelector('.card-box').onclick = (e) => {
+          e.stopPropagation();
+          openModal(idx, block);
+        };
         container.appendChild(row);
       });
 
-      // Marcador final y footer con Luna (Alineado con el riel central)
-      const lastBlock = blocks.length > 0 ? blocks[blocks.length - 1] : null;
-      const lastEndHour = lastBlock ? pad(lastBlock.end_hour) : '';
-
+      // Marcador final y footer con Luna (Sin duplicar la hora de fin porque ya se renderizó arriba uniformemente)
       const bottomArea = document.createElement('div');
       bottomArea.className = 'timeline-bottom-area';
       bottomArea.innerHTML = `
-        <div class="time-gutter">
-          ${lastEndHour ? `<div class="gutter-hour intermediate-hour" style="top: 50%;">${lastEndHour}</div>` : ''}
-        </div>
+        <div class="time-gutter"></div>
         <div class="rail-container bottom-rail">
           <div class="rail-line-back bottom-stem"></div>
           <div class="pole-node bottom">${LUCIDE_ICONS.moon}</div>
@@ -2164,7 +2700,10 @@
 
       const btnCreate = bottomArea.querySelector('#btn-create-in-stream');
       if (btnCreate) {
-        btnCreate.onclick = () => openModal(null, null);
+        btnCreate.onclick = (e) => {
+          e.stopPropagation();
+          openModal(null, null);
+        };
       }
 
       updateEndOfDay(blocks, timeStr, isFreeDay);
@@ -2176,32 +2715,73 @@
       const delBtn = document.getElementById('btn-delete');
 
       if (block) {
-        document.getElementById('modal-title').textContent = 'Editar Bloque';
+        document.getElementById('modal-title').textContent = 'Editar Turno';
         document.getElementById('inp-title').value = block.title;
         document.getElementById('inp-start-h').value = block.start_hour;
         document.getElementById('inp-start-m').value = block.start_min;
         document.getElementById('inp-end-h').value = block.end_hour;
         document.getElementById('inp-end-m').value = block.end_min;
-        activeColor = block.color;
+        activeColor = block.color ? { r: block.color.r, g: block.color.g, b: block.color.b } : COLOR_PRESETS[0];
+        activeIcon = block.icon || 'auto';
+        activeCardBg = block.card_bg || 'transparent';
         delBtn.style.display = 'inline-block';
       } else {
-        document.getElementById('modal-title').textContent = 'Nuevo Bloque';
+        document.getElementById('modal-title').textContent = 'Nuevo Turno';
         document.getElementById('inp-title').value = 'Nueva Tarea';
         document.getElementById('inp-start-h').value = 8;
         document.getElementById('inp-start-m').value = 0;
         document.getElementById('inp-end-h').value = 12;
         document.getElementById('inp-end-m').value = 0;
         activeColor = COLOR_PRESETS[0];
+        activeIcon = 'auto';
+        activeCardBg = 'transparent';
         delBtn.style.display = 'none';
       }
 
+      const customInp = document.getElementById('inp-custom-icon');
+      if (customInp) {
+        customInp.value = (activeIcon && !AVAILABLE_ICONS.some(i => i.id === activeIcon)) ? activeIcon : '';
+      }
+
       renderPalette();
+      renderIconChips();
+      renderCardBgChips();
+      updateEditorPreview();
+
       overlay.classList.add('visible');
     }
 
     function closeModal() {
       document.getElementById('editor-overlay').classList.remove('visible');
       currentEditingIndex = null;
+    }
+
+    // Live preview listeners in modal
+    ['inp-title', 'inp-start-h', 'inp-start-m', 'inp-end-h', 'inp-end-m', 'inp-custom-icon'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', () => {
+          if (id === 'inp-custom-icon') {
+            const v = el.value.trim();
+            if (v) activeIcon = v;
+            renderIconChips();
+          }
+          updateEditorPreview();
+        });
+      }
+    });
+
+    const customColorInp = document.getElementById('inp-icon-color-custom');
+    if (customColorInp) {
+      customColorInp.addEventListener('input', (e) => {
+        const hex = e.target.value;
+        const r = parseInt(hex.slice(1, 3), 16) || 0;
+        const g = parseInt(hex.slice(3, 5), 16) || 0;
+        const b = parseInt(hex.slice(5, 7), 16) || 0;
+        activeColor = { r, g, b };
+        renderPalette();
+        updateEditorPreview();
+      });
     }
 
     // Responsive Scaling Function
@@ -2270,30 +2850,44 @@
     }
     initWindowResizing();
 
-    // Native OS Window Dragging
+    // Detección global de hover sobre cualquier componente para neutralizar temblores al interactuar
+    document.addEventListener('mouseover', (e) => {
+      if (e.target && e.target.closest(INTERACTIVE_SELECTOR)) {
+        isHoveringInteractive = true;
+        document.body.classList.add('is-hovering-component');
+        const cd = document.getElementById('lbl-countdown');
+        if (cd) {
+          cd.classList.remove('quake-continuous', 'quake-burst');
+        }
+      }
+    });
+
+    document.addEventListener('mouseout', (e) => {
+      const rel = e.relatedTarget;
+      if (!rel || !rel.closest(INTERACTIVE_SELECTOR)) {
+        isHoveringInteractive = false;
+        document.body.classList.remove('is-hovering-component');
+      }
+    });
+
+    // Native OS Window Dragging - Excluir completamente todos los elementos interactivos y tarjetas
     document.addEventListener('mousedown', (e) => {
       if (e.button !== 0) return;
-      if (e.target.closest('button, input, select, textarea, .block-row, .timeline-card, .timeline-capsule, .btn-create-event, .editor-overlay, .swatch, .resize-handle')) {
+      if (e.target.closest('button, input, select, textarea, .timeline-row, .card-box, .rail-capsule, .timeline-bottom-area, .timeline-stream, .agenda-section, .btn-create-event, .editor-overlay, .settings-modal-overlay, .weather-strip, .weather-card, .swatch, .icon-chip, .card-bg-chip, .resize-handle, #btn-sound, #btn-settings, #btn-mode, #btn-close, #lbl-block-name')) {
         return;
       }
       invoke('drag_window');
     });
 
     // Handlers
-    document.getElementById('btn-sound').onclick = async () => {
-      const soundBtn = document.getElementById('btn-sound');
-      if (soundBtn.textContent === '🔇') {
-        await invoke('toggle_sound');
-        pollSnapshot();
-      } else {
-        playAlarm();
-      }
-    };
-
-    document.getElementById('btn-sound').oncontextmenu = async (e) => {
-      e.preventDefault();
+    document.getElementById('btn-sound').onclick = async (e) => {
+      e.stopPropagation();
       await invoke('toggle_sound');
       pollSnapshot();
+    };
+
+    document.getElementById('btn-sound').oncontextmenu = (e) => {
+      e.preventDefault();
     };
 
     document.getElementById('btn-mode').onclick = async () => {
@@ -2333,6 +2927,9 @@
       const eh = parseInt(document.getElementById('inp-end-h').value) || 0;
       const em = parseInt(document.getElementById('inp-end-m').value) || 0;
 
+      const customIconVal = document.getElementById('inp-custom-icon').value.trim();
+      const finalIcon = customIconVal ? customIconVal : activeIcon;
+
       await invoke('save_block', {
         index: currentEditingIndex,
         title,
@@ -2343,6 +2940,8 @@
         colorR: activeColor.r,
         colorG: activeColor.g,
         colorB: activeColor.b,
+        icon: finalIcon === 'auto' ? null : finalIcon,
+        cardBg: activeCardBg,
         monday: true, tuesday: true, wednesday: true, thursday: true, friday: true, saturday: true, sunday: false
       });
 
@@ -2434,7 +3033,7 @@
       vignette: 85,
       weather: {
         enabled: true,
-        cityName: 'Santa Cruz, Bolivia',
+        cityName: 'SCZ',
         lat: -17.7833,
         lon: -63.1821,
         unit: 'c'
@@ -2445,35 +3044,38 @@
     };
 
     const WMO_WEATHER_MAP = {
-      0: { desc: 'Despejado', icon: '☀️' },
-      1: { desc: 'Mayormente despejado', icon: '🌤️' },
-      2: { desc: 'Parcialmente nublado', icon: '⛅' },
-      3: { desc: 'Nublado', icon: '☁️' },
-      45: { desc: 'Niebla', icon: '🌫️' },
-      48: { desc: 'Niebla con escarcha', icon: '🌫️' },
-      51: { desc: 'Llovizna ligera', icon: '🌦️' },
-      53: { desc: 'Llovizna moderada', icon: '🌧️' },
-      55: { desc: 'Llovizna densa', icon: '🌧️' },
-      61: { desc: 'Lluvia ligera', icon: '🌦️' },
-      63: { desc: 'Lluvia moderada', icon: '🌧️' },
-      65: { desc: 'Lluvia fuerte', icon: '🌧️' },
-      71: { desc: 'Nevada ligera', icon: '🌨️' },
-      73: { desc: 'Nevada moderada', icon: '🌨️' },
-      75: { desc: 'Nevada intensa', icon: '❄️' },
-      80: { desc: 'Chubascos leves', icon: '🌦️' },
-      81: { desc: 'Chubascos moderados', icon: '🌧️' },
-      82: { desc: 'Chubascos violentos', icon: '⛈️' },
-      95: { desc: 'Tormenta eléctrica', icon: '⛈️' },
-      96: { desc: 'Tormenta con granizo leve', icon: '⛈️' },
-      99: { desc: 'Tormenta con granizo fuerte', icon: '⛈️' }
+      0: { desc: 'Despejado', iconDay: '☀️', iconNight: '🌙' },
+      1: { desc: 'Mayormente despejado', iconDay: '🌤️', iconNight: '🌌' },
+      2: { desc: 'Parcialmente nublado', iconDay: '⛅', iconNight: '☁️' },
+      3: { desc: 'Nublado', iconDay: '☁️', iconNight: '☁️' },
+      45: { desc: 'Niebla', iconDay: '🌫️', iconNight: '🌫️' },
+      48: { desc: 'Niebla con escarcha', iconDay: '🌫️', iconNight: '🌫️' },
+      51: { desc: 'Llovizna ligera', iconDay: '🌦️', iconNight: '🌧️' },
+      53: { desc: 'Llovizna moderada', iconDay: '🌧️', iconNight: '🌧️' },
+      55: { desc: 'Llovizna densa', iconDay: '🌧️', iconNight: '🌧️' },
+      61: { desc: 'Lluvia ligera', iconDay: '🌦️', iconNight: '🌧️' },
+      63: { desc: 'Lluvia moderada', iconDay: '🌧️', iconNight: '🌧️' },
+      65: { desc: 'Lluvia fuerte', iconDay: '⛈️', iconNight: '⛈️' },
+      71: { desc: 'Nevada ligera', iconDay: '🌨️', iconNight: '🌨️' },
+      73: { desc: 'Nevada moderada', iconDay: '🌨️', iconNight: '🌨️' },
+      75: { desc: 'Nevada intensa', iconDay: '❄️', iconNight: '❄️' },
+      77: { desc: 'Granizo menudo', iconDay: '🌨️', iconNight: '🌨️' },
+      80: { desc: 'Chubascos leves', iconDay: '🌦️', iconNight: '🌧️' },
+      81: { desc: 'Chubascos moderados', iconDay: '🌧️', iconNight: '🌧️' },
+      82: { desc: 'Chubascos violentos', iconDay: '⛈️', iconNight: '⛈️' },
+      85: { desc: 'Chubascos de nieve', iconDay: '🌨️', iconNight: '🌨️' },
+      86: { desc: 'Chubascos de nieve fuertes', iconDay: '❄️', iconNight: '❄️' },
+      95: { desc: 'Tormenta eléctrica', iconDay: '⛈️', iconNight: '⛈️' },
+      96: { desc: 'Tormenta con granizo', iconDay: '⛈️', iconNight: '⛈️' },
+      99: { desc: 'Tormenta severa', iconDay: '⛈️', iconNight: '⛈️' }
     };
 
     function getWeatherInfo(code, isDay = 1) {
-      let item = WMO_WEATHER_MAP[code] || { desc: 'Variable', icon: '🌤️' };
-      if (!isDay && (code === 0 || code === 1)) {
-        return { desc: item.desc, icon: '🌙' };
-      }
-      return item;
+      const item = WMO_WEATHER_MAP[code] || { desc: 'Variable', iconDay: '🌤️', iconNight: '🌤️' };
+      return {
+        desc: item.desc,
+        icon: isDay ? item.iconDay : item.iconNight
+      };
     }
 
     let weatherCache = {
@@ -2525,7 +3127,7 @@
 
       const imgLogo = document.getElementById('img-logo');
       if (imgLogo && appSettings.logoSrc) {
-        if (!imgLogo.src.endsWith(appSettings.logoSrc)) {
+        if (!imgLogo.src || !imgLogo.src.endsWith(appSettings.logoSrc)) {
           imgLogo.src = appSettings.logoSrc;
         }
       }
@@ -2588,7 +3190,8 @@
 
     function updateActiveThemeCard(activeId) {
       document.querySelectorAll('.theme-card').forEach(card => {
-        if (card.dataset.themeId === activeId) {
+        const tid = (card.dataset && card.dataset.themeId) || card.getAttribute('data-theme-id');
+        if (tid === activeId) {
           card.classList.add('active');
         } else {
           card.classList.remove('active');
@@ -2620,8 +3223,10 @@
     }
 
     function updateActivePresetSwatch(color) {
+      if (!color) return;
       document.querySelectorAll('.preset-swatch').forEach(sw => {
-        if (sw.dataset.color.toLowerCase() === color.toLowerCase()) {
+        const swColor = (sw.dataset && sw.dataset.color) || sw.getAttribute('data-color') || '';
+        if (swColor && swColor.toLowerCase() === color.toLowerCase()) {
           sw.classList.add('active');
         } else {
           sw.classList.remove('active');
@@ -2696,7 +3301,8 @@
       modal.classList.add('active');
 
       renderThemeCards();
-      document.getElementById('chk-auto-bg').checked = appSettings.autoBg;
+      const chkAuto = document.getElementById('chk-auto-bg');
+      if (chkAuto) chkAuto.checked = appSettings.autoBg;
       document.getElementById('inp-bg-color').value = appSettings.bgColor;
       document.getElementById('inp-laser-color').value = appSettings.laserColor;
       document.getElementById('rng-vignette').value = appSettings.vignette;
@@ -2759,9 +3365,9 @@
 
     // Open-Meteo Weather
     async function fetchWeather(force = false) {
-      const pill = document.getElementById('weather-pill');
+      const strip = document.getElementById('weather-strip');
       if (!appSettings.weather.enabled) {
-        if (pill) pill.style.display = 'none';
+        if (strip) strip.style.display = 'none';
         return;
       }
 
@@ -2772,7 +3378,7 @@
       }
 
       const { lat, lon } = appSettings.weather;
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m&timezone=auto`;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m&hourly=precipitation_probability&timezone=auto`;
 
       try {
         const res = await fetch(url);
@@ -2785,24 +3391,26 @@
         console.warn('Error fetching weather:', err);
         if (weatherCache.data) {
           renderWeather(weatherCache.data);
-        } else if (pill) {
-          pill.style.display = 'inline-flex';
-          document.getElementById('weather-icon').textContent = '⚠️';
-          document.getElementById('weather-temp').textContent = '--';
+        } else if (strip) {
+          strip.style.display = 'flex';
+          const iconTemp = document.getElementById('w-icon-temp');
+          const valTemp = document.getElementById('w-val-temp');
+          if (iconTemp) iconTemp.textContent = '⚠️';
+          if (valTemp) valTemp.textContent = '--';
         }
       }
     }
 
     function renderWeather(data) {
-      const pill = document.getElementById('weather-pill');
-      if (!pill) return;
+      const strip = document.getElementById('weather-strip');
+      if (!strip) return;
 
       if (!appSettings.weather.enabled) {
-        pill.style.display = 'none';
+        strip.style.display = 'none';
         return;
       }
 
-      pill.style.display = 'inline-flex';
+      strip.style.display = 'flex';
       const cur = data.current;
       if (!cur) return;
 
@@ -2815,22 +3423,61 @@
         unitSymbol = '°F';
       }
 
-      const formattedTemp = Math.round(tempVal) + unitSymbol;
-      document.getElementById('weather-icon').textContent = info.icon;
-      document.getElementById('weather-temp').textContent = formattedTemp;
-      pill.title = `${appSettings.weather.cityName}: ${info.desc}, ${formattedTemp} (Clic para configurar)`;
+      // 1. Tarjeta Temperatura & Ciudad
+      const iconTempEl = document.getElementById('w-icon-temp');
+      const valTempEl = document.getElementById('w-val-temp');
+      const unitTempEl = document.getElementById('w-unit-temp');
+      const cityLabelEl = document.getElementById('w-city-label');
 
+      if (iconTempEl) iconTempEl.textContent = info.icon;
+      if (valTempEl) valTempEl.textContent = Math.round(tempVal);
+      if (unitTempEl) unitTempEl.textContent = unitSymbol;
+      if (cityLabelEl) {
+        const rawName = appSettings.weather.cityName || 'SCZ';
+        cityLabelEl.textContent = rawName.includes('Santa Cruz') || rawName === 'SCZ' ? 'SCZ' : rawName.slice(0, 5).toUpperCase();
+      }
+
+      // 2. Tarjeta Viento
+      const valWindEl = document.getElementById('w-val-wind');
+      if (valWindEl) {
+        valWindEl.textContent = Math.round(cur.wind_speed_10m || 0);
+      }
+
+      // 3. Tarjeta Lluvia (Probabilidad horaria o estimación)
+      let rainProb = 0;
+      if (data.hourly && data.hourly.precipitation_probability && data.hourly.time) {
+        const curIsoHour = new Date().toISOString().slice(0, 13);
+        const matchIdx = data.hourly.time.findIndex(t => t.startsWith(curIsoHour));
+        if (matchIdx !== -1 && data.hourly.precipitation_probability[matchIdx] !== undefined) {
+          rainProb = data.hourly.precipitation_probability[matchIdx];
+        } else if (data.hourly.precipitation_probability.length > 0) {
+          rainProb = data.hourly.precipitation_probability[0];
+        }
+      } else if (cur.precipitation !== undefined) {
+        rainProb = cur.precipitation > 0 ? Math.min(100, Math.round(cur.precipitation * 35)) : 0;
+      }
+
+      const valRainEl = document.getElementById('w-val-rain');
+      const iconRainEl = document.getElementById('w-icon-rain');
+      if (valRainEl) valRainEl.textContent = Math.round(rainProb);
+      if (iconRainEl) {
+        iconRainEl.textContent = rainProb >= 40 ? '🌧️' : (rainProb >= 15 ? '🌦️' : '💧');
+      }
+
+      strip.title = `${appSettings.weather.cityName}: ${info.desc}, ${Math.round(tempVal)}${unitSymbol}, Viento: ${Math.round(cur.wind_speed_10m || 0)} km/h, Prob. lluvia: ${Math.round(rainProb)}% (Clic para configurar)`;
+
+      // Preview en la pestaña de Ajustes
       const prevTemp = document.getElementById('preview-weather-temp');
       if (prevTemp) {
-        prevTemp.textContent = `${info.icon} ${formattedTemp}`;
+        prevTemp.textContent = `${info.icon} ${Math.round(tempVal)}${unitSymbol}`;
         document.getElementById('preview-weather-desc').textContent = `${info.desc} en ${appSettings.weather.cityName}`;
 
         let appTemp = cur.apparent_temperature;
         if (appSettings.weather.unit === 'f') appTemp = (appTemp * 9/5) + 32;
         document.getElementById('preview-weather-apparent').textContent = `${Math.round(appTemp)}${unitSymbol}`;
         document.getElementById('preview-weather-humidity').textContent = `${cur.relative_humidity_2m}%`;
-        document.getElementById('preview-weather-wind').textContent = `${cur.wind_speed_10m} km/h`;
-        document.getElementById('preview-weather-precip').textContent = `${cur.precipitation} mm`;
+        document.getElementById('preview-weather-wind').textContent = `${Math.round(cur.wind_speed_10m || 0)} km/h`;
+        document.getElementById('preview-weather-precip').textContent = `${rainProb}% prob. (${cur.precipitation || 0} mm)`;
       }
     }
 
@@ -2848,76 +3495,30 @@
       btn.onclick = () => switchTab(btn.dataset.tab);
     });
 
-    document.getElementById('logo-hub').onclick = () => {
-      openSettingsModal('tab-logo');
-    };
-
-    const editBadge = document.getElementById('btn-edit-logo');
-    if (editBadge) {
-      editBadge.onclick = (e) => {
-        e.stopPropagation();
-        openSettingsModal('tab-logo');
-      };
-    }
-
-    const weatherPill = document.getElementById('weather-pill');
-    if (weatherPill) {
-      weatherPill.onclick = () => {
+    const weatherStrip = document.getElementById('weather-strip');
+    if (weatherStrip) {
+      weatherStrip.onclick = () => {
         openSettingsModal('tab-weather');
       };
     }
 
-    document.getElementById('btn-browse-logo').onclick = () => {
-      document.getElementById('inp-logo-file').click();
-    };
-
-    document.getElementById('inp-logo-file').onchange = (e) => {
-      const file = e.target.files && e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          appSettings.logoSrc = event.target.result;
-          applySettingsToDOM(appSettings.autoBg);
-          saveSettings();
-        };
-        reader.readAsDataURL(file);
-      }
-    };
-
-    document.getElementById('btn-apply-url').onclick = () => {
-      const url = document.getElementById('inp-logo-url').value.trim();
-      if (url) {
-        appSettings.logoSrc = url;
-        applySettingsToDOM(appSettings.autoBg);
+    const chkAutoBg = document.getElementById('chk-auto-bg');
+    if (chkAutoBg) {
+      chkAutoBg.onchange = (e) => {
+        appSettings.autoBg = e.target.checked;
+        if (appSettings.autoBg) {
+          detectAndApplyBgColor();
+        }
         saveSettings();
-      }
-    };
-
-    document.getElementById('btn-reset-logo').onclick = () => {
-      appSettings.logoSrc = DEFAULT_LOGO_SRC;
-      appSettings.bgColor = '#000000';
-      appSettings.themeId = 'midnight';
-      appSettings.autoBg = true;
-      appSettings.vignette = 85;
-      document.getElementById('chk-auto-bg').checked = true;
-      document.getElementById('inp-logo-url').value = '';
-      applySettingsToDOM(false);
-      saveSettings();
-    };
-
-    document.getElementById('chk-auto-bg').onchange = (e) => {
-      appSettings.autoBg = e.target.checked;
-      if (appSettings.autoBg) {
-        detectAndApplyBgColor();
-      }
-      saveSettings();
-    };
+      };
+    }
 
     document.getElementById('inp-bg-color').oninput = (e) => {
       appSettings.bgColor = e.target.value;
       appSettings.autoBg = false;
       appSettings.themeId = 'custom';
-      document.getElementById('chk-auto-bg').checked = false;
+      const chk = document.getElementById('chk-auto-bg');
+      if (chk) chk.checked = false;
       applySettingsToDOM(false);
       saveSettings();
     };
@@ -2936,7 +3537,8 @@
         appSettings.bgColor = color;
         appSettings.autoBg = false;
         appSettings.themeId = 'custom';
-        document.getElementById('chk-auto-bg').checked = false;
+        const chk = document.getElementById('chk-auto-bg');
+        if (chk) chk.checked = false;
         document.getElementById('inp-bg-color').value = color;
         applySettingsToDOM(false);
         saveSettings();

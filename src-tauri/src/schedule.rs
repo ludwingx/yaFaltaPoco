@@ -24,6 +24,7 @@ impl ColorRgb {
     }
 }
 
+#[allow(dead_code)]
 pub const DEFAULT_COLORS: [(&str, ColorRgb); 8] = [
     ("Azul Océano", ColorRgb::new(37, 99, 235)),
     ("Cian Eléctrico", ColorRgb::new(34, 211, 238)),
@@ -99,6 +100,10 @@ pub struct TimeBlock {
     pub end_hour: u32,
     pub end_min: u32,
     pub color: ColorRgb,
+    #[serde(default)]
+    pub icon: Option<String>,
+    #[serde(default)]
+    pub card_bg: Option<String>,
     pub days: WeekdayFilter,
     pub notify_on_start: bool,
     pub notify_on_end: bool,
@@ -123,6 +128,8 @@ impl TimeBlock {
             end_hour,
             end_min,
             color,
+            icon: None,
+            card_bg: None,
             days: WeekdayFilter::monday_to_saturday(),
             notify_on_start: true,
             notify_on_end: true,

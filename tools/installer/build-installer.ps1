@@ -49,6 +49,10 @@ if (-not $dllSource) {
     throw "No se encontró WebView2Loader.dll en las carpetas de compilación ni en dist."
 }
 
+# Detener instancias en ejecucion para permitir sobreescritura limpia
+Get-Process yafaltapoco -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+Start-Sleep -Milliseconds 400
+
 # Sincronizar versión portable en dist/portable/
 Copy-Item $exeSource -Destination "$portableDir\yafaltapoco.exe" -Force
 Copy-Item $dllSource -Destination "$portableDir\WebView2Loader.dll" -Force

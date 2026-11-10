@@ -137,7 +137,7 @@ $leemeContent = @"
 
 1. Instalador Oficial (Recomendado):
    Ejecuta "setup.exe". 
-   - Diseñado con asistente visual en modo oscuro y logo animado.
+   - Asistente visual moderno en modo oscuro nativo.
    - Crea automáticamente el acceso directo en el Escritorio y en el Menú Inicio.
    - Integra desinstalador limpio en el Panel de Configuración de Windows.
 
@@ -149,7 +149,7 @@ $leemeContent = @"
 ¡Que disfrutes tu jornada! 🚀
 ============================================================
 "@
-Set-Content -Path "$distDir\LEEME.txt" -Value $leemeContent -Encoding UTF8
+[System.IO.File]::WriteAllText("$distDir\LEEME.txt", $leemeContent, [System.Text.Encoding]::UTF8)
 
 $setupSize = [math]::Round((Get-Item $outputSetup).Length / 1MB, 2)
 Write-Host "[3/3] ¡Instalador generado con éxito!" -ForegroundColor Green

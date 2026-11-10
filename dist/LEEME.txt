@@ -6,7 +6,7 @@
 
 1. Instalador Oficial (Recomendado):
    Ejecuta "setup.exe". 
-   - DiseÃ±ado con asistente visual en modo oscuro y logo animado.
+   - Asistente visual moderno en modo oscuro nativo.
    - Crea automÃ¡ticamente el acceso directo en el Escritorio y en el MenÃº Inicio.
    - Integra desinstalador limpio en el Panel de ConfiguraciÃ³n de Windows.
 

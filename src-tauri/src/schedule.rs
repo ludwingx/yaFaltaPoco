@@ -213,11 +213,7 @@ pub enum ScheduleStatus<'a> {
 }
 
 pub fn default_sample_blocks() -> Vec<TimeBlock> {
-    vec![
-        TimeBlock::new("block-1", "OtherBrain I", 8, 0, 12, 0, ColorRgb::new(10, 132, 255)), // Azul eléctrico
-        TimeBlock::new("block-2", "Almuerzo", 12, 0, 13, 0, ColorRgb::new(255, 159, 10)),   // Ámbar / naranja
-        TimeBlock::new("block-3", "OtherBrain II", 13, 0, 20, 0, ColorRgb::new(191, 90, 242)), // Púrpura
-    ]
+    Vec::new()
 }
 
 pub fn evaluate_schedule<'a>(blocks: &'a [TimeBlock], now: NaiveDateTime) -> ScheduleStatus<'a> {

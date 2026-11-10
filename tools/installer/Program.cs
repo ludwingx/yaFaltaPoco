@@ -4,6 +4,7 @@ using System.Drawing.Drawing2D;
 using System.IO;
 using System.IO.Compression;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 using Microsoft.Win32;
@@ -28,6 +29,255 @@ namespace YaFaltaPoco.Installer
         }
     }
 
+    // Dibujado de rectángulos con bordes redondeados
+    internal static class GraphicsExtensions
+    {
+        public static GraphicsPath GetRoundedPath(Rectangle rect, int radius)
+        {
+            GraphicsPath path = new GraphicsPath();
+            if (radius <= 0)
+            {
+                path.AddRectangle(rect);
+                return path;
+            }
+
+            int d = radius * 2;
+            Rectangle arc = new Rectangle(rect.X, rect.Y, d, d);
+
+            path.AddArc(arc, 180, 90);
+            arc.X = rect.Right - d;
+            path.AddArc(arc, 270, 90);
+            arc.Y = rect.Bottom - d;
+            path.AddArc(arc, 0, 90);
+            arc.X = rect.Left;
+            path.AddArc(arc, 90, 90);
+            path.CloseFigure();
+            return path;
+        }
+
+        public static void FillRoundedRectangle(this Graphics g, Brush brush, Rectangle rect, int radius)
+        {
+            using (GraphicsPath path = GetRoundedPath(rect, radius))
+            {
+                g.FillPath(brush, path);
+            }
+        }
+
+        public static void DrawRoundedRectangle(this Graphics g, Pen pen, Rectangle rect, int radius)
+        {
+            using (GraphicsPath path = GetRoundedPath(rect, radius))
+            {
+                g.DrawPath(pen, path);
+            }
+        }
+    }
+
+    // Botón moderno personalizado con hover y colores dark
+    public class ModernButton : Button
+    {
+        public bool IsPrimary { get; set; }
+        public bool IsSuccess { get; set; }
+        private bool isHovered = false;
+        private bool isPressed = false;
+
+        public ModernButton()
+        {
+            SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
+            Cursor = Cursors.Hand;
+            Font = new Font("Segoe UI", 9.5f, FontStyle.Bold);
+            Height = 36;
+            Width = 120;
+        }
+
+        protected override void OnMouseEnter(EventArgs e)
+        {
+            base.OnMouseEnter(e);
+            isHovered = true;
+            Invalidate();
+        }
+
+        protected override void OnMouseLeave(EventArgs e)
+        {
+            base.OnMouseLeave(e);
+            isHovered = false;
+            isPressed = false;
+            Invalidate();
+        }
+
+        protected override void OnMouseDown(MouseEventArgs mevent)
+        {
+            base.OnMouseDown(mevent);
+            if (mevent.Button == MouseButtons.Left)
+            {
+                isPressed = true;
+                Invalidate();
+            }
+        }
+
+        protected override void OnMouseUp(MouseEventArgs mevent)
+        {
+            base.OnMouseUp(mevent);
+            isPressed = false;
+            Invalidate();
+        }
+
+        protected override void OnPaint(PaintEventArgs pevent)
+        {
+            Graphics g = pevent.Graphics;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+
+            Rectangle rect = new Rectangle(0, 0, Width - 1, Height - 1);
+
+            if (!Enabled)
+            {
+                using (SolidBrush b = new SolidBrush(Color.FromArgb(24, 24, 30)))
+                    g.FillRoundedRectangle(b, rect, 6);
+                using (Pen p = new Pen(Color.FromArgb(38, 38, 46)))
+                    g.DrawRoundedRectangle(p, rect, 6);
+                TextRenderer.DrawText(g, Text, Font, rect, Color.FromArgb(90, 90, 100), TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+                return;
+            }
+
+            if (IsSuccess)
+            {
+                Color bg = isPressed ? Color.FromArgb(36, 175, 72) : (isHovered ? Color.FromArgb(52, 219, 98) : Color.FromArgb(48, 209, 88));
+                using (SolidBrush b = new SolidBrush(bg))
+                    g.FillRoundedRectangle(b, rect, 6);
+                TextRenderer.DrawText(g, Text, Font, rect, Color.White, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+                return;
+            }
+
+            if (IsPrimary)
+            {
+                Color c1 = isPressed ? Color.FromArgb(0, 102, 204) : (isHovered ? Color.FromArgb(24, 144, 255) : Color.FromArgb(10, 132, 255));
+                Color c2 = isPressed ? Color.FromArgb(0, 85, 179) : (isHovered ? Color.FromArgb(0, 120, 235) : Color.FromArgb(0, 113, 227));
+                using (LinearGradientBrush lgb = new LinearGradientBrush(rect, c1, c2, LinearGradientMode.Vertical))
+                {
+                    g.FillRoundedRectangle(lgb, rect, 6);
+                }
+                using (Pen p = new Pen(Color.FromArgb(56, 189, 248), 1))
+                {
+                    if (isHovered)
+                        g.DrawRoundedRectangle(p, rect, 6);
+                }
+                TextRenderer.DrawText(g, Text, Font, rect, Color.White, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+            }
+            else
+            {
+                Color bg = isPressed ? Color.FromArgb(22, 22, 28) : (isHovered ? Color.FromArgb(36, 36, 46) : Color.FromArgb(26, 26, 34));
+                Color border = isHovered ? Color.FromArgb(70, 70, 85) : Color.FromArgb(45, 45, 56);
+                using (SolidBrush b = new SolidBrush(bg))
+                    g.FillRoundedRectangle(b, rect, 6);
+                using (Pen p = new Pen(border))
+                    g.DrawRoundedRectangle(p, rect, 6);
+                Color textCol = isHovered ? Color.White : Color.FromArgb(180, 180, 190);
+                TextRenderer.DrawText(g, Text, Font, rect, textCol, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+            }
+        }
+    }
+
+    // Checkbox dark moderno personalizado
+    public class ModernCheckBox : Control
+    {
+        private bool _checked = true;
+        public bool Checked
+        {
+            get { return _checked; }
+            set
+            {
+                if (_checked != value)
+                {
+                    _checked = value;
+                    Invalidate();
+                    if (CheckedChanged != null)
+                    {
+                        CheckedChanged(this, EventArgs.Empty);
+                    }
+                }
+            }
+        }
+
+        public event EventHandler CheckedChanged;
+        private bool isHovered = false;
+
+        public ModernCheckBox()
+        {
+            SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
+            Cursor = Cursors.Hand;
+            Font = new Font("Segoe UI", 9.25f);
+            ForeColor = Color.FromArgb(220, 220, 225);
+            Height = 26;
+            Width = 320;
+        }
+
+        protected override void OnMouseEnter(EventArgs e)
+        {
+            base.OnMouseEnter(e);
+            isHovered = true;
+            Invalidate();
+        }
+
+        protected override void OnMouseLeave(EventArgs e)
+        {
+            base.OnMouseLeave(e);
+            isHovered = false;
+            Invalidate();
+        }
+
+        protected override void OnClick(EventArgs e)
+        {
+            Checked = !Checked;
+            base.OnClick(e);
+        }
+
+        protected override void OnPaint(PaintEventArgs pevent)
+        {
+            Graphics g = pevent.Graphics;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+
+            // Caja del checkbox
+            int boxSize = 17;
+            int boxY = (Height - boxSize) / 2;
+            Rectangle boxRect = new Rectangle(1, boxY, boxSize, boxSize);
+
+            if (_checked)
+            {
+                using (SolidBrush fill = new SolidBrush(Color.FromArgb(10, 132, 255)))
+                {
+                    g.FillRoundedRectangle(fill, boxRect, 4);
+                }
+                using (Pen checkPen = new Pen(Color.White, 2.2f))
+                {
+                    checkPen.StartCap = LineCap.Round;
+                    checkPen.EndCap = LineCap.Round;
+                    g.DrawLines(checkPen, new Point[] {
+                        new Point(boxRect.Left + 4, boxRect.Top + 9),
+                        new Point(boxRect.Left + 7, boxRect.Top + 12),
+                        new Point(boxRect.Left + 13, boxRect.Top + 5)
+                    });
+                }
+            }
+            else
+            {
+                using (SolidBrush bg = new SolidBrush(Color.FromArgb(24, 24, 30)))
+                {
+                    g.FillRoundedRectangle(bg, boxRect, 4);
+                }
+                Color borderColor = isHovered ? Color.FromArgb(90, 90, 110) : Color.FromArgb(50, 50, 62);
+                using (Pen border = new Pen(borderColor, 1.2f))
+                {
+                    g.DrawRoundedRectangle(border, boxRect, 4);
+                }
+            }
+
+            // Texto
+            Rectangle textRect = new Rectangle(boxSize + 10, 0, Width - (boxSize + 10), Height);
+            Color textCol = isHovered ? Color.White : ForeColor;
+            TextRenderer.DrawText(g, Text, Font, textRect, textCol, TextFormatFlags.Left | TextFormatFlags.VerticalCenter);
+        }
+    }
+
+    // Barra de progreso con gradiente y bordes redondeados
     public class ModernProgressBar : Control
     {
         private int _value = 0;
@@ -44,7 +294,7 @@ namespace YaFaltaPoco.Installer
         public ModernProgressBar()
         {
             SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
-            Height = 10;
+            Height = 8;
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -52,31 +302,32 @@ namespace YaFaltaPoco.Installer
             Graphics g = e.Graphics;
             g.SmoothingMode = SmoothingMode.AntiAlias;
 
+            Rectangle rect = new Rectangle(0, 0, Width - 1, Height - 1);
+
             // Fondo del riel
-            using (SolidBrush bgBrush = new SolidBrush(Color.FromArgb(28, 28, 34)))
+            using (SolidBrush bgBrush = new SolidBrush(Color.FromArgb(24, 24, 30)))
             {
-                g.FillRectangle(bgBrush, 0, 0, Width, Height);
+                g.FillRoundedRectangle(bgBrush, rect, 4);
+            }
+            using (Pen borderPen = new Pen(Color.FromArgb(38, 38, 48)))
+            {
+                g.DrawRoundedRectangle(borderPen, rect, 4);
             }
 
-            // Borde sutil
-            using (Pen borderPen = new Pen(Color.FromArgb(42, 42, 50)))
-            {
-                g.DrawRectangle(borderPen, 0, 0, Width - 1, Height - 1);
-            }
-
-            // Barra de progreso (Azul eléctrico vibrante)
+            // Progreso
             if (_value > 0)
             {
                 int fillWidth = (int)((Width - 2) * (_value / 100.0));
-                if (fillWidth > 0)
+                if (fillWidth > 4)
                 {
+                    Rectangle fillRect = new Rectangle(1, 1, fillWidth, Height - 2);
                     using (LinearGradientBrush fillBrush = new LinearGradientBrush(
-                        new Rectangle(1, 1, fillWidth, Height - 2),
+                        fillRect,
                         Color.FromArgb(10, 132, 255),
-                        Color.FromArgb(56, 189, 248),
+                        Color.FromArgb(34, 211, 238),
                         LinearGradientMode.Horizontal))
                     {
-                        g.FillRectangle(fillBrush, 1, 1, fillWidth, Height - 2);
+                        g.FillRoundedRectangle(fillBrush, fillRect, 3);
                     }
                 }
             }
@@ -85,279 +336,281 @@ namespace YaFaltaPoco.Installer
 
     public class InstallerForm : Form
     {
-        private PictureBox picLogo;
-        private Label lblTitle;
+        [DllImport("dwmapi.dll", PreserveSig = true)]
+        private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
+
+        private Label lblAppTitle;
+        private Label lblVersionBadge;
         private Label lblSubtitle;
-        private Label[] lblStepIcons;
-        private Label[] lblStepTexts;
         private ModernProgressBar progressBar;
         private Label lblStatus;
         private Label lblPercent;
-        private CheckBox chkDesktop;
-        private CheckBox chkLaunch;
-        private Label lblDestPath;
-        private Button btnCancel;
-        private Button btnInstall;
+        private ModernCheckBox chkDesktop;
+        private ModernCheckBox chkLaunch;
+        private Label lblDestDir;
+        private ModernButton btnCancel;
+        private ModernButton btnInstall;
 
         private bool isFinished = false;
         private string installDir;
         private string exePath;
-
-        private readonly string[] stepTitles = new string[]
-        {
-            "Preparar directorio de instalación",
-            "Desempaquetar componentes de YaFaltaPoco",
-            "Instalar binario y WebView2 Loader",
-            "Crear acceso directo en el Escritorio",
-            "Registrar en el Menú Inicio de Windows"
-        };
+        private Icon appIcon;
 
         public InstallerForm()
         {
             InitializeComponent();
+            ApplyNativeDarkTheme();
             LoadEmbeddedAssets();
+        }
+
+        private void ApplyNativeDarkTheme()
+        {
+            try
+            {
+                // DWMWA_USE_IMMERSIVE_DARK_MODE = 20 (Windows 11 / 10 20H1+), 19 (Windows 10 anteriores)
+                int darkMode = 1;
+                DwmSetWindowAttribute(Handle, 20, ref darkMode, sizeof(int));
+                DwmSetWindowAttribute(Handle, 19, ref darkMode, sizeof(int));
+
+                // DWMWA_WINDOW_CORNER_PREFERENCE = 33 (Windows 11 esquinas redondeadas)
+                int cornerRound = 2; // DWMWCP_ROUND
+                DwmSetWindowAttribute(Handle, 33, ref cornerRound, sizeof(int));
+            }
+            catch { }
         }
 
         private void InitializeComponent()
         {
-            Text = "Ya Falta Poco — Instalador";
-            ClientSize = new Size(680, 440);
+            Text = "Instalador de YaFaltaPoco";
+            ClientSize = new Size(580, 420);
             StartPosition = FormStartPosition.CenterScreen;
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
-            BackColor = Color.FromArgb(14, 14, 17);
+            BackColor = Color.FromArgb(14, 14, 18);
             ForeColor = Color.White;
             Font = new Font("Segoe UI", 9.5f, FontStyle.Regular);
 
             installDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "YaFaltaPoco");
             exePath = Path.Combine(installDir, "yafaltapoco.exe");
 
-            // Panel Izquierdo (GIF animado de marca sobre fondo negro puro)
-            Panel pnlLeft = new Panel
+            // Header Hero (Icono + Título + Versión + Subtítulo)
+            Panel pnlHeader = new Panel
             {
-                Dock = DockStyle.Left,
-                Width = 220,
-                BackColor = Color.FromArgb(8, 8, 10)
+                Location = new Point(0, 0),
+                Size = new Size(580, 96),
+                BackColor = Color.FromArgb(17, 17, 23)
             };
-            pnlLeft.Paint += (s, e) =>
+            pnlHeader.Paint += (s, e) =>
             {
-                using (Pen borderPen = new Pen(Color.FromArgb(28, 28, 34)))
+                using (Pen p = new Pen(Color.FromArgb(32, 32, 42)))
                 {
-                    e.Graphics.DrawLine(borderPen, pnlLeft.Width - 1, 0, pnlLeft.Width - 1, pnlLeft.Height);
+                    e.Graphics.DrawLine(p, 0, pnlHeader.Height - 1, pnlHeader.Width, pnlHeader.Height - 1);
+                }
+
+                // Insignia con el Icono de la App
+                Rectangle badgeRect = new Rectangle(28, 20, 56, 56);
+                using (SolidBrush b = new SolidBrush(Color.FromArgb(25, 25, 34)))
+                    e.Graphics.FillRoundedRectangle(b, badgeRect, 10);
+                using (Pen pen = new Pen(Color.FromArgb(45, 45, 60), 1.2f))
+                    e.Graphics.DrawRoundedRectangle(pen, badgeRect, 10);
+
+                if (appIcon != null)
+                {
+                    e.Graphics.DrawIcon(appIcon, new Rectangle(badgeRect.X + 12, badgeRect.Y + 12, 32, 32));
                 }
             };
+            Controls.Add(pnlHeader);
 
-            picLogo = new PictureBox
-            {
-                Location = new Point(15, 60),
-                Size = new Size(190, 190),
-                SizeMode = PictureBoxSizeMode.Zoom,
-                BackColor = Color.Transparent
-            };
-            pnlLeft.Controls.Add(picLogo);
-
-            Label lblBrandName = new Label
+            lblAppTitle = new Label
             {
                 Text = "Ya Falta Poco",
-                Location = new Point(10, 260),
-                Size = new Size(200, 26),
-                TextAlign = ContentAlignment.MiddleCenter,
-                Font = new Font("Segoe UI", 12f, FontStyle.Bold),
-                ForeColor = Color.White
-            };
-            pnlLeft.Controls.Add(lblBrandName);
-
-            Label lblBrandTag = new Label
-            {
-                Text = "v1.0.0 • Agenda & Temporizador",
-                Location = new Point(10, 288),
-                Size = new Size(200, 20),
-                TextAlign = ContentAlignment.MiddleCenter,
-                Font = new Font("Segoe UI", 8.5f),
-                ForeColor = Color.FromArgb(120, 120, 130)
-            };
-            pnlLeft.Controls.Add(lblBrandTag);
-
-            Controls.Add(pnlLeft);
-
-            // Panel Derecho (Contenido del Instalador)
-            Panel pnlRight = new Panel
-            {
-                Dock = DockStyle.Fill,
-                BackColor = Color.FromArgb(14, 14, 17),
-                Padding = new Padding(26, 20, 26, 20)
-            };
-            Controls.Add(pnlRight);
-
-            lblTitle = new Label
-            {
-                Text = "Instalación de YaFaltaPoco",
-                Location = new Point(24, 18),
+                Location = new Point(98, 22),
                 AutoSize = true,
-                Font = new Font("Segoe UI", 15f, FontStyle.Bold),
+                Font = new Font("Segoe UI", 16f, FontStyle.Bold),
                 ForeColor = Color.White
             };
-            pnlRight.Controls.Add(lblTitle);
+            pnlHeader.Controls.Add(lblAppTitle);
+
+            lblVersionBadge = new Label
+            {
+                Text = "v1.0.0",
+                Location = new Point(255, 29),
+                Size = new Size(54, 20),
+                TextAlign = ContentAlignment.MiddleCenter,
+                Font = new Font("Segoe UI", 8.25f, FontStyle.Bold),
+                ForeColor = Color.FromArgb(34, 211, 238),
+                BackColor = Color.FromArgb(20, 36, 46)
+            };
+            lblVersionBadge.Paint += (s, e) =>
+            {
+                using (Pen p = new Pen(Color.FromArgb(34, 211, 238, 100)))
+                    e.Graphics.DrawRoundedRectangle(p, new Rectangle(0, 0, lblVersionBadge.Width - 1, lblVersionBadge.Height - 1), 3);
+            };
+            pnlHeader.Controls.Add(lblVersionBadge);
 
             lblSubtitle = new Label
             {
-                Text = "Configura el entorno de escritorio en tu equipo.",
-                Location = new Point(25, 48),
+                Text = "Compañero visual de productividad y cuenta regresiva para escritorio.",
+                Location = new Point(100, 54),
                 AutoSize = true,
                 Font = new Font("Segoe UI", 9f),
-                ForeColor = Color.FromArgb(142, 142, 147)
+                ForeColor = Color.FromArgb(150, 150, 160)
             };
-            pnlRight.Controls.Add(lblSubtitle);
+            pnlHeader.Controls.Add(lblSubtitle);
 
-            // Pasos de instalación
-            int startY = 80;
-            lblStepIcons = new Label[stepTitles.Length];
-            lblStepTexts = new Label[stepTitles.Length];
-
-            for (int i = 0; i < stepTitles.Length; i++)
+            // Tarjeta de Opciones y Directorio (Centro)
+            Panel pnlCard = new Panel
             {
-                lblStepIcons[i] = new Label
-                {
-                    Text = "○",
-                    Location = new Point(26, startY + (i * 24)),
-                    Size = new Size(20, 20),
-                    Font = new Font("Segoe UI", 9.5f, FontStyle.Bold),
-                    ForeColor = Color.FromArgb(70, 70, 80),
-                    TextAlign = ContentAlignment.MiddleCenter
-                };
-                pnlRight.Controls.Add(lblStepIcons[i]);
+                Location = new Point(28, 114),
+                Size = new Size(524, 156),
+                BackColor = Color.FromArgb(20, 20, 26)
+            };
+            pnlCard.Paint += (s, e) =>
+            {
+                e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                Rectangle r = new Rectangle(0, 0, pnlCard.Width - 1, pnlCard.Height - 1);
+                using (Pen p = new Pen(Color.FromArgb(36, 36, 48)))
+                    e.Graphics.DrawRoundedRectangle(p, r, 8);
+            };
+            Controls.Add(pnlCard);
 
-                lblStepTexts[i] = new Label
-                {
-                    Text = stepTitles[i],
-                    Location = new Point(48, startY + (i * 24) + 1),
-                    AutoSize = true,
-                    Font = new Font("Segoe UI", 9.2f),
-                    ForeColor = Color.FromArgb(120, 120, 130)
-                };
-                pnlRight.Controls.Add(lblStepTexts[i]);
-            }
+            Label lblDestTag = new Label
+            {
+                Text = "DIRECTORIO DE INSTALACIÓN",
+                Location = new Point(18, 16),
+                AutoSize = true,
+                Font = new Font("Segoe UI", 7.5f, FontStyle.Bold),
+                ForeColor = Color.FromArgb(100, 100, 115)
+            };
+            pnlCard.Controls.Add(lblDestTag);
 
-            // Barra de progreso moderna
+            lblDestDir = new Label
+            {
+                Text = installDir,
+                Location = new Point(18, 36),
+                Size = new Size(488, 26),
+                Font = new Font("Segoe UI", 8.5f),
+                ForeColor = Color.FromArgb(200, 200, 210),
+                BackColor = Color.FromArgb(15, 15, 20),
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(8, 0, 8, 0),
+                AutoEllipsis = true
+            };
+            lblDestDir.Paint += (s, e) =>
+            {
+                using (Pen p = new Pen(Color.FromArgb(32, 32, 42)))
+                    e.Graphics.DrawRoundedRectangle(p, new Rectangle(0, 0, lblDestDir.Width - 1, lblDestDir.Height - 1), 4);
+            };
+            pnlCard.Controls.Add(lblDestDir);
+
+            chkDesktop = new ModernCheckBox
+            {
+                Text = "Crear acceso directo en el Escritorio",
+                Checked = true,
+                Location = new Point(18, 80),
+                Size = new Size(350, 24)
+            };
+            pnlCard.Controls.Add(chkDesktop);
+
+            chkLaunch = new ModernCheckBox
+            {
+                Text = "Iniciar YaFaltaPoco al terminar la instalación",
+                Checked = true,
+                Location = new Point(18, 114),
+                Size = new Size(350, 24)
+            };
+            pnlCard.Controls.Add(chkLaunch);
+
+            // Barra de progreso y estado
             progressBar = new ModernProgressBar
             {
-                Location = new Point(26, 215),
-                Size = new Size(405, 8),
+                Location = new Point(28, 292),
+                Size = new Size(524, 8),
                 Value = 0
             };
-            pnlRight.Controls.Add(progressBar);
+            Controls.Add(progressBar);
 
             lblStatus = new Label
             {
-                Text = "Listo para instalar.",
-                Location = new Point(25, 230),
-                Size = new Size(330, 20),
+                Text = "Listo para instalar en este equipo.",
+                Location = new Point(28, 308),
+                Size = new Size(440, 20),
                 Font = new Font("Segoe UI", 8.5f),
-                ForeColor = Color.FromArgb(142, 142, 147)
+                ForeColor = Color.FromArgb(150, 150, 162)
             };
-            pnlRight.Controls.Add(lblStatus);
+            Controls.Add(lblStatus);
 
             lblPercent = new Label
             {
                 Text = "0%",
-                Location = new Point(370, 230),
-                Size = new Size(60, 20),
-                Font = new Font("JetBrains Mono", 8.5f, FontStyle.Bold),
-                ForeColor = Color.FromArgb(142, 142, 147),
+                Location = new Point(480, 308),
+                Size = new Size(72, 20),
+                Font = new Font("Segoe UI", 8.5f, FontStyle.Bold),
+                ForeColor = Color.FromArgb(150, 150, 162),
                 TextAlign = ContentAlignment.TopRight
             };
-            pnlRight.Controls.Add(lblPercent);
+            Controls.Add(lblPercent);
 
-            // Opciones de instalación (Checkboxes oscuros)
-            chkDesktop = new CheckBox
+            // Barra Inferior de Acciones
+            Panel pnlFooter = new Panel
             {
-                Text = "Crear acceso directo en el Escritorio",
-                Checked = true,
-                Location = new Point(28, 260),
-                AutoSize = true,
-                Font = new Font("Segoe UI", 9f),
-                ForeColor = Color.FromArgb(210, 210, 215)
+                Location = new Point(0, 344),
+                Size = new Size(580, 76),
+                BackColor = Color.FromArgb(17, 17, 23)
             };
-            pnlRight.Controls.Add(chkDesktop);
-
-            chkLaunch = new CheckBox
+            pnlFooter.Paint += (s, e) =>
             {
-                Text = "Iniciar YaFaltaPoco al terminar",
-                Checked = true,
-                Location = new Point(28, 286),
-                AutoSize = true,
-                Font = new Font("Segoe UI", 9f),
-                ForeColor = Color.FromArgb(210, 210, 215)
+                using (Pen p = new Pen(Color.FromArgb(32, 32, 42)))
+                    e.Graphics.DrawLine(p, 0, 0, pnlFooter.Width, 0);
             };
-            pnlRight.Controls.Add(chkLaunch);
+            Controls.Add(pnlFooter);
 
-            // Ruta de instalación destino
-            lblDestPath = new Label
+            Label lblInfoNote = new Label
             {
-                Text = "Destino: " + installDir,
-                Location = new Point(26, 335),
-                Size = new Size(405, 18),
-                Font = new Font("Segoe UI", 8f),
-                ForeColor = Color.FromArgb(90, 90, 100),
-                AutoEllipsis = true
+                Text = "Instalación local y segura • No requiere permisos de administrador.",
+                Location = new Point(28, 24),
+                Size = new Size(270, 32),
+                Font = new Font("Segoe UI", 7.5f),
+                ForeColor = Color.FromArgb(90, 90, 105)
             };
-            pnlRight.Controls.Add(lblDestPath);
+            pnlFooter.Controls.Add(lblInfoNote);
 
-            // Botones de acción inferiores
-            btnCancel = new Button
+            btnCancel = new ModernButton
             {
                 Text = "Cancelar",
-                Location = new Point(220, 360),
-                Size = new Size(100, 32),
-                FlatStyle = FlatStyle.Flat,
-                BackColor = Color.FromArgb(26, 26, 32),
-                ForeColor = Color.FromArgb(170, 170, 180),
-                Cursor = Cursors.Hand
+                Location = new Point(310, 18),
+                Size = new Size(105, 36),
+                IsPrimary = false
             };
-            btnCancel.FlatAppearance.BorderSize = 1;
-            btnCancel.FlatAppearance.BorderColor = Color.FromArgb(42, 42, 50);
             btnCancel.Click += (s, e) => Close();
-            pnlRight.Controls.Add(btnCancel);
+            pnlFooter.Controls.Add(btnCancel);
 
-            btnInstall = new Button
+            btnInstall = new ModernButton
             {
                 Text = "Instalar",
-                Location = new Point(330, 360),
-                Size = new Size(100, 32),
-                FlatStyle = FlatStyle.Flat,
-                BackColor = Color.FromArgb(10, 132, 255),
-                ForeColor = Color.White,
-                Font = new Font("Segoe UI", 9.5f, FontStyle.Bold),
-                Cursor = Cursors.Hand
+                Location = new Point(425, 18),
+                Size = new Size(125, 36),
+                IsPrimary = true
             };
-            btnInstall.FlatAppearance.BorderSize = 0;
             btnInstall.Click += BtnInstall_Click;
-            pnlRight.Controls.Add(btnInstall);
+            pnlFooter.Controls.Add(btnInstall);
         }
-
-        private Stream logoStream;
-        private Stream iconStream;
 
         private void LoadEmbeddedAssets()
         {
             try
             {
                 Assembly asm = Assembly.GetExecutingAssembly();
-                logoStream = asm.GetManifestResourceStream("LogoPayload");
-                if (logoStream != null)
-                {
-                    picLogo.Image = Image.FromStream(logoStream);
-                }
-
-                iconStream = asm.GetManifestResourceStream("IconPayload");
+                Stream iconStream = asm.GetManifestResourceStream("IconPayload");
                 if (iconStream != null)
                 {
-                    Icon = new Icon(iconStream);
+                    appIcon = new Icon(iconStream);
+                    Icon = appIcon;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error al cargar recursos embebidos: " + ex.ToString());
+                Console.WriteLine("Error al cargar icono embebido: " + ex.Message);
             }
         }
 
@@ -394,29 +647,6 @@ namespace YaFaltaPoco.Installer
                 IsBackground = true
             };
             worker.Start();
-        }
-
-        private void SetStepState(int stepIndex, int state)
-        {
-            // state: 0 = pending (○), 1 = active (►), 2 = completed (✓)
-            if (InvokeRequired)
-            {
-                Invoke(new Action(() => SetStepState(stepIndex, state)));
-                return;
-            }
-
-            if (state == 1)
-            {
-                lblStepIcons[stepIndex].Text = "►";
-                lblStepIcons[stepIndex].ForeColor = Color.FromArgb(56, 189, 248); // Cyan vibrante
-                lblStepTexts[stepIndex].ForeColor = Color.White;
-            }
-            else if (state == 2)
-            {
-                lblStepIcons[stepIndex].Text = "✓";
-                lblStepIcons[stepIndex].ForeColor = Color.FromArgb(48, 209, 88); // Verde esmeralda
-                lblStepTexts[stepIndex].ForeColor = Color.FromArgb(220, 220, 225);
-            }
         }
 
         private void UpdateProgress(int percent, string statusText)
@@ -481,31 +711,23 @@ namespace YaFaltaPoco.Installer
             {
                 Assembly asm = Assembly.GetExecutingAssembly();
 
-                // Paso 1: Preparar directorio
-                SetStepState(0, 1);
-                UpdateProgress(10, "Creando carpeta de instalación...");
-                Thread.Sleep(250);
+                UpdateProgress(10, "Preparando directorio de instalación...");
+                Thread.Sleep(200);
 
                 if (!Directory.Exists(installDir))
                 {
                     Directory.CreateDirectory(installDir);
                 }
-                SetStepState(0, 2);
 
-                // Paso 2: Desempaquetar componentes
-                SetStepState(1, 1);
-                UpdateProgress(30, "Descomprimiendo binarios de YaFaltaPoco...");
-                Thread.Sleep(300);
+                UpdateProgress(35, "Descomprimiendo binarios de YaFaltaPoco...");
+                Thread.Sleep(250);
 
                 byte[] exeBytes = ExtractGzipResource(asm, "AppPayload");
                 byte[] dllBytes = ExtractGzipResource(asm, "LoaderPayload");
                 byte[] icoBytes = ExtractRawResource(asm, "IconPayload");
-                SetStepState(1, 2);
 
-                // Paso 3: Instalar archivos principales
-                SetStepState(2, 1);
-                UpdateProgress(60, "Instalando yafaltapoco.exe y WebView2Loader.dll...");
-                Thread.Sleep(350);
+                UpdateProgress(65, "Instalando ejecutable y dependencias del sistema...");
+                Thread.Sleep(250);
 
                 // Escribir ejecutable principal
                 File.WriteAllBytes(exePath, exeBytes);
@@ -521,14 +743,11 @@ namespace YaFaltaPoco.Installer
                     File.WriteAllBytes(icoPath, icoBytes);
                 }
 
-                // Escribir desinstalador por script
+                // Escribir desinstalador
                 CreateUninstaller();
-                SetStepState(2, 2);
 
-                // Paso 4: Crear acceso directo en el Escritorio
-                SetStepState(3, 1);
-                UpdateProgress(80, "Creando acceso directo en el Escritorio...");
-                Thread.Sleep(250);
+                UpdateProgress(85, "Configurando accesos directos...");
+                Thread.Sleep(200);
 
                 if (chkDesktop.Checked)
                 {
@@ -536,12 +755,9 @@ namespace YaFaltaPoco.Installer
                     string desktopLink = Path.Combine(desktopPath, "YaFaltaPoco.lnk");
                     CreateShortcut(desktopLink, exePath, installDir, icoPath, "Ya Falta Poco — Widget de productividad");
                 }
-                SetStepState(3, 2);
 
-                // Paso 5: Registrar en el Menú Inicio
-                SetStepState(4, 1);
-                UpdateProgress(95, "Registrando accesos en el Menú Inicio...");
-                Thread.Sleep(250);
+                UpdateProgress(95, "Registrando en el Menú Inicio de Windows...");
+                Thread.Sleep(200);
 
                 string startMenuPrograms = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs", "YaFaltaPoco");
                 if (!Directory.Exists(startMenuPrograms))
@@ -555,17 +771,15 @@ namespace YaFaltaPoco.Installer
                 string uninstLink = Path.Combine(startMenuPrograms, "Desinstalar YaFaltaPoco.lnk");
                 CreateShortcut(uninstLink, Path.Combine(installDir, "desinstalar.cmd"), installDir, null, "Desinstalar Ya Falta Poco");
 
-                SetStepState(4, 2);
-
-                // Finalización
                 UpdateProgress(100, "¡Instalación completada con éxito!");
 
                 Invoke(new Action(() =>
                 {
                     isFinished = true;
                     btnInstall.Enabled = true;
-                    btnInstall.Text = "Iniciar";
-                    btnInstall.BackColor = Color.FromArgb(48, 209, 88); // Verde esmeralda
+                    btnInstall.IsPrimary = false;
+                    btnInstall.IsSuccess = true;
+                    btnInstall.Text = "Iniciar App";
                     btnCancel.Enabled = true;
                     btnCancel.Text = "Cerrar";
                 }));

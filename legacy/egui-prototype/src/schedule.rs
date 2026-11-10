@@ -194,9 +194,9 @@ pub enum ScheduleStatus<'a> {
 
 pub fn default_sample_blocks() -> Vec<TimeBlock> {
     vec![
-        TimeBlock::new("block-1", "OtherBrain I", 8, 0, 12, 0, ColorRgb::new(37, 99, 235)), // Azul
+        TimeBlock::new("block-1", "Turno Mañana", 8, 0, 12, 0, ColorRgb::new(37, 99, 235)), // Azul
         TimeBlock::new("block-2", "Almuerzo", 12, 0, 13, 0, ColorRgb::new(245, 158, 11)),   // Ámbar
-        TimeBlock::new("block-3", "OtherBrain II", 13, 0, 20, 0, ColorRgb::new(37, 99, 235)), // Azul (concorde con el degradado azul)
+        TimeBlock::new("block-3", "Turno Tarde", 13, 0, 20, 0, ColorRgb::new(37, 99, 235)), // Azul (concorde con el degradado azul)
     ]
 }
 

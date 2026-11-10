@@ -23,7 +23,7 @@ Inspirado en la elegancia visual de **Linear** y las interfaces de **Apple**, co
 ```text
   ┌──────────────────────────────────────────────────────────────┐
   │  ☀️ 08:00   ┌──────────────────────────┐                     │
-  │     │       │ 💻 OtherBrain I          │ Turno de Mañana     │
+  │     │       │ 💻 Turno Mañana          │ Enfoque y tareas    │
   │     09:00   │    08:00 – 12:00 (4h)    │                     │
   │     10:00   └──────────────────────────┘                     │
   │  ───🔴 11:34 ───────────────────────────── ¡Láser en Vivo!   │
@@ -31,7 +31,7 @@ Inspirado en la elegancia visual de **Linear** y las interfaces de **Apple**, co
   │     12:00   │ 🍽️ Almuerzo              │ ¡A recargar energía!│
   │     │       └──────────────────────────┘                     │
   │     13:00   ┌──────────────────────────┐                     │
-  │     14:00   │ 💻 OtherBrain II         │ Turno de Tarde      │
+  │     14:00   │ 💻 Turno Tarde           │ Cierre de jornada   │
   │     │       │    13:00 – 20:00 (7h)    │                     │
   │     ...     └──────────────────────────┘                     │
   │  🌙 20:00 ─── Fin de Jornada ───────────── Domingo Free 🌴   │

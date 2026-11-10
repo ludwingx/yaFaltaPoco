@@ -927,6 +927,34 @@
       margin-bottom: calc(var(--s) * 6px);
     }
 
+    .timeline-empty-card {
+      margin: calc(var(--s) * 16px) calc(var(--s) * 8px);
+      padding: calc(var(--s) * 16px) calc(var(--s) * 12px);
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px dashed rgba(255, 255, 255, 0.12);
+      border-radius: 0;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--s) * 4px);
+    }
+
+    .empty-hint-title {
+      font-size: calc(var(--s) * 11px);
+      font-weight: 700;
+      color: #e4e4e7;
+    }
+
+    .empty-hint-desc {
+      font-size: calc(var(--s) * 9.5px);
+      color: #8e8e93;
+      line-height: 1.4;
+    }
+
+    .empty-hint-desc strong {
+      color: #22d3ee;
+    }
+
     .free-day-badge {
       font-size: calc(var(--s) * 10.5px);
       font-weight: 800;
@@ -2008,38 +2036,7 @@
     let devMockState = {
       mode: 'Horario',
       sound_enabled: true,
-      blocks: [
-        {
-          id: 'block-1',
-          title: 'OtherBrain I',
-          start_hour: 8,
-          start_min: 0,
-          end_hour: 12,
-          end_min: 0,
-          color: { r: 10, g: 132, b: 255 },
-          days: { monday: true, tuesday: true, wednesday: true, thursday: true, friday: true, saturday: true, sunday: false }
-        },
-        {
-          id: 'block-2',
-          title: 'Almuerzo',
-          start_hour: 12,
-          start_min: 0,
-          end_hour: 13,
-          end_min: 0,
-          color: { r: 255, g: 159, b: 10 },
-          days: { monday: true, tuesday: true, wednesday: true, thursday: true, friday: true, saturday: true, sunday: false }
-        },
-        {
-          id: 'block-3',
-          title: 'OtherBrain II',
-          start_hour: 13,
-          start_min: 0,
-          end_hour: 20,
-          end_min: 0,
-          color: { r: 191, g: 90, b: 242 },
-          days: { monday: true, tuesday: true, wednesday: true, thursday: true, friday: true, saturday: true, sunday: false }
-        }
-      ]
+      blocks: []
     };
 
     async function mockInvoke(cmd, args = {}) {
@@ -2058,8 +2055,8 @@
           date_title: dateTitle,
           current_time_str: timeStr,
           weekday_str: isSunday ? 'Domingo' : dayNames[now.getDay()],
-          countdown_str: isSunday ? 'LIBRE' : '02:44:15',
-          block_name: isSunday ? '¡Domingo Free! 🎉' : 'Termina: OtherBrain I',
+          countdown_str: isSunday ? 'LIBRE' : '--:--:--',
+          block_name: isSunday ? '¡Domingo Free! 🎉' : 'Sin turnos hoy',
           events_count_str: `${devMockState.blocks.length} turnos`,
           mode: devMockState.mode,
           blocks: devMockState.blocks,
@@ -2528,6 +2525,16 @@
         </div>
       `;
       container.appendChild(topPole);
+
+      if (blocks.length === 0) {
+        const emptyCard = document.createElement('div');
+        emptyCard.className = 'timeline-empty-card';
+        emptyCard.innerHTML = `
+          <div class="empty-hint-title">Sin turnos configurados</div>
+          <div class="empty-hint-desc">Haz clic abajo en <strong>+ Crear turno</strong> para programar tu primer bloque.</div>
+        `;
+        container.appendChild(emptyCard);
+      }
 
       blocks.forEach((block, idx) => {
         const start = block.start_hour * 60 + block.start_min;

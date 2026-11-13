@@ -363,6 +363,31 @@ fn close_app(app: AppHandle, state: State<'_, AppState>) {
     app.exit(0);
 }
 
+#[tauri::command]
+fn minimize_window(window: WebviewWindow) {
+    let _ = window.minimize();
+}
+
+#[tauri::command]
+fn toggle_maximize_window(window: WebviewWindow) -> bool {
+    if let Ok(is_max) = window.is_maximized() {
+        if is_max {
+            let _ = window.unmaximize();
+            false
+        } else {
+            let _ = window.maximize();
+            true
+        }
+    } else {
+        false
+    }
+}
+
+#[tauri::command]
+fn is_window_maximized(window: WebviewWindow) -> bool {
+    window.is_maximized().unwrap_or(false)
+}
+
 fn main() {
     let (mut initial_config, _) = AppConfig::load();
     let alarm = AlarmManager::new();
@@ -404,6 +429,9 @@ fn main() {
             delete_block,
             stop_alarm,
             close_app,
+            minimize_window,
+            toggle_maximize_window,
+            is_window_maximized,
         ])
         .run(tauri::generate_context!())
         .expect("error running tauri app");

@@ -109,7 +109,12 @@ Ingresa a la carpeta [`dist/portable/`](./dist/portable/) y ejecuta directamente
 | Gesto / Clic | ¿Qué hace? |
 |---|---|
 | **Arrastrar desde arriba** | Mueve el widget libremente por cualquier parte de tu pantalla. |
+| **Doble clic en barra superior** | Maximiza o restaura la ventana al instante. |
 | **Arrastrar esquina SE** | Cambia el tamaño del widget con escalado responsivo suave. |
+| **Clic en `📌` (Pin)** | Fija o desfija la ventana siempre al frente (*Always on Top*). |
+| **Clic en `—` (Minimizar)** | Minimiza la aplicación a la barra de tareas. |
+| **Clic en `□` / `❐` (Maximizar / Restaurar)** | Alterna entre maximizado y tamaño flotante. |
+| **Clic en `✕` (Cerrar)** | Cierra la aplicación guardando tu configuración. |
 | **Clic en `⚙️` (Configuración)** | Abre el panel integral con pestañas de Temas, GIF, Clima y Ajustes. |
 | **Clic en la píldora de Clima (`🌤️ 27°C`)** | Abre directamente los detalles y ajustes del clima. |
 | **Clic en el GIF / Logo** | Abre directamente el personalizador de GIF y fondo. |
@@ -118,7 +123,6 @@ Ingresa a la carpeta [`dist/portable/`](./dist/portable/) y ejecuta directamente
 | **Clic sobre una tarjeta** | Edita el nombre, horario o color de ese turno. |
 | **Clic en `🔔` (izquierdo)** | Prueba la campana sonora. |
 | **Clic en `🔔` (derecho)** | Silencia o activa el sonido. |
-| **Clic en `✕`** | Cierra la aplicación limpiamente. |
 
 ---
 

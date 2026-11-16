@@ -1,6 +1,7 @@
 # Script de compilacion y empaquetado integral para YaFaltaPoco
 param(
-    [switch]$SkipRustBuild = $false
+    [switch]$SkipRustBuild = $false,
+    [switch]$RegenerateIcons = $false
 )
 
 $ErrorActionPreference = "Stop"
@@ -10,6 +11,13 @@ Set-Location $workspaceRoot
 Write-Host "============================================================" -ForegroundColor Magenta
 Write-Host "      YaFaltaPoco - Proceso de Build y Distribucion         " -ForegroundColor Magenta
 Write-Host "============================================================" -ForegroundColor Magenta
+
+# 0. Generar o verificar iconos
+$icoPath = "$workspaceRoot\src-tauri\icons\icon.ico"
+if ($RegenerateIcons -or (-not (Test-Path $icoPath))) {
+    Write-Host "`n[Paso 0/2] Generando conjunto de iconos de alta resolucion..." -ForegroundColor Cyan
+    & powershell -ExecutionPolicy Bypass -File "$workspaceRoot\tools\generate-icons.ps1"
+}
 
 # 1. Compilar backend de Rust en release (si no se omite)
 if (-not $SkipRustBuild) {

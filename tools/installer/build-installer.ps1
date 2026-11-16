@@ -1,4 +1,4 @@
-# Script automatizado para compilar el instalador nativo setup.exe de YaFaltaPoco
+﻿# Script automatizado para compilar el instalador nativo setup.exe de YaFaltaPoco
 $ErrorActionPreference = "Stop"
 
 $workspaceRoot = Resolve-Path "$PSScriptRoot\..\.."
@@ -56,6 +56,9 @@ Start-Sleep -Milliseconds 400
 # Sincronizar versión portable en dist/portable/
 Copy-Item $exeSource -Destination "$portableDir\yafaltapoco.exe" -Force
 Copy-Item $dllSource -Destination "$portableDir\WebView2Loader.dll" -Force
+if (Test-Path "$workspaceRoot\src-tauri\icons\icon.ico") {
+    Copy-Item "$workspaceRoot\src-tauri\icons\icon.ico" -Destination "$portableDir\icon.ico" -Force
+}
 
 $gifSource = "$workspaceRoot\ui\bg-logo.gif"
 $icoSource = "$workspaceRoot\src-tauri\icons\icon.ico"
